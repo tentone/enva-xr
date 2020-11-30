@@ -1,34 +1,43 @@
 import {Vector3,
-    Line3,
-    LineBasicMaterial,
-    BufferGeometry,
-    Line,
-    RingBufferGeometry,
-    CircleBufferGeometry,
-    Mesh,
-    MeshBasicMaterial,
-    WebGLRenderer,
-    Scene,
-    PerspectiveCamera,
-    HemisphereLight,
-    BoxBufferGeometry,
-    MeshNormalMaterial} from "three";
+	Line3,
+	LineBasicMaterial,
+	BufferGeometry,
+	Line,
+	RingBufferGeometry,
+	CircleBufferGeometry,
+	Mesh,
+	MeshBasicMaterial,
+	WebGLRenderer,
+	Scene,
+	PerspectiveCamera,
+	HemisphereLight,
+	BoxBufferGeometry,
+	MeshNormalMaterial} from "three";
 import {ARButton} from "three/examples/jsm/webxr/ARButton.js";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import TextSprite from '@seregpie/three.text-sprite';
 
-let cssContainer;
-let camera, scene, renderer, light;
+var cssContainer;
+var camera, scene, renderer, light;
 
-let hitTestSource = null;
-let hitTestSourceRequested = false;
+var hitTestSource = null;
+var hitTestSourceRequested = false;
 
-let measurements = [];
-let labels = [];
+var measurements = [];
 
-let cursor = null;
-let currentLine = null;
+/**
+ * List of labels stored with {div: ..., point: ....}
+ */
+var labels = [];
 
-let width, height;
+var cursor = null;
+
+/**
+ * Line being created currently.
+ */
+var currentLine = null;
+
+var width, height;
    
 /**
  * Project a point in the world to the screen correct screen position.
@@ -57,21 +66,21 @@ function projectPoint(point, camera)
  */
 function createLine(point)
 {
-	let lineMaterial = new LineBasicMaterial(
+	var lineMaterial = new LineBasicMaterial(
 	{
 		color: 0xffffff,
 		linewidth: 5,
 		linecap: "round"
 	});
 
-    let lineGeometry = new BufferGeometry().setFromPoints([point, point]);
-    
+	var lineGeometry = new BufferGeometry().setFromPoints([point, point]);
+	
 	return new Line(lineGeometry, lineMaterial);
 }
 
 function updateLine(matrix)
 {
-	let positions = currentLine.geometry.attributes.position.array;
+	var positions = currentLine.geometry.attributes.position.array;
 	positions[3] = matrix.elements[12]
 	positions[4] = matrix.elements[13]
 	positions[5] = matrix.elements[14]
@@ -81,17 +90,17 @@ function updateLine(matrix)
 
 function createCursor()
 {
-	let ring = new RingBufferGeometry(0.045, 0.05, 32).rotateX(-Math.PI / 2);
-    let dot = new CircleBufferGeometry(0.005, 32).rotateX(-Math.PI / 2);
-    
+	var ring = new RingBufferGeometry(0.045, 0.05, 32).rotateX(-Math.PI / 2);
+	var dot = new CircleBufferGeometry(0.005, 32).rotateX(-Math.PI / 2);
+	
 	var cursor = new Mesh(
 		BufferGeometryUtils.mergeBufferGeometries([ring, dot]),
 		new MeshBasicMaterial()
 	);
 	cursor.matrixAutoUpdate = false;
-    cursor.visible = false;
+	cursor.visible = false;
 
-    return cursor;
+	return cursor;
 }
 
 function createRenderer()
@@ -116,13 +125,13 @@ function createCSS3DContainer()
 
 function createScene()
 {
-    scene = new Scene();
-    
-    camera = new PerspectiveCamera(70, width / height, 0.01, 20);
+	scene = new Scene();
+	
+	camera = new PerspectiveCamera(70, width / height, 0.01, 20);
 
-    light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
-    light.position.set(0.5, 1, 0.25);
-    scene.add(light);
+	light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
+	light.position.set(0.5, 1, 0.25);
+	scene.add(light);
 }
 
 function initialize()
@@ -149,15 +158,30 @@ function initialize()
 	controller.addEventListener("select", onSelect);
 	scene.add(controller);
 
-    var box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial());
-    box.scale.set(0.1, 0.1, 0.1);
-    scene.add(box);
+	var box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial());
+	box.scale.set(0.1, 0.1, 0.1);
+	scene.add(box);
+
+	var instance = new TextSprite({
+	alignment: 'center',
+	color: '#24ff00',
+	fontFamily: '"Times New Roman", Times, serif',
+	fontSize: 8,
+	fontStyle: 'italic',
+	text: [
+		'Twinkle, twinkle, little star,',
+		'How I wonder what you are!',
+		'Up above the world so high,',
+		'Like a diamond in the sky.',
+	].join('\n'),
+	});
+	scene.add(instance);
 
 	cursor = createCursor();
 	scene.add(cursor);
 
-    window.addEventListener("resize", resize, false);
-    
+	window.addEventListener("resize", resize, false);
+	
 	renderer.setAnimationLoop(render);
 }
 
@@ -165,24 +189,24 @@ function onSelect()
 {
 	if (cursor.visible)
 	{
-        // Get cursor position
-        let position = new Vector3();
-        position.setFromMatrixPosition(cursor.matrix);
+		// Get cursor position
+		var position = new Vector3();
+		position.setFromMatrixPosition(cursor.matrix);
 
-        // Add to the measurements list
-        measurements.push(position);
-        
+		// Add to the measurements list
+		measurements.push(position);
+		
 		if (measurements.length == 2)
 		{
-			let distance = Math.round(measurements[0].distanceTo(measurements[1]) * 100);
+			var distance = Math.round(measurements[0].distanceTo(measurements[1]) * 100);
 
-			let text = document.createElement("div");
-            text.style.position = "absolute";
+			var text = document.createElement("div");
+			text.style.position = "absolute";
 			text.style.color = "rgb(255,255,255)";
 			text.textContent = distance + " cm";
 			cssContainer.appendChild(text);
 
-            let line = new Line3(measurements[0], measurements[1])
+			var line = new Line3(measurements[0], measurements[1])
 
  			labels.push(
 			{
@@ -214,8 +238,8 @@ function render(timestamp, frame)
 {
 	if (frame)
 	{
-		let referenceSpace = renderer.xr.getReferenceSpace();
-		let session = renderer.xr.getSession();
+		var referenceSpace = renderer.xr.getReferenceSpace();
+		var session = renderer.xr.getSession();
 		if (hitTestSourceRequested === false)
 		{
 			session.requestReferenceSpace("viewer").then(function(referenceSpace)
@@ -238,10 +262,10 @@ function render(timestamp, frame)
 
 		if (hitTestSource)
 		{
-			let hitTestResults = frame.getHitTestResults(hitTestSource);
+			var hitTestResults = frame.getHitTestResults(hitTestSource);
 			if (hitTestResults.length)
 			{
-				let hit = hitTestResults[0];
+				var hit = hitTestResults[0];
 				cursor.visible = true;
 				cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 			}
@@ -258,9 +282,9 @@ function render(timestamp, frame)
 
 		labels.map((label) =>
 		{
-			let pos = projectPoint(label.point, renderer.xr.getCamera(camera));
-			let x = pos.x;
-			let y = pos.y;
+			var pos = projectPoint(label.point, renderer.xr.getCamera(camera));
+			var x = pos.x;
+			var y = pos.y;
 			label.div.style.transform = "translate(-50%, -50%) translate(" + x + "px," + y + "px)";
 		})
 
