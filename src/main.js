@@ -13,9 +13,9 @@ import {Vector3,
 	HemisphereLight,
 	BoxBufferGeometry,
 	MeshNormalMaterial} from "three";
-import {ARButton} from "three/examples/jsm/webxr/ARButton.js";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import TextSprite from '@seregpie/three.text-sprite';
+import {XRManager} from "./XRManager.js";
+import SpriteText from 'three-spritetext';
 
 var cssContainer;
 var camera, scene, renderer, light;
@@ -38,12 +38,12 @@ var cursor = null;
 var currentLine = null;
 
 var width, height;
-   
+
 /**
  * Project a point in the world to the screen correct screen position.
- * 
- * @param {*} point 
- * @param {*} camera 
+ *
+ * @param {*} point
+ * @param {*} camera
  */
 function projectPoint(point, camera)
 {
@@ -61,8 +61,8 @@ function projectPoint(point, camera)
 
 /**
  * Create a line object to draw the measurement in the scene.
- * 
- * @param {*} point 
+ *
+ * @param {*} point
  */
 function createLine(point)
 {
@@ -74,7 +74,7 @@ function createLine(point)
 	});
 
 	var lineGeometry = new BufferGeometry().setFromPoints([point, point]);
-	
+
 	return new Line(lineGeometry, lineMaterial);
 }
 
@@ -92,7 +92,7 @@ function createCursor()
 {
 	var ring = new RingBufferGeometry(0.045, 0.05, 32).rotateX(-Math.PI / 2);
 	var dot = new CircleBufferGeometry(0.005, 32).rotateX(-Math.PI / 2);
-	
+
 	var cursor = new Mesh(
 		BufferGeometryUtils.mergeBufferGeometries([ring, dot]),
 		new MeshBasicMaterial()
@@ -103,12 +103,13 @@ function createCursor()
 	return cursor;
 }
 
-function createRenderer()
+function createRenderer(canvas)
 {
 	renderer = new WebGLRenderer(
 	{
 		antialias: true,
-		alpha: true
+		alpha: true,
+		canvas: canvas
 	});
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -126,7 +127,7 @@ function createCSS3DContainer()
 function createScene()
 {
 	scene = new Scene();
-	
+
 	camera = new PerspectiveCamera(70, width / height, 0.01, 20);
 
 	light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
@@ -141,18 +142,28 @@ function initialize()
 
 	createScene();
 
-	createRenderer()
-	document.body.appendChild(renderer.domElement);
+	var button = document.createElement("div");
+	button.style.backgroundColor = "#FF6666";
+	button.style.width = "200px";
+	button.style.height = "200px";
+	button.innerText = "Enter AR";
+	button.onclick = function()
+	{
+		XRManager.start(renderer,
+		{
+			optionalFeatures: ["dom-overlay"],
+			domOverlay: {root: cssContainer},
+			requiredFeatures: ["hit-test"]
+		});
+	};
+	document.body.appendChild(button);
+
+	var canvas = document.createElement("canvas");
+	document.body.appendChild(canvas);
+	createRenderer(canvas)
 
 	createCSS3DContainer()
 	document.body.appendChild(cssContainer);
-
-	document.body.appendChild(ARButton.createButton(renderer,
-	{
-		optionalFeatures: ["dom-overlay"],
-		domOverlay: {root: cssContainer},
-		requiredFeatures: ["hit-test"]
-	}));
 
 	var controller = renderer.xr.getController(0);
 	controller.addEventListener("select", onSelect);
@@ -162,26 +173,15 @@ function initialize()
 	box.scale.set(0.1, 0.1, 0.1);
 	scene.add(box);
 
-	var instance = new TextSprite({
-	alignment: 'center',
-	color: '#24ff00',
-	fontFamily: '"Times New Roman", Times, serif',
-	fontSize: 8,
-	fontStyle: 'italic',
-	text: [
-		'Twinkle, twinkle, little star,',
-		'How I wonder what you are!',
-		'Up above the world so high,',
-		'Like a diamond in the sky.',
-	].join('\n'),
-	});
-	scene.add(instance);
+	// var text = new SpriteText("Sprite text");
+	// text.position.x = 2;
+	// scene.add(text);
 
 	cursor = createCursor();
 	scene.add(cursor);
 
 	window.addEventListener("resize", resize, false);
-	
+
 	renderer.setAnimationLoop(render);
 }
 
@@ -195,12 +195,13 @@ function onSelect()
 
 		// Add to the measurements list
 		measurements.push(position);
-		
+
 		if (measurements.length == 2)
 		{
 			var distance = Math.round(measurements[0].distanceTo(measurements[1]) * 100);
 
 			var text = document.createElement("div");
+			text.style.fontFamily = "Arial, Helvetica, sans-serif";
 			text.style.position = "absolute";
 			text.style.color = "rgb(255,255,255)";
 			text.textContent = distance + " cm";

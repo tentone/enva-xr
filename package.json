@@ -15,8 +15,7 @@
   ],
   "dependencies": {
     "three": "0.122.0",
-    "nunu-studio": "0.98.27",
-    "@seregpie/three.text-sprite": "3.2.0"
+    "three-spritetext": "1.5.2"
   },
   "devDependencies": {
     "html-webpack-plugin": "^4.3.0",
