@@ -4,8 +4,8 @@
   "description": "ar-tracking",
   "main": "source/main.js",
   "scripts": {
-    "start": "rollup -c rollup.dev.js",
-    "build": "rollup -c"
+    "build": "webpack",
+    "start": "webpack-dev-server --host 0.0.0.0 --https"
   },
   "author": "Tentone",
   "license": "MIT",
