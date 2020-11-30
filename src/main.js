@@ -292,16 +292,19 @@ function render(timestamp, frame)
 		}
 
 		// Handle depth
-		const pose = frame.getViewerPose(xrRefSpace);
+
+		const pose = frame.getViewerPose(referenceSpace);
 		if (pose)
 		{
 			for(const view of pose.views)
 			{
+
 				const depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-					renderDepthInformationGPU(depthData, view, viewport);
+					// renderDepthInformationGPU(depthData, view, viewport);
 				}
+
 			}
 		}
 	}
