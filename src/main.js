@@ -14,21 +14,15 @@ import {Vector3,
 	BoxBufferGeometry,
 	MeshNormalMaterial} from "three";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import {XRManager} from "./XRManager.js";
+import {XRManager} from "./utils/XRManager.js";
 import {Text} from 'troika-three-text'
 
-var cssContainer;
 var camera, scene, renderer, light;
 
 var hitTestSource = null;
 var hitTestSourceRequested = false;
 
 var measurements = [];
-
-/**
- * List of labels stored with {div: ..., point: ....}
- */
-var labels = [];
 
 var cursor = null;
 
@@ -116,14 +110,6 @@ function createRenderer(canvas)
 	renderer.xr.enabled = true;
 }
 
-function createCSS3DContainer()
-{
-	cssContainer = document.createElement("div");
-	cssContainer.style.position = "absolute";
-	cssContainer.style.top = "0px";
-	cssContainer.style.pointerEvents = "none";
-}
-
 function createScene()
 {
 	scene = new Scene();
@@ -142,6 +128,19 @@ function initialize()
 
 	createScene();
 
+	var container = document.createElement("div");
+	container.style.width = "100%";
+	container.style.height = "100%";
+
+	var test = document.createElement("div");
+	test.style.width = "100px";
+	test.style.height = "100px";
+	test.style.position = "absolute";
+	test.style.left = "10px";
+	test.style.top = "10px";
+	test.style.backgroundColor = "#FF000077";
+	container.appendChild(test);
+
 	var button = document.createElement("div");
 	button.style.backgroundColor = "#FF6666";
 	button.style.width = "200px";
@@ -151,8 +150,8 @@ function initialize()
 	{
 		XRManager.start(renderer,
 		{
-			optionalFeatures: ["dom-overlay"],
-			domOverlay: {root: cssContainer},
+			// optionalFeatures: ["dom-overlay"],
+			// domOverlay: {root: container},
 			requiredFeatures: ["hit-test"]
 		});
 	};
@@ -162,9 +161,6 @@ function initialize()
 	document.body.appendChild(canvas);
 	createRenderer(canvas)
 
-	createCSS3DContainer()
-	document.body.appendChild(cssContainer);
-
 	var controller = renderer.xr.getController(0);
 	controller.addEventListener("select", onSelect);
 	scene.add(controller);
@@ -172,16 +168,6 @@ function initialize()
 	var box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial());
 	box.scale.set(0.1, 0.1, 0.1);
 	scene.add(box);
-
-	// Text
-	const text = new Text()
-	text.text = 'Hello world!'
-	text.fontSize = 0.2
-	text.position.z = -2
-	text.color = 0x9966FF
-	text.position.x = 2;
-	text.sync();
-	scene.add(text);
 
 	// Cursor to select objects
 	cursor = createCursor();
@@ -206,21 +192,16 @@ function onSelect()
 		if (measurements.length == 2)
 		{
 			var distance = Math.round(measurements[0].distanceTo(measurements[1]) * 100);
+			var line = new Line3(measurements[0], measurements[1]);
 
-			var text = document.createElement("div");
-			text.style.fontFamily = "Arial, Helvetica, sans-serif";
-			text.style.position = "absolute";
-			text.style.color = "rgb(255,255,255)";
-			text.textContent = distance + " cm";
-			cssContainer.appendChild(text);
-
-			var line = new Line3(measurements[0], measurements[1])
-
- 			labels.push(
-			{
-				div: text,
-				point: line.getCenter()
-			});
+			const text = new Text()
+			text.text = distance + " cm";
+			text.fontSize = 0.3
+			text.position.z = -2
+			text.color = 0x9966FF
+			text.position.copy(line.getCenter())
+			text.sync();
+			scene.add(text);
 
 			measurements = [];
 			currentLine = null;
@@ -287,15 +268,6 @@ function render(timestamp, frame)
 				updateLine(cursor.matrix);
 			}
 		}
-
-		labels.map((label) =>
-		{
-			var pos = projectPoint(label.point, renderer.xr.getCamera(camera));
-			var x = pos.x;
-			var y = pos.y;
-			label.div.style.transform = "translate(-50%, -50%) translate(" + x + "px," + y + "px)";
-		})
-
 	}
 	renderer.render(scene, camera);
 }
