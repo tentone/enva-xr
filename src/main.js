@@ -10,13 +10,14 @@ import {Vector3,
     WebGLRenderer,
     Scene,
     PerspectiveCamera,
-    HemisphereLight} from "three";
+    HemisphereLight,
+    BoxBufferGeometry,
+    MeshNormalMaterial} from "three";
 import {ARButton} from "three/examples/jsm/webxr/ARButton.js";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
-let container, css3DContainer;
+let cssContainer;
 let camera, scene, renderer, light;
-let controller;
 
 let hitTestSource = null;
 let hitTestSourceRequested = false;
@@ -78,16 +79,19 @@ function updateLine(matrix)
 	currentLine.geometry.computeBoundingSphere();
 }
 
-function createSelector()
+function createCursor()
 {
 	let ring = new RingBufferGeometry(0.045, 0.05, 32).rotateX(-Math.PI / 2);
-	let dot = new CircleBufferGeometry(0.005, 32).rotateX(-Math.PI / 2);
-	cursor = new Mesh(
+    let dot = new CircleBufferGeometry(0.005, 32).rotateX(-Math.PI / 2);
+    
+	var cursor = new Mesh(
 		BufferGeometryUtils.mergeBufferGeometries([ring, dot]),
 		new MeshBasicMaterial()
 	);
 	cursor.matrixAutoUpdate = false;
-	cursor.visible = false;
+    cursor.visible = false;
+
+    return cursor;
 }
 
 function createRenderer()
@@ -104,11 +108,10 @@ function createRenderer()
 
 function createCSS3DContainer()
 {
-	css3DContainer = document.createElement("div");
-	css3DContainer.style.position = "absolute";
-	css3DContainer.style.top = "0px";
-	css3DContainer.style.pointerEvents = "none";
-	css3DContainer.setAttribute("id", "container");
+	cssContainer = document.createElement("div");
+	cssContainer.style.position = "absolute";
+	cssContainer.style.top = "0px";
+	cssContainer.style.pointerEvents = "none";
 }
 
 function createScene()
@@ -124,35 +127,33 @@ function createScene()
 
 function initialize()
 {
-	container = document.createElement("div");
-	document.body.appendChild(container);
-
 	width = window.innerWidth;
 	height = window.innerHeight;
 
 	createScene();
 
 	createRenderer()
-	container.appendChild(renderer.domElement);
+	document.body.appendChild(renderer.domElement);
 
 	createCSS3DContainer()
-	container.appendChild(css3DContainer);
+	document.body.appendChild(cssContainer);
 
 	document.body.appendChild(ARButton.createButton(renderer,
 	{
 		optionalFeatures: ["dom-overlay"],
-		domOverlay:
-		{
-			root: document.querySelector("#container")
-		},
+		domOverlay: {root: cssContainer},
 		requiredFeatures: ["hit-test"]
 	}));
 
-	controller = renderer.xr.getController(0);
+	var controller = renderer.xr.getController(0);
 	controller.addEventListener("select", onSelect);
 	scene.add(controller);
 
-	createSelector();
+    var box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial());
+    box.scale.set(0.1, 0.1, 0.1);
+    scene.add(box);
+
+	cursor = createCursor();
 	scene.add(cursor);
 
     window.addEventListener("resize", resize, false);
@@ -176,10 +177,10 @@ function onSelect()
 			let distance = Math.round(measurements[0].distanceTo(measurements[1]) * 100);
 
 			let text = document.createElement("div");
-			text.className = "label";
+            text.style.position = "absolute";
 			text.style.color = "rgb(255,255,255)";
 			text.textContent = distance + " cm";
-			document.querySelector("#container").appendChild(text);
+			cssContainer.appendChild(text);
 
             let line = new Line3(measurements[0], measurements[1])
 
@@ -267,4 +268,4 @@ function render(timestamp, frame)
 	renderer.render(scene, camera);
 }
 
-export {initialize};
+initialize();
