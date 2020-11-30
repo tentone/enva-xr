@@ -15,7 +15,7 @@ import {Vector3,
 	MeshNormalMaterial} from "three";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import {XRManager} from "./XRManager.js";
-import SpriteText from 'three-spritetext';
+import {Text} from 'troika-three-text'
 
 var cssContainer;
 var camera, scene, renderer, light;
@@ -95,7 +95,7 @@ function createCursor()
 
 	var cursor = new Mesh(
 		BufferGeometryUtils.mergeBufferGeometries([ring, dot]),
-		new MeshBasicMaterial()
+		new MeshBasicMaterial({opacity: 0.4, transparent: true})
 	);
 	cursor.matrixAutoUpdate = false;
 	cursor.visible = false;
@@ -173,10 +173,17 @@ function initialize()
 	box.scale.set(0.1, 0.1, 0.1);
 	scene.add(box);
 
-	// var text = new SpriteText("Sprite text");
-	// text.position.x = 2;
-	// scene.add(text);
+	// Text
+	const text = new Text()
+	text.text = 'Hello world!'
+	text.fontSize = 0.2
+	text.position.z = -2
+	text.color = 0x9966FF
+	text.position.x = 2;
+	text.sync();
+	scene.add(text);
 
+	// Cursor to select objects
 	cursor = createCursor();
 	scene.add(cursor);
 
