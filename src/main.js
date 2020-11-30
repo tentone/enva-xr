@@ -17,13 +17,25 @@ import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.
 import {XRManager} from "./utils/XRManager.js";
 import {Text} from 'troika-three-text'
 
-var camera, scene, renderer, light;
+var camera;
+var scene;
 
+/**
+ * WebGL renderer used to draw the scene.
+ */
+var renderer;
+
+/**
+ * WebXR hit test source, (null until requested).
+ */
 var hitTestSource = null;
 var hitTestSourceRequested = false;
 
 var measurements = [];
 
+/**
+ * Cursor to hit test the scene.
+ */
 var cursor = null;
 
 /**
@@ -31,6 +43,9 @@ var cursor = null;
  */
 var currentLine = null;
 
+/**
+ * Size of the rendererer.
+ */
 var width, height;
 
 /**
@@ -116,7 +131,7 @@ function createScene()
 
 	camera = new PerspectiveCamera(70, width / height, 0.01, 20);
 
-	light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
+	var light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
 	light.position.set(0.5, 1, 0.25);
 	scene.add(light);
 }
@@ -131,7 +146,7 @@ function initialize()
 	var container = document.createElement("div");
 	container.style.width = "100%";
 	container.style.height = "100%";
-
+	document.body.appendChild(container);
 	var test = document.createElement("div");
 	test.style.width = "100px";
 	test.style.height = "100px";
@@ -150,9 +165,9 @@ function initialize()
 	{
 		XRManager.start(renderer,
 		{
-			// optionalFeatures: ["dom-overlay"],
-			// domOverlay: {root: container},
-			requiredFeatures: ["hit-test"]
+			optionalFeatures: ["dom-overlay"],
+			domOverlay: {root: container},
+			requiredFeatures: ["hit-test", "depth-sensing"]
 		});
 	};
 	document.body.appendChild(button);
@@ -196,9 +211,11 @@ function onSelect()
 
 			const text = new Text()
 			text.text = distance + " cm";
-			text.fontSize = 0.3
+			text.fontSize = 0.1
 			text.position.z = -2
 			text.color = 0x9966FF
+			text.anchorX = "center";
+			text.anchorY = "middle";
 			text.position.copy(line.getCenter())
 			text.sync();
 			scene.add(text);
@@ -229,7 +246,9 @@ function render(timestamp, frame)
 	{
 		var referenceSpace = renderer.xr.getReferenceSpace();
 		var session = renderer.xr.getSession();
-		if (hitTestSourceRequested === false)
+
+		// Request hit test source
+		if (!hitTestSourceRequested)
 		{
 			session.requestReferenceSpace("viewer").then(function(referenceSpace)
 			{
@@ -241,14 +260,17 @@ function render(timestamp, frame)
 					hitTestSource = source;
 				});
 			});
+
 			session.addEventListener("end", function()
 			{
 				hitTestSourceRequested = false;
 				hitTestSource = null;
 			});
+
 			hitTestSourceRequested = true;
 		}
 
+		// Process Hit test
 		if (hitTestSource)
 		{
 			var hitTestResults = frame.getHitTestResults(hitTestSource);
@@ -266,6 +288,20 @@ function render(timestamp, frame)
 			if (currentLine)
 			{
 				updateLine(cursor.matrix);
+			}
+		}
+
+		// Handle depth
+		const pose = frame.getViewerPose(xrRefSpace);
+		if (pose)
+		{
+			for(const view of pose.views)
+			{
+				const depthData = frame.getDepthInformation(view);
+				if(depthData)
+				{
+					renderDepthInformationGPU(depthData, view, viewport);
+				}
 			}
 		}
 	}
