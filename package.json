@@ -15,7 +15,8 @@
   ],
   "dependencies": {
     "three": "0.122.0",
-    "three-spritetext": "1.5.2"
+    "three-spritetext": "1.5.2",
+    "three-bmfont-text": "3.0.1"
   },
   "devDependencies": {
     "html-webpack-plugin": "^4.3.0",
