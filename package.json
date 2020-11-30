@@ -1,0 +1,27 @@
+{
+  "name": "ar-tracking",
+  "version": "0.0.1",
+  "description": "ar-tracking",
+  "main": "source/main.js",
+  "scripts": {
+    "start": "rollup -c rollup.dev.js",
+    "build": "rollup -c"
+  },
+  "author": "Tentone",
+  "license": "MIT",
+  "keywords": [
+    "three",
+    "ar"
+  ],
+  "dependencies": {
+    "three": "0.122.0"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.6.4",
+    "uglify-js": "^3.9.2",
+    "rollup": "^2.9.1",
+    "@rollup/plugin-strip": "^1.3.3",
+    "rollup-plugin-uglify": "^6.0.4",
+    "rollup-plugin-serve": "^2.0.0-beta.0"
+  }
+}
