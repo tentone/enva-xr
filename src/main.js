@@ -172,26 +172,42 @@ function initialize()
 	container.style.height = "100%";
 	document.body.appendChild(container);
 
-	var test = document.createElement("div");
-	test.style.width = "70px";
-	test.style.height = "70px";
-	test.style.position = "absolute";
-	test.style.left = "10px";
-	test.style.bottom = "10px";
-	test.style.backgroundColor = "#FFFFFF66";
-	test.style.borderRadius = "10px";
-	container.appendChild(test);
+	var toolButton = document.createElement("div");
+	toolButton.style.width = "70px";
+	toolButton.style.height = "70px";
+	toolButton.style.position = "absolute";
+	toolButton.style.left = "10px";
+	toolButton.style.bottom = "10px";
+	toolButton.style.backgroundColor = "#FFFFFF66";
+	toolButton.style.borderRadius = "20px";
+	container.appendChild(toolButton);
+
+	var ruler = document.createElement("img");
+	ruler.src = "./assets/ruler.svg";
+	ruler.style.width = "80%";
+	ruler.style.height = "80%";
+	ruler.style.top = "10%";
+	ruler.style.left = "10%";
+	ruler.style.position = "absolute";
+	toolButton.appendChild(ruler);
 
 	depthCanvas = document.createElement("canvas");
 	depthCanvas.style.position = "absolute";
-	depthCanvas.style.right = "10px";
-	depthCanvas.style.bottom = "10px";
+	depthCanvas.style.right = "0px";
+	depthCanvas.style.bottom = "0px";
+	depthCanvas.style.height = "160px";
+	depthCanvas.style.width = "90px";
 	container.appendChild(depthCanvas);
 
 	var button = document.createElement("div");
+	button.style.position = "absolute";
 	button.style.backgroundColor = "#FF6666";
-	button.style.width = "200px";
-	button.style.height = "200px";
+	button.style.width = "100%";
+	button.style.height = "20%";
+	button.style.borderRadius = "20px";
+	button.style.textAlign = "center";
+	button.style.fontFamily = "Arial";
+	button.style.fontSize = "50px";
 	button.innerText = "Enter AR";
 	button.onclick = function()
 	{
@@ -272,9 +288,13 @@ function onSelect()
 	}
 }
 
+/**
+ * Resize the canvas and renderer size.
+ */
 function resize()
 {
 	resolution.set(window.innerWidth, window.innerHeight);
+
 	camera.aspect = resolution.x / resolution.y;
     camera.updateProjectionMatrix();
 
@@ -341,10 +361,16 @@ function render(timestamp, frame)
 				var depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-					depthCanvas.style.width = depthData.width + "px";
-					depthCanvas.style.height = depthData.height + "px";
 
-					var ctx = depthCanvas.getContext("2d");
+					depthCanvas.width = depthData.width + "px";
+					depthCanvas.height = depthData.height + "px";
+
+					var context = depthCanvas.getContext("2d");
+
+					for(var i = 0; i < depthData.data.length; i++)
+					{
+
+					}
 
 					console.log(depthData);
 				}
