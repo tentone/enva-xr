@@ -13,9 +13,11 @@ import {Vector3, Vector2,
 	HemisphereLight,
 	BoxBufferGeometry,
 	MeshNormalMaterial,
-    DataTexture} from "three";
+    DataTexture,
+	SphereBufferGeometry} from "three";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import {XRManager} from "./utils/XRManager.js";
+import {BillboardGroup} from "./object/BillboardGroup.js";
 import {Text} from 'troika-three-text'
 
 /**
@@ -59,7 +61,7 @@ var currentLine = null;
  */
 var resolution = new Vector2();
 
-var depthBox;
+var depthCanvas;
 
 /**
  * Project a point in the world to the screen correct screen position.
@@ -152,9 +154,9 @@ function createScene()
 {
 	scene = new Scene();
 
-	camera = new PerspectiveCamera(70, resolution.x / resolution.y, 0.01, 20);
+	camera = new PerspectiveCamera(60, resolution.x / resolution.y, 0.1, 20);
 
-	var light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
+	var light = new HemisphereLight(0xffffff, 0xBBBBff, 1);
 	light.position.set(0.5, 1, 0.25);
 	scene.add(light);
 }
@@ -169,14 +171,22 @@ function initialize()
 	container.style.width = "100%";
 	container.style.height = "100%";
 	document.body.appendChild(container);
+
 	var test = document.createElement("div");
-	test.style.width = "100px";
-	test.style.height = "100px";
+	test.style.width = "70px";
+	test.style.height = "70px";
 	test.style.position = "absolute";
 	test.style.left = "10px";
-	test.style.top = "10px";
-	test.style.backgroundColor = "#FF000077";
+	test.style.bottom = "10px";
+	test.style.backgroundColor = "#FFFFFF66";
+	test.style.borderRadius = "10px";
 	container.appendChild(test);
+
+	depthCanvas = document.createElement("canvas");
+	depthCanvas.style.position = "absolute";
+	depthCanvas.style.right = "10px";
+	depthCanvas.style.bottom = "10px";
+	container.appendChild(depthCanvas);
 
 	var button = document.createElement("div");
 	button.style.backgroundColor = "#FF6666";
@@ -207,10 +217,10 @@ function initialize()
     box.position.x = 2;
 	scene.add(box);
 
-	depthBox = new Mesh(new BoxBufferGeometry(), new MeshBasicMaterial({map: new DataTexture()}));
-    depthBox.scale.set(0.2, 0.2, 0.2);
-    depthBox.position.z = 2;
-	scene.add(depthBox);
+	var sphere = new Mesh(new SphereBufferGeometry(), new MeshNormalMaterial());
+    sphere.scale.set(0.1, 0.1, 0.1);
+    sphere.position.z = 2;
+	scene.add(sphere);
 
 	// Cursor to select objects
 	cursor = createCursor();
@@ -237,16 +247,19 @@ function onSelect()
 			var distance = Math.round(measurements[0].distanceTo(measurements[1]) * 100);
 			var line = new Line3(measurements[0], measurements[1]);
 
-			const text = new Text()
+			var group = new BillboardGroup();
+			line.getCenter(group.position);
+			scene.add(group);
+
+			var text = new Text();
 			text.text = distance + " cm";
 			text.fontSize = 0.1
-			text.position.z = -2
-			text.color = 0x9966FF
+			text.color = 0xFFFFFF;
 			text.anchorX = "center";
 			text.anchorY = "middle";
-			text.position.copy(line.getCenter())
+			text.rotation.set(Math.PI, Math.PI, Math.PI);
 			text.sync();
-			scene.add(text);
+			group.add(text);
 
 			measurements = [];
 			currentLine = null;
@@ -320,26 +333,26 @@ function render(timestamp, frame)
 		}
 
 		// Handle depth
-		const pose = frame.getViewerPose(referenceSpace);
+		var pose = frame.getViewerPose(referenceSpace);
 		if (pose)
 		{
-			for(const view of pose.views)
+			for(var view of pose.views)
 			{
-
-				const depthData = frame.getDepthInformation(view);
+				var depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-                    console.log(depthBox.material.map);
-                    depthBox.material.map.image = depthData.data;
-                    depthBox.material.map.width = depthData.width;
-                    depthBox.material.map.height = depthData.height;
-                    depthBox.material.map.needsUpdate = true;
-					// renderDepthInformationGPU(depthData, view, viewport);
+					depthCanvas.style.width = depthData.width + "px";
+					depthCanvas.style.height = depthData.height + "px";
+
+					var ctx = depthCanvas.getContext("2d");
+
+					console.log(depthData);
 				}
 
 			}
 		}
 	}
+
 	renderer.render(scene, camera);
 }
 

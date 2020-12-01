@@ -1,3 +1,7 @@
-export class Measurement {
+export class Measurement
+{
+	constructor()
+	{
 
+	}
 }

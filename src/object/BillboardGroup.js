@@ -1,5 +1,18 @@
-import {Group} from "three";
+import {Mesh, BufferGeometry, MeshBasicMaterial, Quaternion} from "three";
 
-export class BillboardGroup extends Group {
+export class BillboardGroup extends Mesh
+{
+	constructor()
+	{
+		super(new BufferGeometry(), new MeshBasicMaterial());
+	}
 
+	onBeforeRender(renderer, scene, camera, geometry, material, group)
+	{
+		super.onBeforeRender(renderer, scene, camera, geometry, material, group);
+
+		var quaternion = new Quaternion();
+		camera.getWorldQuaternion(quaternion);
+		this.quaternion.copy(quaternion);
+	}
 }
