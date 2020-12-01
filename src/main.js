@@ -1,4 +1,4 @@
-import {Vector3,
+import {Vector3, Vector2,
 	Line3,
 	LineBasicMaterial,
 	BufferGeometry,
@@ -12,12 +12,20 @@ import {Vector3,
 	PerspectiveCamera,
 	HemisphereLight,
 	BoxBufferGeometry,
-	MeshNormalMaterial} from "three";
+	MeshNormalMaterial,
+    DataTexture} from "three";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import {XRManager} from "./utils/XRManager.js";
 import {Text} from 'troika-three-text'
 
+/**
+ * Camera used to view the scene.
+ */
 var camera;
+
+/**
+ * Scene to draw into the screen.
+ */
 var scene;
 
 /**
@@ -31,6 +39,9 @@ var renderer;
 var hitTestSource = null;
 var hitTestSourceRequested = false;
 
+/**
+ * List of measurement points.
+ */
 var measurements = [];
 
 /**
@@ -46,7 +57,9 @@ var currentLine = null;
 /**
  * Size of the rendererer.
  */
-var width, height;
+var resolution = new Vector2();
+
+var depthBox;
 
 /**
  * Project a point in the world to the screen correct screen position.
@@ -61,8 +74,8 @@ function projectPoint(point, camera)
 	vector.copy(point);
 	vector.project(camera);
 
-	vector.x = (vector.x + 1) * width / 2;
-	vector.y = (-vector.y + 1) * height / 2;
+	vector.x = (vector.x + 1) * resolution.x / 2;
+	vector.y = (-vector.y + 1) * resolution.y / 2;
 	vector.z = 0;
 
 	return vector
@@ -114,12 +127,22 @@ function createCursor()
 
 function createRenderer(canvas)
 {
+    var context = canvas.getContext("webgl2", {xrCompatible: true});
+
 	renderer = new WebGLRenderer(
 	{
+        context: context,
 		antialias: true,
 		alpha: true,
-		canvas: canvas
-	});
+        canvas: canvas,
+        depth: true,
+        powerPreference: "high-performance",
+        precision: "highp"
+    });
+
+    renderer.shadowMap.enabled = false;
+    renderer.extensions.get("WEBGL_depth_texture");
+
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.xr.enabled = true;
@@ -129,7 +152,7 @@ function createScene()
 {
 	scene = new Scene();
 
-	camera = new PerspectiveCamera(70, width / height, 0.01, 20);
+	camera = new PerspectiveCamera(70, resolution.x / resolution.y, 0.01, 20);
 
 	var light = new HemisphereLight(0xffffff, 0xbbbbff, 1);
 	light.position.set(0.5, 1, 0.25);
@@ -138,8 +161,7 @@ function createScene()
 
 function initialize()
 {
-	width = window.innerWidth;
-	height = window.innerHeight;
+	resolution.set(window.innerWidth, window.innerHeight);
 
 	createScene();
 
@@ -181,8 +203,14 @@ function initialize()
 	scene.add(controller);
 
 	var box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial());
-	box.scale.set(0.1, 0.1, 0.1);
+    box.scale.set(0.1, 0.1, 0.1);
+    box.position.x = 2;
 	scene.add(box);
+
+	depthBox = new Mesh(new BoxBufferGeometry(), new MeshBasicMaterial({map: new DataTexture()}));
+    depthBox.scale.set(0.2, 0.2, 0.2);
+    depthBox.position.z = 2;
+	scene.add(depthBox);
 
 	// Cursor to select objects
 	cursor = createCursor();
@@ -233,11 +261,11 @@ function onSelect()
 
 function resize()
 {
-	width = window.innerWidth;
-	height = window.innerHeight;
-	camera.aspect = width / height;
-	camera.updateProjectionMatrix();
-	renderer.setSize(width, height);
+	resolution.set(window.innerWidth, window.innerHeight);
+	camera.aspect = resolution.x / resolution.y;
+    camera.updateProjectionMatrix();
+
+	renderer.setSize(resolution.x, resolution.y);
 }
 
 function render(timestamp, frame)
@@ -292,7 +320,6 @@ function render(timestamp, frame)
 		}
 
 		// Handle depth
-
 		const pose = frame.getViewerPose(referenceSpace);
 		if (pose)
 		{
@@ -302,6 +329,11 @@ function render(timestamp, frame)
 				const depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
+                    console.log(depthBox.material.map);
+                    depthBox.material.map.image = depthData.data;
+                    depthBox.material.map.width = depthData.width;
+                    depthBox.material.map.height = depthData.height;
+                    depthBox.material.map.needsUpdate = true;
 					// renderDepthInformationGPU(depthData, view, viewport);
 				}
 
