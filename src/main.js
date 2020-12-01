@@ -193,8 +193,8 @@ function initialize()
 
 	depthCanvas = document.createElement("canvas");
 	depthCanvas.style.position = "absolute";
-	depthCanvas.style.right = "0px";
-	depthCanvas.style.bottom = "0px";
+	depthCanvas.style.right = "10px";
+	depthCanvas.style.bottom = "10px";
 	depthCanvas.style.height = "160px";
 	depthCanvas.style.width = "90px";
 	container.appendChild(depthCanvas);
@@ -361,18 +361,44 @@ function render(timestamp, frame)
 				var depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-
-					depthCanvas.width = depthData.width + "px";
-					depthCanvas.height = depthData.height + "px";
+					depthCanvas.width = depthData.width;
+					depthCanvas.height = depthData.height;
 
 					var context = depthCanvas.getContext("2d");
+					var imageData = context.getImageData(0, 0, depthCanvas.width, depthCanvas.height);
 
-					for(var i = 0; i < depthData.data.length; i++)
+					/*var maxDistance = 0;
+					for(var x = 0; x < depthData.width; x++)
 					{
+						for(var y = 0; y < depthData.height; y++)
+						{
+							var distance = depthData.getDepth(x, y);
+							if(distance > maxDistance)
+							{
+								maxDistance = distance;
+							}
+						}
+					}*/
 
+					for(var x = 0; x < depthData.width; x++)
+					{
+						for(var y = 0; y < depthData.height; y++)
+						{
+							var distance = depthData.getDepth(x, y) / 3.0;
+							var j = ((depthData.height - y) * depthCanvas.width + x) * 4;
+
+							if (distance > 1.0) {
+								distance = 1.0;
+							}
+
+							imageData.data[j] = Math.ceil(distance * 256);
+							imageData.data[j + 1] = Math.ceil(distance * 256);
+							imageData.data[j + 2] = Math.ceil(distance * 256);
+							imageData.data[j + 3] = 255;
+						}
 					}
 
-					console.log(depthData);
+					context.putImageData(imageData, 0, 0);
 				}
 
 			}
