@@ -5,14 +5,14 @@ export class GUIUtils {
 	 * @param {*} imageSrc
 	 * @param {*} onclick
 	 */
-	static createButton(imageSrc, onclick)
+	static createButton(imageSrc, x, y, w, h, onclick)
 	{
 		var button = document.createElement("div");
-		button.style.width = "70px";
-		button.style.height = "70px";
+		button.style.width = w + "px";
+		button.style.height = h + "px";
 		button.style.position = "absolute";
-		button.style.left = "10px";
-		button.style.bottom = "10px";
+		button.style.left = x + "px";
+		button.style.bottom = y + "px";
 		button.style.backgroundColor = "#FFFFFF66";
 		button.style.borderRadius = "20px";
 		button.onclick = onclick;

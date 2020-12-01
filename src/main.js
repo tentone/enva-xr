@@ -3,10 +3,7 @@ import {Vector3, Vector2,
 	LineBasicMaterial,
 	BufferGeometry,
 	Line,
-	RingBufferGeometry,
-	CircleBufferGeometry,
 	Mesh,
-	MeshBasicMaterial,
 	WebGLRenderer,
 	Scene,
 	PerspectiveCamera,
@@ -14,11 +11,11 @@ import {Vector3, Vector2,
 	BoxBufferGeometry,
 	MeshNormalMaterial,
 	SphereBufferGeometry} from "three";
-import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import {XRManager} from "./utils/XRManager.js";
 import {BillboardGroup} from "./object/BillboardGroup.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {Text} from 'troika-three-text'
+import {Cursor} from "./object/Cursor.js";
 
 /**
  * Camera used to view the scene.
@@ -115,21 +112,6 @@ function updateLine(matrix)
 	currentLine.geometry.computeBoundingSphere();
 }
 
-function createCursor()
-{
-	var ring = new RingBufferGeometry(0.045, 0.05, 32).rotateX(-Math.PI / 2);
-	var dot = new CircleBufferGeometry(0.005, 32).rotateX(-Math.PI / 2);
-
-	var cursor = new Mesh(
-		BufferGeometryUtils.mergeBufferGeometries([ring, dot]),
-		new MeshBasicMaterial({opacity: 0.4, transparent: true})
-	);
-	cursor.matrixAutoUpdate = false;
-	cursor.visible = false;
-
-	return cursor;
-}
-
 function createRenderer(canvas)
 {
     var context = canvas.getContext("webgl2", {xrCompatible: true});
@@ -175,11 +157,19 @@ function initialize()
 	container.style.height = "100%";
 	document.body.appendChild(container);
 
-	var toolButton = GUIUtils.createButton("./assets/ruler.svg", function()
+	var toolButton = GUIUtils.createButton("./assets/ruler.svg", 10, 10, 70, 70, function()
 	{
 
 	});
 	container.appendChild(toolButton);
+
+
+	var depthButton = GUIUtils.createButton("./assets/3d.svg", 10, 90, 70, 70, function()
+	{
+
+	});
+
+	container.appendChild(depthButton);
 
 
 	depthCanvas = document.createElement("canvas");
@@ -228,7 +218,7 @@ function initialize()
 	scene.add(sphere);
 
 	// Cursor to select objects
-	cursor = createCursor();
+	cursor = new Cursor();
 	scene.add(cursor);
 
 	window.addEventListener("resize", resize, false);
@@ -254,6 +244,7 @@ function onSelect()
 
 			var group = new BillboardGroup();
 			line.getCenter(group.position);
+			group.position.y += 0.1;
 			scene.add(group);
 
 			var text = new Text();
