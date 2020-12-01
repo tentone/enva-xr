@@ -13,11 +13,11 @@ import {Vector3, Vector2,
 	HemisphereLight,
 	BoxBufferGeometry,
 	MeshNormalMaterial,
-    DataTexture,
 	SphereBufferGeometry} from "three";
 import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import {XRManager} from "./utils/XRManager.js";
 import {BillboardGroup} from "./object/BillboardGroup.js";
+import {GUIUtils} from "./utils/GUIUtils.js";
 import {Text} from 'troika-three-text'
 
 /**
@@ -61,6 +61,9 @@ var currentLine = null;
  */
 var resolution = new Vector2();
 
+/**
+ * Canvas to draw depth information for debug.
+ */
 var depthCanvas;
 
 /**
@@ -172,31 +175,17 @@ function initialize()
 	container.style.height = "100%";
 	document.body.appendChild(container);
 
-	var toolButton = document.createElement("div");
-	toolButton.style.width = "70px";
-	toolButton.style.height = "70px";
-	toolButton.style.position = "absolute";
-	toolButton.style.left = "10px";
-	toolButton.style.bottom = "10px";
-	toolButton.style.backgroundColor = "#FFFFFF66";
-	toolButton.style.borderRadius = "20px";
+	var toolButton = GUIUtils.createButton("./assets/ruler.svg", function()
+	{
+
+	});
 	container.appendChild(toolButton);
 
-	var ruler = document.createElement("img");
-	ruler.src = "./assets/ruler.svg";
-	ruler.style.width = "80%";
-	ruler.style.height = "80%";
-	ruler.style.top = "10%";
-	ruler.style.left = "10%";
-	ruler.style.position = "absolute";
-	toolButton.appendChild(ruler);
 
 	depthCanvas = document.createElement("canvas");
 	depthCanvas.style.position = "absolute";
 	depthCanvas.style.right = "10px";
 	depthCanvas.style.bottom = "10px";
-	depthCanvas.style.height = "160px";
-	depthCanvas.style.width = "90px";
 	container.appendChild(depthCanvas);
 
 	var button = document.createElement("div");
@@ -361,51 +350,51 @@ function render(timestamp, frame)
 				var depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-					depthCanvas.width = depthData.width;
-					depthCanvas.height = depthData.height;
-
-					var context = depthCanvas.getContext("2d");
-					var imageData = context.getImageData(0, 0, depthCanvas.width, depthCanvas.height);
-
-					/*var maxDistance = 0;
-					for(var x = 0; x < depthData.width; x++)
-					{
-						for(var y = 0; y < depthData.height; y++)
-						{
-							var distance = depthData.getDepth(x, y);
-							if(distance > maxDistance)
-							{
-								maxDistance = distance;
-							}
-						}
-					}*/
-
-					for(var x = 0; x < depthData.width; x++)
-					{
-						for(var y = 0; y < depthData.height; y++)
-						{
-							var distance = depthData.getDepth(x, y) / 3.0;
-							var j = ((depthData.height - y) * depthCanvas.width + x) * 4;
-
-							if (distance > 1.0) {
-								distance = 1.0;
-							}
-
-							imageData.data[j] = Math.ceil(distance * 256);
-							imageData.data[j + 1] = Math.ceil(distance * 256);
-							imageData.data[j + 2] = Math.ceil(distance * 256);
-							imageData.data[j + 3] = 255;
-						}
-					}
-
-					context.putImageData(imageData, 0, 0);
+					drawDepthCanvas(depthData, depthCanvas, 4.0)
 				}
-
 			}
 		}
 	}
 
 	renderer.render(scene, camera);
+}
+
+/**
+ * Draw depth data to a canvas, also sets the size of the canvas.
+ *
+ * @param {*} depth
+ * @param {*} canvas
+ */
+function drawDepthCanvas(depth, canvas, maxDistance)
+{
+	canvas.width = depth.height;
+	canvas.height = depth.width;
+
+	canvas.style.width = (2 * canvas.width) + "px";
+	canvas.style.height = (2 * canvas.height) + "px";
+
+	var context = canvas.getContext("2d");
+	var image = context.getImageData(0, 0, canvas.width, canvas.height);
+
+	for(var x = 0; x < depth.width; x++)
+	{
+		for(var y = 0; y < depth.height; y++)
+		{
+			var distance = depth.getDepth(x, y) / maxDistance;
+			var j = (x * canvas.width + (canvas.width - y)) * 4;
+
+			if (distance > 1.0) {
+				distance = 1.0;
+			}
+
+			image.data[j] = Math.ceil(distance * 256);
+			image.data[j + 1] = Math.ceil(distance * 256);
+			image.data[j + 2] = Math.ceil(distance * 256);
+			image.data[j + 3] = 255;
+		}
+	}
+
+	context.putImageData(image, 0, 0);
 }
 
 initialize();
