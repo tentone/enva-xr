@@ -216,19 +216,13 @@ function initialize()
 				var scale = 0.01;
 
 				var object = gltf.scene;
-				object.position.copy(position);
 				object.scale.set(scale, scale, scale);
 				scene.add(object);
+				object.updateMatrixWorld(true);
 
-				var box = ObjectUtils.calculateBoundingBox(object);
+				ObjectUtils.centerUnitary(object);
 
-				var size = box.max.clone();
-				size.sub(box.min);
-				size.multiplyScalar(scale);
-
-				object.position.sub(size);
-
-				console.log(object, gltf, box, size);
+				object.position.copy(position);
 			});
 		}
 	});
