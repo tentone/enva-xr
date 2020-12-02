@@ -13,6 +13,7 @@ import {GUIUtils} from "./utils/GUIUtils.js";
 import {Text} from 'troika-three-text'
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+import { ObjectUtils } from "./utils/ObjectUtils.js";
 
 /**
  * If true the depth data is shown.
@@ -202,7 +203,7 @@ function initialize()
 	});
 	container.appendChild(rulerButton);
 
-	var plantButton = GUIUtils.createButton("./assets/icon/tree.svg", 10, 90, 70, 70, function()
+	var treeButton = GUIUtils.createButton("./assets/icon/tree.svg", 10, 90, 70, 70, function()
 	{
 		if (cursor.visible)
 		{
@@ -212,15 +213,26 @@ function initialize()
 				var position = new Vector3();
 				position.setFromMatrixPosition(cursor.matrix);
 
-				console.log(gltf);
+				var scale = 0.01;
 
-				gltf.scene.position.copy(position);
-				gltf.scene.scale.set(0.01, 0.01, 0.01);
-				scene.add(gltf.scene);
+				var object = gltf.scene;
+				object.position.copy(position);
+				object.scale.set(scale, scale, scale);
+				scene.add(object);
+
+				var box = ObjectUtils.calculateBoundingBox(object);
+
+				var size = box.max.clone();
+				size.sub(box.min);
+				size.multiplyScalar(scale);
+
+				object.position.sub(size);
+
+				console.log(object, gltf, box, size);
 			});
 		}
 	});
-	container.appendChild(plantButton);
+	container.appendChild(treeButton);
 
 
 	var depthButton = GUIUtils.createButton("./assets/icon/3d.svg", 10, 180, 70, 70, function()
