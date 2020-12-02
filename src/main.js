@@ -1,5 +1,5 @@
 import {Vector3, Vector2, Line3,
-	LineBasicMaterial, BufferGeometry, Line, Mesh,
+	LineBasicMaterial, BufferGeometry, Line, Mesh, Euler,
 	WebGLRenderer,
 	Scene,
 	PerspectiveCamera,
@@ -12,8 +12,7 @@ import {BillboardGroup} from "./object/BillboardGroup.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {Text} from 'troika-three-text'
 import {Cursor} from "./object/Cursor.js";
-import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import { ObjectUtils } from "./utils/ObjectUtils.js";
+import {FileUtils} from "./utils/FileUtils.js";
 
 /**
  * If true the depth data is shown.
@@ -209,26 +208,23 @@ function initialize()
 		{
 			var position = new Vector3();
 			position.setFromMatrixPosition(cursor.matrix);
-
-			const loader = new GLTFLoader();
-			loader.load("./assets/3d/tree/scene.gltf", function(gltf)
-			{
-				var scale = 0.01;
-
-				var object = gltf.scene;
-				scene.add(object);
-				object.updateMatrixWorld(true);
-
-				ObjectUtils.centerUnitary(object);
-
-				object.position.copy(position);
-			});
+			FileUtils.loadGLTFMesh("./assets/3d/tree/scene.gltf", scene, position, new Euler(0, 0, 0), 0.002);
 		}
 	});
 	container.appendChild(treeButton);
 
+	var flowerButton = GUIUtils.createButton("./assets/icon/flower.svg", 10, 180, 70, 70, function()
+	{
+		if (cursor.visible)
+		{
+			var position = new Vector3();
+			position.setFromMatrixPosition(cursor.matrix);
+			FileUtils.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(Math.PI, 0, 0), 0.01);
+		}
+	});
+	container.appendChild(flowerButton);
 
-	var depthButton = GUIUtils.createButton("./assets/icon/3d.svg", 10, 180, 70, 70, function()
+	var depthButton = GUIUtils.createButton("./assets/icon/3d.svg", 10, 270, 70, 70, function()
 	{
         showDepthDebug = !showDepthDebug;
         depthCanvas.style.display = showDepthDebug ? "block" : "none";
@@ -240,6 +236,8 @@ function initialize()
 	depthCanvas.style.position = "absolute";
 	depthCanvas.style.right = "10px";
 	depthCanvas.style.bottom = "10px";
+	depthCanvas.style.opacity = "0.9";
+	depthCanvas.style.borderRadius = "20px";
 	container.appendChild(depthCanvas);
 
 	var button = document.createElement("div");
