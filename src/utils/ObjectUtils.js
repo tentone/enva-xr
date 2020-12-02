@@ -1,3 +1,5 @@
+import {Vector3} from "three";
+
 export class ObjectUtils {
 	static centerUnitary(object)
 	{

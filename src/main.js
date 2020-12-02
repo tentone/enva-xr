@@ -207,16 +207,15 @@ function initialize()
 	{
 		if (cursor.visible)
 		{
+			var position = new Vector3();
+			position.setFromMatrixPosition(cursor.matrix);
+
 			const loader = new GLTFLoader();
 			loader.load("./assets/3d/tree/scene.gltf", function(gltf)
 			{
-				var position = new Vector3();
-				position.setFromMatrixPosition(cursor.matrix);
-
 				var scale = 0.01;
 
 				var object = gltf.scene;
-				object.scale.set(scale, scale, scale);
 				scene.add(object);
 				object.updateMatrixWorld(true);
 
