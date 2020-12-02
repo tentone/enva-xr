@@ -1,9 +1,5 @@
-import {Vector3, Vector2,
-	Line3,
-	LineBasicMaterial,
-	BufferGeometry,
-	Line,
-	Mesh,
+import {Vector3, Vector2, Line3,
+	LineBasicMaterial, BufferGeometry, Line, Mesh,
 	WebGLRenderer,
 	Scene,
 	PerspectiveCamera,
@@ -16,6 +12,17 @@ import {BillboardGroup} from "./object/BillboardGroup.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {Text} from 'troika-three-text'
 import {Cursor} from "./object/Cursor.js";
+import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+
+/**
+ * If true the depth data is shown.
+ */
+var showDepthDebug = true;
+
+/**
+ * Canvas to draw depth information for debug.
+ */
+var depthCanvas;
 
 /**
  * Camera used to view the scene.
@@ -57,11 +64,6 @@ var currentLine = null;
  * Size of the rendererer.
  */
 var resolution = new Vector2();
-
-/**
- * Canvas to draw depth information for debug.
- */
-var depthCanvas;
 
 /**
  * Project a point in the world to the screen correct screen position.
@@ -157,18 +159,75 @@ function initialize()
 	container.style.height = "100%";
 	document.body.appendChild(container);
 
-	var toolButton = GUIUtils.createButton("./assets/ruler.svg", 10, 10, 70, 70, function()
+	var rulerButton = GUIUtils.createButton("./assets/icon/ruler.svg", 10, 10, 70, 70, function()
 	{
+		if (cursor.visible)
+		{
+			// Get cursor position
+			var position = new Vector3();
+			position.setFromMatrixPosition(cursor.matrix);
 
+			// Add to the measurements list
+			measurements.push(position);
+
+			if (measurements.length == 2)
+			{
+				var distance = Math.round(measurements[0].distanceTo(measurements[1]) * 100);
+				var line = new Line3(measurements[0], measurements[1]);
+
+				var group = new BillboardGroup();
+				line.getCenter(group.position);
+				group.position.y += 0.1;
+				scene.add(group);
+
+				var text = new Text();
+				text.text = distance + " cm";
+				text.fontSize = 0.1
+				text.color = 0xFFFFFF;
+				text.anchorX = "center";
+				text.anchorY = "middle";
+				text.rotation.set(Math.PI, Math.PI, Math.PI);
+				text.sync();
+				group.add(text);
+
+				measurements = [];
+				currentLine = null;
+			}
+			else
+			{
+				currentLine = createLine(measurements[0]);
+				scene.add(currentLine);
+			}
+		}
 	});
-	container.appendChild(toolButton);
+	container.appendChild(rulerButton);
 
-
-	var depthButton = GUIUtils.createButton("./assets/3d.svg", 10, 90, 70, 70, function()
+	var plantButton = GUIUtils.createButton("./assets/icon/tree.svg", 10, 90, 70, 70, function()
 	{
+		if (cursor.visible)
+		{
+			const loader = new GLTFLoader();
+			loader.load("./assets/3d/tree/scene.gltf", function(gltf)
+			{
+				var position = new Vector3();
+				position.setFromMatrixPosition(cursor.matrix);
 
+				console.log(gltf);
+
+				gltf.scene.position.copy(position);
+				gltf.scene.scale.set(0.01, 0.01, 0.01);
+				scene.add(gltf.scene);
+			});
+		}
 	});
+	container.appendChild(plantButton);
 
+
+	var depthButton = GUIUtils.createButton("./assets/icon/3d.svg", 10, 180, 70, 70, function()
+	{
+        showDepthDebug = !showDepthDebug;
+        depthCanvas.style.display = showDepthDebug ? "block" : "none";
+    });
 	container.appendChild(depthButton);
 
 
@@ -203,9 +262,9 @@ function initialize()
 	document.body.appendChild(canvas);
 	createRenderer(canvas)
 
-	var controller = renderer.xr.getController(0);
+	/* var controller = renderer.xr.getController(0);
 	controller.addEventListener("select", onSelect);
-	scene.add(controller);
+	scene.add(controller);*/
 
 	var box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial());
     box.scale.set(0.1, 0.1, 0.1);
@@ -224,48 +283,6 @@ function initialize()
 	window.addEventListener("resize", resize, false);
 
 	renderer.setAnimationLoop(render);
-}
-
-function onSelect()
-{
-	if (cursor.visible)
-	{
-		// Get cursor position
-		var position = new Vector3();
-		position.setFromMatrixPosition(cursor.matrix);
-
-		// Add to the measurements list
-		measurements.push(position);
-
-		if (measurements.length == 2)
-		{
-			var distance = Math.round(measurements[0].distanceTo(measurements[1]) * 100);
-			var line = new Line3(measurements[0], measurements[1]);
-
-			var group = new BillboardGroup();
-			line.getCenter(group.position);
-			group.position.y += 0.1;
-			scene.add(group);
-
-			var text = new Text();
-			text.text = distance + " cm";
-			text.fontSize = 0.1
-			text.color = 0xFFFFFF;
-			text.anchorX = "center";
-			text.anchorY = "middle";
-			text.rotation.set(Math.PI, Math.PI, Math.PI);
-			text.sync();
-			group.add(text);
-
-			measurements = [];
-			currentLine = null;
-		}
-		else
-		{
-			currentLine = createLine(measurements[0]);
-			scene.add(currentLine);
-		}
-	}
 }
 
 /**
@@ -341,7 +358,10 @@ function render(timestamp, frame)
 				var depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-					drawDepthCanvas(depthData, depthCanvas, 4.0)
+                    if(showDepthDebug)
+                    {
+                        drawDepthCanvas(depthData, depthCanvas, 4.0);
+                    }
 				}
 			}
 		}
