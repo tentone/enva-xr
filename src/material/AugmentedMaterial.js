@@ -21,6 +21,7 @@ export class AugmentedMaterial extends ShaderMaterial
 		varying vec2 vUv;
 
 		uniform sampler2D colorMap;
+		uniform sampler2D depthMap;
 
 		void main() {
 			vec4 pixel = texture2D(colorMap, vUv);
@@ -28,12 +29,15 @@ export class AugmentedMaterial extends ShaderMaterial
 				discard;
 			}
 
+			vec4 depthPixel = texture2D(depthMap, gl_FragCoord.xy);
+
 			gl_FragColor = vec4(pixel.rgb, 1.0);
 		}`;
 
 		super({
 			uniforms: {
-				colorMap: {value: colorMap ? colorMap : new Texture()},
+				colorMap: {value: colorMap},
+				depthMap: {value: depthMap}
 			},
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader

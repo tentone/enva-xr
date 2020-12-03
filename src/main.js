@@ -159,7 +159,7 @@ function loadGLTFMesh(url, scene, position, rotation, scale) {
 			{
 				console.log(child);
 
-				child.material = new AugmentedMaterial(child.material.map);
+				child.material = new AugmentedMaterial(child.material.map, depthTexture);
 
 				child.scale.set(scale, scale, scale);
 				child.position.copy(position);
