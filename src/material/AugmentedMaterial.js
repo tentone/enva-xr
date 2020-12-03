@@ -31,6 +31,8 @@ export class AugmentedMaterial extends ShaderMaterial
 
 			vec4 depthPixel = texture2D(depthMap, gl_FragCoord.xy);
 
+			// gl_FragDepth
+
 			gl_FragColor = vec4(pixel.rgb, 1.0);
 		}`;
 
