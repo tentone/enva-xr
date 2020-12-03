@@ -245,7 +245,7 @@ function initialize()
 			var position = new Vector3();
 			position.setFromMatrixPosition(cursor.matrix);
 
-			loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(Math.PI, 0, 0), 0.01);
+			loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(Math.PI, 0, 0), 0.007);
 		}
 	});
 	container.appendChild(flowerButton);
@@ -257,7 +257,7 @@ function initialize()
     });
 	container.appendChild(depthButton);
 
-	var cubeButton = GUIUtils.createButton("./assets/icon/cube.svg", 10, 330, 70, 70, function()
+	/*var cubeButton = GUIUtils.createButton("./assets/icon/cube.svg", 10, 330, 70, 70, function()
 	{
 		if (cursor.visible)
 		{
@@ -271,7 +271,7 @@ function initialize()
 
 		}
     });
-	container.appendChild(cubeButton);
+	container.appendChild(cubeButton);*/
 
 	depthCanvas = document.createElement("canvas");
 	depthCanvas.style.position = "absolute";
