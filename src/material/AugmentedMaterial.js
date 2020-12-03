@@ -42,7 +42,7 @@ export class AugmentedMaterial extends ShaderMaterial
 			// float y = gl_FragCoord.y / uHeight;
 
 			float x = gl_FragCoord.x / 1080.0;
-			float y = gl_FragCoord.y / 2160.0;
+			float y = gl_FragCoord.y / 2100.0;
 
 			float near = 0.1;
 			float far = 20.0;
