@@ -1,12 +1,13 @@
 import {Vector3, Vector2, Line3,
 	LineBasicMaterial, BufferGeometry, Line, Mesh, Euler,
-	WebGLRenderer,
+	WebGLRenderer, CanvasTexture,
 	Scene,
 	PerspectiveCamera,
 	BoxBufferGeometry,
 	MeshNormalMaterial,
 	SphereBufferGeometry,
-	AmbientLight} from "three";
+	AmbientLight,
+	MeshBasicMaterial} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {BillboardGroup} from "./object/BillboardGroup.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
@@ -24,6 +25,7 @@ var showDepthDebug = true;
  * Canvas to draw depth information for debug.
  */
 var depthCanvas;
+var depthTexture;
 
 /**
  * Camera used to view the scene.
@@ -238,7 +240,7 @@ function initialize()
 	});
 	container.appendChild(treeButton);
 
-	var flowerButton = GUIUtils.createButton("./assets/icon/flower.svg", 10, 180, 70, 70, function()
+	var flowerButton = GUIUtils.createButton("./assets/icon/flower.svg", 10, 170, 70, 70, function()
 	{
 		if (cursor.visible)
 		{
@@ -250,12 +252,28 @@ function initialize()
 	});
 	container.appendChild(flowerButton);
 
-	var depthButton = GUIUtils.createButton("./assets/icon/3d.svg", 10, 270, 70, 70, function()
+	var depthButton = GUIUtils.createButton("./assets/icon/3d.svg", 10, 250, 70, 70, function()
 	{
         showDepthDebug = !showDepthDebug;
         depthCanvas.style.display = showDepthDebug ? "block" : "none";
     });
 	container.appendChild(depthButton);
+
+	var testButton = GUIUtils.createButton("./assets/icon/cube.svg", 10, 330, 70, 70, function()
+	{
+		if (cursor.visible)
+		{
+			var position = new Vector3();
+			position.setFromMatrixPosition(cursor.matrix);
+
+			var box = new Mesh(new BoxBufferGeometry(), new MeshBasicMaterial({map: depthTexture}));
+			box.scale.set(0.3, 0.3, 0.3);
+			box.position.copy(position);
+			scene.add(box);
+
+		}
+    });
+	container.appendChild(testButton);
 
 	depthCanvas = document.createElement("canvas");
 	depthCanvas.style.position = "absolute";
@@ -263,6 +281,8 @@ function initialize()
 	depthCanvas.style.bottom = "10px";
 	depthCanvas.style.borderRadius = "20px";
 	container.appendChild(depthCanvas);
+
+	depthTexture = new CanvasTexture(depthCanvas);
 
 	var button = document.createElement("div");
 	button.style.position = "absolute";
@@ -294,8 +314,8 @@ function initialize()
 	scene.add(controller);*/
 
 	var box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial());
-    box.scale.set(0.1, 0.1, 0.1);
-    box.position.x = 2;
+	box.scale.set(0.1, 0.1, 0.1);
+	box.position.x = 2;
 	scene.add(box);
 
 	var sphere = new Mesh(new SphereBufferGeometry(), new MeshNormalMaterial());
@@ -391,10 +411,7 @@ function render(time, frame)
 				var depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-                    if(showDepthDebug)
-                    {
-                        drawDepthCanvas(depthData, depthCanvas, 4.0);
-                    }
+                    drawDepthCanvas(depthData, depthCanvas, 4.0);
 				}
 			}
 		}
@@ -438,6 +455,7 @@ function drawDepthCanvas(depth, canvas, maxDistance)
 		}
 	}
 
+	depthTexture.needsUpdate = true;
 	context.putImageData(image, 0, 0);
 }
 
