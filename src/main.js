@@ -157,8 +157,6 @@ function loadGLTFMesh(url, scene, position, rotation, scale) {
 		{
 			if (child instanceof Mesh)
 			{
-				console.log(child);
-
 				child.material = new AugmentedMaterial(child.material.map, depthTexture);
 
 				child.scale.set(scale, scale, scale);
@@ -307,11 +305,7 @@ function initialize()
 
 	var canvas = document.createElement("canvas");
 	document.body.appendChild(canvas);
-	createRenderer(canvas)
-
-	/* var controller = renderer.xr.getController(0);
-	controller.addEventListener("select", onSelect);
-	scene.add(controller);*/
+	createRenderer(canvas);
 
 	var box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial());
 	box.scale.set(0.1, 0.1, 0.1);
@@ -355,6 +349,19 @@ function render(time, frame)
 {
 	if (frame)
 	{
+		scene.traverse(function(child)
+		{
+			if (child instanceof Mesh)
+			{
+				if(child.material && child.material instanceof AugmentedMaterial)
+				{
+					child.material.uniforms.uWidth = resolution.x;
+					child.material.uniforms.uHeight = resolution.y;
+					child.material.uniformsNeedUpdate = true;
+				}
+			}
+		});
+
 		var referenceSpace = renderer.xr.getReferenceSpace();
 		var session = renderer.xr.getSession();
 
@@ -411,7 +418,7 @@ function render(time, frame)
 				var depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-                    drawDepthCanvas(depthData, depthCanvas, 4.0);
+                    drawDepthCanvas(depthData, depthCanvas, 5.0);
 				}
 			}
 		}
