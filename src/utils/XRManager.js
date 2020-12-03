@@ -2,6 +2,12 @@ let currentSession = null;
 
 export class XRManager
 {
+	/**
+	 * Start webxr session for immersive-ar with the provided session configuration.
+	 *
+	 * @param {*} renderer
+	 * @param {*} sessionInit
+	 */
 	static start(renderer, sessionInit = {})
 	{
 		function onSessionStarted(session)

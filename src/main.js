@@ -3,10 +3,10 @@ import {Vector3, Vector2, Line3,
 	WebGLRenderer,
 	Scene,
 	PerspectiveCamera,
-	HemisphereLight,
 	BoxBufferGeometry,
 	MeshNormalMaterial,
-	SphereBufferGeometry} from "three";
+	SphereBufferGeometry,
+	AmbientLight} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {BillboardGroup} from "./object/BillboardGroup.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
@@ -90,21 +90,23 @@ function projectPoint(point, camera)
  *
  * @param {*} point
  */
-function createLine(point)
+function createMeasurement(point)
 {
-	var lineMaterial = new LineBasicMaterial(
+	var geometry = new BufferGeometry().setFromPoints([point, point]);
+
+	return new Line(geometry, new LineBasicMaterial(
 	{
 		color: 0xffffff,
-		linewidth: 5,
-		linecap: "round"
-	});
-
-	var lineGeometry = new BufferGeometry().setFromPoints([point, point]);
-
-	return new Line(lineGeometry, lineMaterial);
+		linewidth: 5
+	}));
 }
 
-function updateLine(matrix)
+/**
+ * Update measurement line with new position.
+ *
+ * @param {*} matrix
+ */
+function updateMeasurement(matrix)
 {
 	var positions = currentLine.geometry.attributes.position.array;
 	positions[3] = matrix.elements[12]
@@ -114,6 +116,11 @@ function updateLine(matrix)
 	currentLine.geometry.computeBoundingSphere();
 }
 
+/**
+ * Create and setup webgl renderer object.
+ *
+ * @param {*} canvas
+ */
 function createRenderer(canvas)
 {
     var context = canvas.getContext("webgl2", {xrCompatible: true});
@@ -137,22 +144,15 @@ function createRenderer(canvas)
 	renderer.xr.enabled = true;
 }
 
-function createScene()
-{
-	scene = new Scene();
-
-	camera = new PerspectiveCamera(60, resolution.x / resolution.y, 0.1, 20);
-
-	var light = new HemisphereLight(0xffffff, 0xBBBBff, 1);
-	light.position.set(0.5, 1, 0.25);
-	scene.add(light);
-}
-
 function initialize()
 {
 	resolution.set(window.innerWidth, window.innerHeight);
 
-	createScene();
+	scene = new Scene();
+
+	camera = new PerspectiveCamera(60, resolution.x / resolution.y, 0.1, 20);
+
+	scene.add(new AmbientLight(0xFFFFFF, 1));
 
 	var container = document.createElement("div");
 	container.style.width = "100%";
@@ -195,7 +195,7 @@ function initialize()
 			}
 			else
 			{
-				currentLine = createLine(measurements[0]);
+				currentLine = createMeasurement(measurements[0]);
 				scene.add(currentLine);
 			}
 		}
@@ -208,6 +208,7 @@ function initialize()
 		{
 			var position = new Vector3();
 			position.setFromMatrixPosition(cursor.matrix);
+
 			FileUtils.loadGLTFMesh("./assets/3d/tree/scene.gltf", scene, position, new Euler(0, 0, 0), 0.002);
 		}
 	});
@@ -219,6 +220,7 @@ function initialize()
 		{
 			var position = new Vector3();
 			position.setFromMatrixPosition(cursor.matrix);
+
 			FileUtils.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(Math.PI, 0, 0), 0.01);
 		}
 	});
@@ -301,7 +303,13 @@ function resize()
 	renderer.setSize(resolution.x, resolution.y);
 }
 
-function render(timestamp, frame)
+/**
+ * Update logic and render scene into the screen.
+ *
+ * @param {*} time
+ * @param {*} frame
+ */
+function render(time, frame)
 {
 	if (frame)
 	{
@@ -348,7 +356,7 @@ function render(timestamp, frame)
 
 			if (currentLine)
 			{
-				updateLine(cursor.matrix);
+				updateMeasurement(cursor.matrix);
 			}
 		}
 

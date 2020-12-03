@@ -1,6 +1,11 @@
 import {Vector3} from "three";
 
 export class ObjectUtils {
+	/**
+	 * Resize a object to fit a unitary box and center around the origin.
+	 *
+	 * @param {*} object
+	 */
 	static centerUnitary(object)
 	{
 		var box = ObjectUtils.calculateBoundingBox(object);
