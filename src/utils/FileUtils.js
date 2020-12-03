@@ -1,5 +1,6 @@
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {Mesh} from "three";
+import {ARMaterial} from "../material/ARMaterial.js";
 
 export class FileUtils {
 	static loadGLTFMesh(url, scene, position, rotation, scale) {
@@ -14,8 +15,7 @@ export class FileUtils {
 				{
 					console.log(child);
 
-					child.material.depthWrite = true;
-					child.material.alphaTest = 0.3;
+					child.material = new ARMaterial(child.material.map);
 
 					child.scale.set(scale, scale, scale);
 					child.position.copy(position);

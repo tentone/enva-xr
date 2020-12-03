@@ -233,12 +233,10 @@ function initialize()
     });
 	container.appendChild(depthButton);
 
-
 	depthCanvas = document.createElement("canvas");
 	depthCanvas.style.position = "absolute";
 	depthCanvas.style.right = "10px";
 	depthCanvas.style.bottom = "10px";
-	depthCanvas.style.opacity = "0.9";
 	depthCanvas.style.borderRadius = "20px";
 	container.appendChild(depthCanvas);
 
