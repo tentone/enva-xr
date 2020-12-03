@@ -1,8 +1,12 @@
 import {ShaderMaterial} from "three"
 
-export class BasicMaterialDepth extends ShaderMaterial
+/**
+ * Shader material used to combine virtual and real scene with depth blending.
+ *
+ */
+export class AugmentedMaterial extends ShaderMaterial
 {
-	constructor(colorMap)
+	constructor(colorMap, depthMap)
 	{
 		var vertexShader = `
 		varying vec2 vUv;
@@ -19,7 +23,12 @@ export class BasicMaterialDepth extends ShaderMaterial
 		uniform sampler2D colorMap;
 
 		void main() {
-			gl_FragColor = vec4(texture2D(colorMap, vUv).rgb, 1.0);
+			vec4 pixel = texture2D(colorMap, vUv);
+			if (pixel.a < 0.3) {
+				discard;
+			}
+
+			gl_FragColor = vec4(pixel.rgb, 1.0);
 		}`;
 
 		super({

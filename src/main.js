@@ -12,7 +12,8 @@ import {BillboardGroup} from "./object/BillboardGroup.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {Text} from 'troika-three-text'
 import {Cursor} from "./object/Cursor.js";
-import {FileUtils} from "./utils/FileUtils.js";
+import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+import {AugmentedMaterial} from "./material/AugmentedMaterial.js";
 
 /**
  * If true the depth data is shown.
@@ -144,6 +145,29 @@ function createRenderer(canvas)
 	renderer.xr.enabled = true;
 }
 
+function loadGLTFMesh(url, scene, position, rotation, scale) {
+
+	const loader = new GLTFLoader();
+	loader.load(url, function(gltf)
+	{
+		var object = gltf.scene;
+		object.traverse(function(child)
+		{
+			if (child instanceof Mesh)
+			{
+				console.log(child);
+
+				child.material = new AugmentedMaterial(child.material.map);
+
+				child.scale.set(scale, scale, scale);
+				child.position.copy(position);
+				child.rotation.copy(rotation);
+				scene.add(child);
+			}
+		});
+	});
+}
+
 function initialize()
 {
 	resolution.set(window.innerWidth, window.innerHeight);
@@ -209,7 +233,7 @@ function initialize()
 			var position = new Vector3();
 			position.setFromMatrixPosition(cursor.matrix);
 
-			FileUtils.loadGLTFMesh("./assets/3d/tree/scene.gltf", scene, position, new Euler(0, 0, 0), 0.002);
+			loadGLTFMesh("./assets/3d/tree/scene.gltf", scene, position, new Euler(0, 0, 0), 0.002);
 		}
 	});
 	container.appendChild(treeButton);
@@ -221,7 +245,7 @@ function initialize()
 			var position = new Vector3();
 			position.setFromMatrixPosition(cursor.matrix);
 
-			FileUtils.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(Math.PI, 0, 0), 0.01);
+			loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(Math.PI, 0, 0), 0.01);
 		}
 	});
 	container.appendChild(flowerButton);
