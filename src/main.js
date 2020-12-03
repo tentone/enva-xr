@@ -259,7 +259,7 @@ function initialize()
     });
 	container.appendChild(depthButton);
 
-	var testButton = GUIUtils.createButton("./assets/icon/cube.svg", 10, 330, 70, 70, function()
+	var cubeButton = GUIUtils.createButton("./assets/icon/cube.svg", 10, 330, 70, 70, function()
 	{
 		if (cursor.visible)
 		{
@@ -273,7 +273,7 @@ function initialize()
 
 		}
     });
-	container.appendChild(testButton);
+	container.appendChild(cubeButton);
 
 	depthCanvas = document.createElement("canvas");
 	depthCanvas.style.position = "absolute";
