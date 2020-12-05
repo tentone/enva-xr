@@ -433,7 +433,7 @@ function render(time, frame)
  * @param {*} depth
  * @param {*} canvas
  */
-function drawDepthCanvas(depth, canvas, maxDistance)
+function drawDepthCanvas(depth, canvas, minDistance, maxDistance)
 {
 	canvas.width = depth.height;
 	canvas.height = depth.width;
@@ -448,12 +448,11 @@ function drawDepthCanvas(depth, canvas, maxDistance)
 	{
 		for(var y = 0; y < depth.height; y++)
 		{
-			var distance = depth.getDepth(x, y) / maxDistance;
+			var distance = (depth.getDepth(x, y) - minDistance) / (maxDistance - minDistance);
 			var j = (x * canvas.width + (canvas.width - y)) * 4;
 
-			if (distance > 1.0) {
-				distance = 1.0;
-			}
+			if (distance > 1.0) {distance = 1.0;}
+			else if (distance < 0.0) {distance = 0.0;}
 
 			image.data[j] = Math.ceil(distance * 256);
 			image.data[j + 1] = Math.ceil(distance * 256);
