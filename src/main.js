@@ -1,12 +1,20 @@
-import {Vector3, Vector2, Line3,
-	LineBasicMaterial, BufferGeometry, Line, Mesh, Euler,
-	WebGLRenderer, CanvasTexture,
+import {Vector3,
+	Vector2,
+	Line3,
+	LineBasicMaterial,
+	BufferGeometry,
+	Line,
+	Mesh,
+	Euler,
+	WebGLRenderer,
+	CanvasTexture,
 	Scene,
 	PerspectiveCamera,
 	BoxBufferGeometry,
 	MeshNormalMaterial,
 	SphereBufferGeometry,
-	AmbientLight} from "three";
+	AmbientLight,
+	DataTexture} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {BillboardGroup} from "./object/BillboardGroup.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
@@ -24,7 +32,18 @@ var showDepthDebug = true;
  * Canvas to draw depth information for debug.
  */
 var depthCanvas;
+
+/**
+ * Depth canvas texture with the calculated depth used to debug.
+ */
 var depthTexture;
+
+/**
+ * Texture with raw depth information packed in 16bit data.
+ *
+ * Contains depth data in millimeter.
+ */
+var depthDataTexture;
 
 /**
  * Camera used to view the scene.
@@ -281,6 +300,8 @@ function initialize()
 
 	depthTexture = new CanvasTexture(depthCanvas);
 
+	depthDataTexture = new DataTexture();
+
 	var button = document.createElement("div");
 	button.style.position = "absolute";
 	button.style.backgroundColor = "#FF6666";
@@ -350,14 +371,11 @@ function render(time, frame)
 	{
 		scene.traverse(function(child)
 		{
-			if (child instanceof Mesh)
+			if(child.isMesh && child.material && child.material instanceof AugmentedMaterial)
 			{
-				if(child.material && child.material instanceof AugmentedMaterial)
-				{
-					child.material.uniforms.uWidth = resolution.x;
-					child.material.uniforms.uHeight = resolution.y;
-					child.material.uniformsNeedUpdate = true;
-				}
+				child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
+				child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
+				child.material.uniformsNeedUpdate = true;
 			}
 		});
 
@@ -417,7 +435,7 @@ function render(time, frame)
 				var depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-                    drawDepthCanvas(depthData, depthCanvas, 5.0);
+                    drawDepthCanvas(depthData, depthCanvas, 0.0, 5.0);
 				}
 			}
 		}
@@ -432,7 +450,7 @@ function render(time, frame)
  * @param {*} depth
  * @param {*} canvas
  */
-function drawDepthCanvas(depth, canvas, minDistance, maxDistance)
+function drawDepthCanvas(depth, canvas, near, far)
 {
 	canvas.width = depth.height;
 	canvas.height = depth.width;
@@ -447,7 +465,7 @@ function drawDepthCanvas(depth, canvas, minDistance, maxDistance)
 	{
 		for(var y = 0; y < depth.height; y++)
 		{
-			var distance = (depth.getDepth(x, y) - minDistance) / (maxDistance - minDistance);
+			var distance = (depth.getDepth(x, y) - near) / (far - near);
 			var j = (x * canvas.width + (canvas.width - y)) * 4;
 
 			if (distance > 1.0) {distance = 1.0;}
