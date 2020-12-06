@@ -6,8 +6,7 @@ import {Vector3, Vector2, Line3,
 	BoxBufferGeometry,
 	MeshNormalMaterial,
 	SphereBufferGeometry,
-	AmbientLight,
-	MeshBasicMaterial} from "three";
+	AmbientLight} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {BillboardGroup} from "./object/BillboardGroup.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
