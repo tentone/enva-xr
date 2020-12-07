@@ -24,9 +24,9 @@ void main() {
 
 	vec4 depthPixel = texture2D(depthMap, vec2(x, y));
 	if (depthPixel.x < z) {
-		// gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-		// return;
-		discard;
+		gl_FragColor = vec4(1.0, pixel.gb, 1.0);
+		return;
+		// discard;
 	}
 
 	gl_FragColor = vec4(pixel.rgb, 1.0);
