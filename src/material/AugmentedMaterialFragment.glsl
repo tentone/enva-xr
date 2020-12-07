@@ -34,5 +34,5 @@ void main() {
 		discard;
 	}
 
-	gl_FragColor = vec4(pixer.rgb, 1.0);
+	gl_FragColor = vec4(pixel.rgb, 1.0);
 }
