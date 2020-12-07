@@ -273,22 +273,6 @@ function initialize()
     });
 	container.appendChild(depthButton);
 
-	var cubeButton = GUIUtils.createButton("./assets/icon/cube.svg", 10, 330, 70, 70, function()
-	{
-		if (cursor.visible)
-		{
-			var position = new Vector3();
-			position.setFromMatrixPosition(cursor.matrix);
-
-			var box = new Mesh(new BoxBufferGeometry(), new AugmentedMaterial(depthTexture, depthTexture));
-			box.scale.set(0.3, 0.3, 0.3);
-			box.position.copy(position);
-			scene.add(box);
-
-		}
-    });
-	container.appendChild(cubeButton);
-
 	depthCanvas = document.createElement("canvas");
 	depthCanvas.style.position = "absolute";
 	depthCanvas.style.right = "10px";
@@ -374,6 +358,8 @@ function render(time, frame)
 			{
 				child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
 				child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
+				child.material.uniforms.uNear.value = camera.near;
+				child.material.uniforms.uFar.value = camera.far;
 
 				child.material.uniformsNeedUpdate = true;
 			}

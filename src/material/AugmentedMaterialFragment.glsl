@@ -4,6 +4,9 @@ varying float vDepth;
 uniform float uWidth;
 uniform float uHeight;
 
+uniform float uNear;
+uniform float uFar;
+
 uniform sampler2D colorMap;
 uniform sampler2D depthMap;
 
@@ -20,7 +23,9 @@ void main() {
 	float y = gl_FragCoord.y / uHeight;
 
 	// Calculate depth [0, 1]
-	float z = (gl_FragCoord.z / gl_FragCoord.w);
+	float z = (vDepth - uNear) / (uFar - uNear);
+	z = max(z, 0.0);
+	z = min(z, 1.0);
 
 	vec4 depthPixel = texture2D(depthMap, vec2(x, y));
 	if (depthPixel.x < z) {
@@ -29,5 +34,5 @@ void main() {
 		// discard;
 	}
 
-	gl_FragColor = vec4(pixel.rgb, 1.0);
+	gl_FragColor = vec4(z, z, z, 1.0);
 }
