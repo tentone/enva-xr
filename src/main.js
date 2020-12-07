@@ -158,7 +158,7 @@ function createRenderer(canvas)
     });
 
     renderer.shadowMap.enabled = false;
-    renderer.extensions.get("WEBGL_depth_texture");
+    // renderer.extensions.get("WEBGL_depth_texture");
 
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -170,13 +170,11 @@ function loadGLTFMesh(url, scene, position, rotation, scale) {
 	const loader = new GLTFLoader();
 	loader.load(url, function(gltf)
 	{
-		var object = gltf.scene;
-		object.traverse(function(child)
+		gltf.scene.traverse(function(child)
 		{
 			if (child instanceof Mesh)
 			{
 				child.material = new AugmentedMaterial(child.material.map, depthTexture);
-
 				child.scale.set(scale, scale, scale);
 				child.position.copy(position);
 				child.rotation.copy(rotation);
@@ -192,7 +190,7 @@ function initialize()
 
 	scene = new Scene();
 
-	camera = new PerspectiveCamera(60, resolution.x / resolution.y, 0.1, 20);
+	camera = new PerspectiveCamera(60, resolution.x / resolution.y, 0.1, 10);
 
 	scene.add(new AmbientLight(0xFFFFFF, 1));
 
@@ -357,6 +355,7 @@ function resize()
     camera.updateProjectionMatrix();
 
 	renderer.setSize(resolution.x, resolution.y);
+	renderer.setPixelRatio(window.devicePixelRatio);
 }
 
 /**
@@ -435,7 +434,7 @@ function render(time, frame)
 				var depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-                    drawDepthCanvas(depthData, depthCanvas, 0.0, 5.0);
+                    drawDepthCanvas(depthData, depthCanvas, camera.near, camera.far);
 				}
 			}
 		}

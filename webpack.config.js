@@ -19,5 +19,13 @@ module.exports = {
     }),
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin()
-  ]
+  ],
+  module: {
+	rules: [
+		{
+			test: /\.glsl$/i,
+			use: "raw-loader"
+		}
+	]
+}
 };
