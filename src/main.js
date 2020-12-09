@@ -22,6 +22,12 @@ import {Text} from 'troika-three-text'
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {AugmentedMaterial} from "./material/AugmentedMaterial.js";
+import {World} from "cannon";
+
+/**
+ * Physics world used for interaction.
+ */
+var physics = new World();
 
 /**
  * If true the depth data is shown.
@@ -48,12 +54,12 @@ var depthDataTexture;
 /**
  * Camera used to view the scene.
  */
-var camera;
+var camera = new PerspectiveCamera(60, 1, 0.1, 10);
 
 /**
  * Scene to draw into the screen.
  */
-var scene;
+var scene = new Scene();
 
 /**
  * WebGL renderer used to draw the scene.
@@ -144,21 +150,21 @@ function updateMeasurement(matrix)
  */
 function createRenderer(canvas)
 {
-    var context = canvas.getContext("webgl2", {xrCompatible: true});
+	var context = canvas.getContext("webgl2", {xrCompatible: true});
 
 	renderer = new WebGLRenderer(
 	{
-        context: context,
+		context: context,
 		antialias: true,
 		alpha: true,
-        canvas: canvas,
-        depth: true,
-        powerPreference: "high-performance",
-        precision: "highp"
-    });
+		canvas: canvas,
+		depth: true,
+		powerPreference: "high-performance",
+		precision: "highp"
+	});
 
-    renderer.shadowMap.enabled = false;
-    // renderer.extensions.get("WEBGL_depth_texture");
+	renderer.shadowMap.enabled = false;
+	// renderer.extensions.get("WEBGL_depth_texture");
 
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -187,10 +193,6 @@ function loadGLTFMesh(url, scene, position, rotation, scale) {
 function initialize()
 {
 	resolution.set(window.innerWidth, window.innerHeight);
-
-	scene = new Scene();
-
-	camera = new PerspectiveCamera(60, resolution.x / resolution.y, 0.1, 10);
 
 	scene.add(new AmbientLight(0xFFFFFF, 1));
 
@@ -268,9 +270,9 @@ function initialize()
 
 	var depthButton = GUIUtils.createButton("./assets/icon/3d.svg", 10, 250, 70, 70, function()
 	{
-        showDepthDebug = !showDepthDebug;
-        depthCanvas.style.display = showDepthDebug ? "block" : "none";
-    });
+		showDepthDebug = !showDepthDebug;
+		depthCanvas.style.display = showDepthDebug ? "block" : "none";
+	});
 	container.appendChild(depthButton);
 
 	depthCanvas = document.createElement("canvas");
@@ -315,8 +317,8 @@ function initialize()
 	scene.add(box);
 
 	var sphere = new Mesh(new SphereBufferGeometry(), new MeshNormalMaterial());
-    sphere.scale.set(0.1, 0.1, 0.1);
-    sphere.position.z = 2;
+	sphere.scale.set(0.1, 0.1, 0.1);
+	sphere.position.z = 2;
 	scene.add(sphere);
 
 	// Cursor to select objects
@@ -336,7 +338,7 @@ function resize()
 	resolution.set(window.innerWidth, window.innerHeight);
 
 	camera.aspect = resolution.x / resolution.y;
-    camera.updateProjectionMatrix();
+	camera.updateProjectionMatrix();
 
 	renderer.setSize(resolution.x, resolution.y);
 	renderer.setPixelRatio(window.devicePixelRatio);
@@ -350,79 +352,83 @@ function resize()
  */
 function render(time, frame)
 {
-	if (frame)
+	if (!frame)
 	{
-		scene.traverse(function(child)
-		{
-			if(child.isMesh && child.material && child.material instanceof AugmentedMaterial)
-			{
-				child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
-				child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
-				child.material.uniforms.uNear.value = camera.near;
-				child.material.uniforms.uFar.value = camera.far;
+		return;
+	}
+	world.step(time);
 
-				child.material.uniformsNeedUpdate = true;
-			}
+
+	scene.traverse(function(child)
+	{
+		if(child.isMesh && child.material && child.material instanceof AugmentedMaterial)
+		{
+			child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
+			child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
+			child.material.uniforms.uNear.value = camera.near;
+			child.material.uniforms.uFar.value = camera.far;
+
+			child.material.uniformsNeedUpdate = true;
+		}
+	});
+
+	var referenceSpace = renderer.xr.getReferenceSpace();
+	var session = renderer.xr.getSession();
+
+	// Request hit test source
+	if (!hitTestSourceRequested)
+	{
+		session.requestReferenceSpace("viewer").then(function(referenceSpace)
+		{
+			session.requestHitTestSource(
+			{
+				space: referenceSpace
+			}).then(function(source)
+			{
+				hitTestSource = source;
+			});
 		});
 
-		var referenceSpace = renderer.xr.getReferenceSpace();
-		var session = renderer.xr.getSession();
-
-		// Request hit test source
-		if (!hitTestSourceRequested)
+		session.addEventListener("end", function()
 		{
-			session.requestReferenceSpace("viewer").then(function(referenceSpace)
-			{
-				session.requestHitTestSource(
-				{
-					space: referenceSpace
-				}).then(function(source)
-				{
-					hitTestSource = source;
-				});
-			});
+			hitTestSourceRequested = false;
+			hitTestSource = null;
+		});
 
-			session.addEventListener("end", function()
-			{
-				hitTestSourceRequested = false;
-				hitTestSource = null;
-			});
+		hitTestSourceRequested = true;
+	}
 
-			hitTestSourceRequested = true;
+	// Process Hit test
+	if (hitTestSource)
+	{
+		var hitTestResults = frame.getHitTestResults(hitTestSource);
+		if (hitTestResults.length)
+		{
+			var hit = hitTestResults[0];
+			cursor.visible = true;
+			cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
+		}
+		else
+		{
+			cursor.visible = false;
 		}
 
-		// Process Hit test
-		if (hitTestSource)
+		if (currentLine)
 		{
-			var hitTestResults = frame.getHitTestResults(hitTestSource);
-			if (hitTestResults.length)
-			{
-				var hit = hitTestResults[0];
-				cursor.visible = true;
-				cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
-			}
-			else
-			{
-				cursor.visible = false;
-			}
-
-			if (currentLine)
-			{
-				updateMeasurement(cursor.matrix);
-			}
+			updateMeasurement(cursor.matrix);
 		}
+	}
 
-		// Handle depth
-		var pose = frame.getViewerPose(referenceSpace);
-		if (pose)
+	// Handle depth
+	var pose = frame.getViewerPose(referenceSpace);
+	if (pose)
+	{
+		for(var view of pose.views)
 		{
-			for(var view of pose.views)
+			var depthData = frame.getDepthInformation(view);
+			if(depthData)
 			{
-				var depthData = frame.getDepthInformation(view);
-				if(depthData)
-				{
-                    drawDepthCanvas(depthData, depthCanvas, camera.near, camera.far);
-				}
+				drawDepthCanvas(depthData, depthCanvas, camera.near, camera.far);
 			}
 		}
 	}
