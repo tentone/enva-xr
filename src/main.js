@@ -91,27 +91,6 @@ var currentLine = null;
  * Size of the rendererer.
  */
 var resolution = new Vector2();
-
-/**
- * Project a point in the world to the screen correct screen position.
- *
- * @param {*} point
- * @param {*} camera
- */
-function projectPoint(point, camera)
-{
-	var vector = new Vector3();
-
-	vector.copy(point);
-	vector.project(camera);
-
-	vector.x = (vector.x + 1) * resolution.x / 2;
-	vector.y = (-vector.y + 1) * resolution.y / 2;
-	vector.z = 0;
-
-	return vector
-};
-
 /**
  * Create a line object to draw the measurement in the scene.
  *
