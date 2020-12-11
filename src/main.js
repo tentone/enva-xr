@@ -18,16 +18,17 @@ import {Vector3,
 import {XRManager} from "./utils/XRManager.js";
 import {BillboardGroup} from "./object/BillboardGroup.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
-import {Text} from 'troika-three-text'
+import {Text} from "troika-three-text"
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {AugmentedMaterial} from "./material/AugmentedMaterial.js";
-import {World} from "cannon";
+import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver} from "cannon";
+import {PhysicsObject} from "./object/PhysicsObject.js";
 
 /**
  * Physics world used for interaction.
  */
-var physics = new World();
+var world;
 
 /**
  * If true the depth data is shown.
@@ -150,6 +151,20 @@ function createRenderer(canvas)
 	renderer.xr.enabled = true;
 }
 
+function createWorld()
+{
+	world = new World();
+	world.gravity.set(0, -9.8, 0);
+	/*world.defaultContactMaterial.contactEquationStiffness = 1e9;
+	world.defaultContactMaterial.contactEquationRelaxation = 4;
+	world.quatNormalizeSkip = 0;
+	world.quatNormalizeFast = false;
+	world.broadphase = new NaiveBroadphase();
+	world.solver = new SplitSolver(new GSSolver());
+	world.solver.tolerance = 0.05;
+	world.solver.iterations = 7;*/
+}
+
 function loadGLTFMesh(url, scene, position, rotation, scale) {
 
 	const loader = new GLTFLoader();
@@ -171,8 +186,9 @@ function loadGLTFMesh(url, scene, position, rotation, scale) {
 
 function initialize()
 {
-	resolution.set(window.innerWidth, window.innerHeight);
+	createWorld();
 
+	resolution.set(window.innerWidth, window.innerHeight);
 	scene.add(new AmbientLight(0xFFFFFF, 1));
 
 	var container = document.createElement("div");
@@ -253,6 +269,31 @@ function initialize()
 		depthCanvas.style.display = showDepthDebug ? "block" : "none";
 	});
 	container.appendChild(depthButton);
+
+	var physicsButton = GUIUtils.createButton("./assets/icon/cube.svg", 10, 330, 70, 70, function()
+	{
+		var position = new Vector3();
+		var direction = new Vector3();
+		camera.getWorldPosition(position);
+		camera.getWorldDirection(direction);
+
+		// TODO <REMOVE THIS>
+		console.log(camera, position, direction);
+
+		var speed = 5.0;
+		direction.multiplyScalar(speed);
+
+		var geometry = new SphereBufferGeometry(0.07, 16, 16);
+		var shape = new Sphere(0.07);
+		var material = new MeshNormalMaterial();
+
+		var ball = new PhysicsObject(geometry, material, world);
+		ball.position.set(position.x, position.y, position.z);
+		ball.body.velocity.set(direction.x, direction.y, direction.z);
+		ball.addShape(shape);
+		scene.add(ball);
+	});
+	container.appendChild(physicsButton);
 
 	depthCanvas = document.createElement("canvas");
 	depthCanvas.style.position = "absolute";
@@ -335,8 +376,8 @@ function render(time, frame)
 	{
 		return;
 	}
-	world.step(time);
 
+	world.step(0.016);
 
 	scene.traverse(function(child)
 	{
