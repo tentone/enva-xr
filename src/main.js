@@ -22,13 +22,18 @@ import {Text} from "troika-three-text"
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {AugmentedMaterial} from "./material/AugmentedMaterial.js";
-import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver} from "cannon";
+import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane} from "cannon";
 import {PhysicsObject} from "./object/PhysicsObject.js";
 
 /**
  * Physics world used for interaction.
  */
-var world;
+var world = null;
+
+/**
+ * Phsyics floor plane should be set to the lowest plane intersection found.
+ */
+var floor = null;
 
 /**
  * If true the depth data is shown.
@@ -36,21 +41,26 @@ var world;
 var showDepthDebug = true;
 
 /**
+ * XR Viewer pose object.
+ */
+var pose = null;
+
+/**
  * Canvas to draw depth information for debug.
  */
-var depthCanvas;
+var depthCanvas = null;
 
 /**
  * Depth canvas texture with the calculated depth used to debug.
  */
-var depthTexture;
+var depthTexture = null;
 
 /**
  * Texture with raw depth information packed in 16bit data.
  *
  * Contains depth data in millimeter.
  */
-var depthDataTexture;
+var depthDataTexture = null;
 
 /**
  * Camera used to view the scene.
@@ -65,7 +75,7 @@ var scene = new Scene();
 /**
  * WebGL renderer used to draw the scene.
  */
-var renderer;
+var renderer = null;
 
 /**
  * WebXR hit test source, (null until requested).
@@ -92,6 +102,7 @@ var currentLine = null;
  * Size of the rendererer.
  */
 var resolution = new Vector2();
+
 /**
  * Create a line object to draw the measurement in the scene.
  *
@@ -155,14 +166,22 @@ function createWorld()
 {
 	world = new World();
 	world.gravity.set(0, -9.8, 0);
-	/*world.defaultContactMaterial.contactEquationStiffness = 1e9;
+	world.defaultContactMaterial.contactEquationStiffness = 1e9;
 	world.defaultContactMaterial.contactEquationRelaxation = 4;
 	world.quatNormalizeSkip = 0;
 	world.quatNormalizeFast = false;
 	world.broadphase = new NaiveBroadphase();
 	world.solver = new SplitSolver(new GSSolver());
 	world.solver.tolerance = 0.05;
-	world.solver.iterations = 7;*/
+	world.solver.iterations = 7;
+
+	floor = new Body();
+	floor.type = Body.STATIC;
+	floor.mass = 1.0;
+	floor.position.set(0, -1, 0);
+	floor.velocity.set(0, 0, 0);
+	floor.addShape(new Plane());
+	world.addBody(floor);
 }
 
 function loadGLTFMesh(url, scene, position, rotation, scale) {
@@ -272,26 +291,30 @@ function initialize()
 
 	var physicsButton = GUIUtils.createButton("./assets/icon/cube.svg", 10, 330, 70, 70, function()
 	{
-		var position = new Vector3();
-		var direction = new Vector3();
-		camera.getWorldPosition(position);
-		camera.getWorldDirection(direction);
+		if(pose !== null)
+		{
+			var position = new Vector3();
+			position.copy(pose.transform.position);
+			console.log(position);
 
-		// TODO <REMOVE THIS>
-		console.log(camera, position, direction);
+			var direction = new Vector3(0, 0, 0);
+			//direction.copy(pose.transform.orientation);
+			// direction.normalize();
 
-		var speed = 5.0;
-		direction.multiplyScalar(speed);
+			var speed = 3.0;
+			direction.multiplyScalar(speed);
 
-		var geometry = new SphereBufferGeometry(0.07, 16, 16);
-		var shape = new Sphere(0.07);
-		var material = new MeshNormalMaterial();
+			var geometry = new SphereBufferGeometry(0.05, 16, 16);
+			var shape = new Sphere(0.05);
+			var material = new MeshNormalMaterial();
 
-		var ball = new PhysicsObject(geometry, material, world);
-		ball.position.set(position.x, position.y, position.z);
-		ball.body.velocity.set(direction.x, direction.y, direction.z);
-		ball.addShape(shape);
-		scene.add(ball);
+			var ball = new PhysicsObject(geometry, material, world);
+			ball.position.set(position.x, position.y, position.z);
+			ball.body.velocity.set(direction.x, direction.y, direction.z);
+			ball.addShape(shape);
+			ball.initialize();
+			scene.add(ball);
+		}
 	});
 	container.appendChild(physicsButton);
 
@@ -418,6 +441,17 @@ function render(time, frame)
 		hitTestSourceRequested = true;
 	}
 
+	if (cursor.visible)
+	{
+		var position = new Vector3();
+		position.setFromMatrixPosition(cursor.matrix);
+
+		if (position.y < floor.position.y)
+		{
+			floor.position.y = position.y;
+		}
+	}
+
 	// Process Hit test
 	if (hitTestSource)
 	{
@@ -440,9 +474,10 @@ function render(time, frame)
 	}
 
 	// Handle depth
-	var pose = frame.getViewerPose(referenceSpace);
-	if (pose)
+	var viewerPose = frame.getViewerPose(referenceSpace);
+	if (viewerPose)
 	{
+		pose = viewerPose;
 		for(var view of pose.views)
 		{
 			var depthData = frame.getDepthInformation(view);

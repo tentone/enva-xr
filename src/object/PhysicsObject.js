@@ -19,7 +19,7 @@ export class PhysicsObject extends Mesh
 		 */
 		this.body = new Body();
 		this.body.type = Body.DYNAMIC;
-		this.body.mass = 1.0;
+		this.body.mass = 0.3;
 
 		/**
 		 * Physics object position mode, indicates how coordinates from the physics engine are transformed into object coordinates.
