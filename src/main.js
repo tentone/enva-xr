@@ -36,6 +36,11 @@ var world = null;
 var floor = null;
 
 /**
+ * Physics depth particles. Matches the same size of the depth map provided by WebXR.
+ */
+var depthParticles = [];
+
+/**
  * If true the depth data is shown.
  */
 var showDepthDebug = true;
