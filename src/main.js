@@ -38,7 +38,7 @@ var floor = null;
 /**
  * Physics depth particles. Matches the same size of the depth map provided by WebXR.
  */
-var depthParticles = [];
+var depthParticles = null;
 
 /**
  * If true the depth data is shown.
@@ -494,6 +494,28 @@ function render(time, frame)
 	}
 
 	renderer.render(scene, camera);
+}
+
+/**
+ * Update the physics particle model to match the depth information.
+ */
+function updateDepthPhysics(depth)
+{
+    if(depthParticles === null) {
+        depthParticles = [];
+
+        for(var x = 0; x < depth.width; x++)
+        {
+            var row = [];
+            for(var y = 0; y < depth.height; y++)
+            {
+                // Create physics model
+                var distance = depth.getDepth(x, y);
+                row.push(distance);
+            }
+            depthParticles.push(row);
+        }
+    }
 }
 
 /**
