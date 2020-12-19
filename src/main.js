@@ -501,7 +501,8 @@ function render(time, frame)
  */
 function updateDepthPhysics(depth)
 {
-    if(depthParticles === null) {
+	if(depthParticles === null)
+	{
         depthParticles = [];
 
         for(var x = 0; x < depth.width; x++)
@@ -509,13 +510,29 @@ function updateDepthPhysics(depth)
             var row = [];
             for(var y = 0; y < depth.height; y++)
             {
-                // Create physics model
+                // TODO <CREATE PARTICLE>
                 var distance = depth.getDepth(x, y);
                 row.push(distance);
             }
             depthParticles.push(row);
         }
-    }
+	}
+	else
+	{
+		var i = 0;
+
+        for(var x = 0; x < depth.width; x++)
+        {
+            var row = [];
+            for(var y = 0; y < depth.height; y++)
+            {
+				// TODO <UPDATE PARTICLE>
+				var distance = depth.getDepth(x, y);
+				depthParticles[i] = distance;
+				i++;
+            }
+		}
+	}
 }
 
 /**
