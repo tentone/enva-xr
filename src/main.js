@@ -86,6 +86,10 @@ var renderer = null;
  * WebXR hit test source, (null until requested).
  */
 var hitTestSource = null;
+
+/**
+ * Indicates if a hit test source was requested.
+ */
 var hitTestSourceRequested = false;
 
 /**
@@ -298,9 +302,9 @@ function initialize()
 	{
 		if(pose !== null)
 		{
-			var position = new Vector3();
-			position.copy(pose.transform.position);
-			console.log(position);
+			var position = new Vector3(1, 1, 0);
+			// position.copy(pose.transform.position);
+			// console.log(position);
 
 			var direction = new Vector3(0, 0, 0);
 			//direction.copy(pose.transform.orientation);
