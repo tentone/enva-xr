@@ -302,7 +302,7 @@ function initialize()
 	{
 		if(pose !== null)
 		{
-			var position = new Vector3(1, 1, 0);
+			var position = new Vector3(0, 3, 0);
 			// position.copy(pose.transform.position);
 			// console.log(position);
 
@@ -455,10 +455,11 @@ function render(time, frame)
 		var position = new Vector3();
 		position.setFromMatrixPosition(cursor.matrix);
 
-		if (position.y < floor.position.y)
+		// TODO <FLOOR HEIGHT>
+		/*if (position.y < floor.position.y)
 		{
 			floor.position.y = position.y;
-		}
+		}*/
 	}
 
 	// Process Hit test
