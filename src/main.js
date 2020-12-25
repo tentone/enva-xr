@@ -164,8 +164,6 @@ function createRenderer(canvas)
 	});
 
 	renderer.shadowMap.enabled = false;
-	// renderer.extensions.get("WEBGL_depth_texture");
-
 	renderer.setPixelRatio(window.devicePixelRatio);
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.xr.enabled = true;
@@ -542,6 +540,8 @@ function updateDepthPhysics(depth)
 
 /**
  * Draw depth data to a canvas, also sets the size of the canvas.
+ *
+ * Uses the camera planes to correctly adjust the values.
  *
  * @param {*} depth
  * @param {*} canvas
