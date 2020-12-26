@@ -506,35 +506,19 @@ function updateDepthPhysics(depth)
 {
 	if(depthParticles === null)
 	{
-        depthParticles = [];
+        depthParticles = new Array(depth.width * depth.height);
+    }
 
-        for(var x = 0; x < depth.width; x++)
+	var i = 0;
+    for(var x = 0; x < depth.width; x++)
+    {
+        for(var y = 0; y < depth.height; y++)
         {
-            var row = [];
-            for(var y = 0; y < depth.height; y++)
-            {
-                // TODO <CREATE PARTICLE>
-                var distance = depth.getDepth(x, y);
-                row.push(distance);
-            }
-            depthParticles.push(row);
+			// TODO <UPDATE PARTICLE>
+			var distance = depth.getDepth(x, y);
+			depthParticles[i] = distance;
+			i++;
         }
-	}
-	else
-	{
-		var i = 0;
-
-        for(var x = 0; x < depth.width; x++)
-        {
-            var row = [];
-            for(var y = 0; y < depth.height; y++)
-            {
-				// TODO <UPDATE PARTICLE>
-				var distance = depth.getDepth(x, y);
-				depthParticles[i] = distance;
-				i++;
-            }
-		}
 	}
 }
 
