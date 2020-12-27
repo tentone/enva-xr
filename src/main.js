@@ -7,7 +7,6 @@ import {Vector3,
 	Mesh,
 	Euler,
 	WebGLRenderer,
-	CanvasTexture,
 	Scene,
 	PerspectiveCamera,
 	BoxBufferGeometry,
@@ -24,6 +23,7 @@ import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {AugmentedMaterial} from "./material/AugmentedMaterial.js";
 import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane} from "cannon";
 import {PhysicsObject} from "./object/PhysicsObject.js";
+import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 
 /**
  * Physics world used for interaction.
@@ -305,7 +305,7 @@ function initialize()
 			// console.log(position);
 
 			var direction = new Vector3(0, 0, 0);
-			//direction.copy(pose.transform.orientation);
+			// direction.copy(pose.transform.orientation);
 			// direction.normalize();
 
 			var speed = 3.0;
@@ -332,7 +332,7 @@ function initialize()
 	depthCanvas.style.borderRadius = "20px";
 	container.appendChild(depthCanvas);
 
-	depthTexture = new CanvasTexture(depthCanvas);
+	depthTexture = new DepthCanvasTexture(depthCanvas);
 
 	depthDataTexture = new DataTexture();
 
@@ -520,6 +520,13 @@ function updateDepthPhysics(depth)
 			i++;
         }
 	}
+}
+
+/**
+ * Update the depth texture.
+ */
+function updateDepthTexture() {
+
 }
 
 /**
