@@ -11,8 +11,10 @@ export class DepthCanvasTexture extends CanvasTexture
 	 *
 	 * Uses the camera planes to correctly adjust the values.
 	 */
-	updateDepth(depth,near, far)
+	updateDepth(depth, near, far)
 	{
+        var canvas = this.image;
+
 		canvas.width = depth.height;
 		canvas.height = depth.width;
 		canvas.style.width = (2 * canvas.width) + "px";
