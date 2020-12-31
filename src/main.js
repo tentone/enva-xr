@@ -522,12 +522,5 @@ function updateDepthPhysics(depth)
 	}
 }
 
-/**
- * Update the depth texture.
- */
-function updateDepthTexture() {
-
-}
-
 
 initialize();
