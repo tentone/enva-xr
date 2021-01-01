@@ -24,6 +24,7 @@ import {AugmentedMaterial} from "./material/AugmentedMaterial.js";
 import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane} from "cannon";
 import {PhysicsObject} from "./object/PhysicsObject.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
+import { Measurement } from "./object/Measurement.js";
 
 /**
  * Physics world used for interaction.
@@ -111,37 +112,6 @@ var currentLine = null;
  * Size of the rendererer.
  */
 var resolution = new Vector2();
-
-/**
- * Create a line object to draw the measurement in the scene.
- *
- * @param {*} point
- */
-function createMeasurement(point)
-{
-	var geometry = new BufferGeometry().setFromPoints([point, point]);
-
-	return new Line(geometry, new LineBasicMaterial(
-	{
-		color: 0xffffff,
-		linewidth: 5
-	}));
-}
-
-/**
- * Update measurement line with new position.
- *
- * @param {*} matrix
- */
-function updateMeasurement(matrix)
-{
-	var positions = currentLine.geometry.attributes.position.array;
-	positions[3] = matrix.elements[12]
-	positions[4] = matrix.elements[13]
-	positions[5] = matrix.elements[14]
-	currentLine.geometry.attributes.position.needsUpdate = true;
-	currentLine.geometry.computeBoundingSphere();
-}
 
 /**
  * Create and setup webgl renderer object.
@@ -258,7 +228,7 @@ function initialize()
 			}
 			else
 			{
-				currentLine = createMeasurement(measurements[0]);
+				currentLine = new Measurement(measurements[0]);
 				scene.add(currentLine);
 			}
 		}
@@ -477,7 +447,7 @@ function render(time, frame)
 
 		if (currentLine)
 		{
-			updateMeasurement(cursor.matrix);
+			currentLine.setPointFromMatrix(cursor.matrix);
 		}
 	}
 
