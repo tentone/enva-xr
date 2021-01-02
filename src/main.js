@@ -1,20 +1,10 @@
-import {Vector3,
-	Vector2,
-	Mesh,
-	Euler,
-	WebGLRenderer,
-	Scene,
-	PerspectiveCamera,
-	BoxBufferGeometry,
-	MeshNormalMaterial,
-	SphereBufferGeometry,
-	AmbientLight} from "three";
+import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera, BoxBufferGeometry, MeshNormalMaterial, SphereBufferGeometry, AmbientLight} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {AugmentedCanvasMaterial} from "./material/AugmentedCanvasMaterial.js";
-import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane} from "cannon";
+import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3} from "cannon";
 import {PhysicsObject} from "./object/PhysicsObject.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {Measurement} from "./object/Measurement.js";
@@ -37,7 +27,7 @@ var depthParticles = null;
 /**
  * If true the depth data is shown.
  */
-var showDepthDebug = true;
+var debugDepth = true;
 
 /**
  * XR Viewer pose object.
@@ -80,19 +70,14 @@ var hitTestSource = null;
 var hitTestSourceRequested = false;
 
 /**
- * List of measurement points.
- */
-var measurements = [];
-
-/**
  * Cursor to hit test the scene.
  */
 var cursor = null;
 
 /**
- * Line being created currently.
+ * Measurement being created currently.
  */
-var currentLine = null;
+var measurement = null;
 
 /**
  * Size of the rendererer.
@@ -135,14 +120,14 @@ function createWorld()
 	world.quatNormalizeFast = false;
 	world.broadphase = new NaiveBroadphase();
 	world.solver = new SplitSolver(new GSSolver());
-	world.solver.tolerance = 0.05;
+	world.solver.tolerance = 0.01;
 	world.solver.iterations = 7;
 
 	floor = new Body();
 	floor.type = Body.STATIC;
-	floor.mass = 1.0;
-	floor.position.set(0, -1, 0);
+	floor.position.set(0, 0, 0);
 	floor.velocity.set(0, 0, 0);
+	floor.quaternion.setFromAxisAngle(new Vec3(1, 0, 0), -Math.PI / 2)
 	floor.addShape(new Plane());
 	world.addBody(floor);
 }
@@ -182,22 +167,16 @@ function initialize()
 	{
 		if (cursor.visible)
 		{
-			// Get cursor position
-			var position = new Vector3();
-			position.setFromMatrixPosition(cursor.matrix);
-
-			// Add to the measurements list
-			measurements.push(position);
-
-			if (measurements.length == 2)
+			if (measurement)
 			{
-				measurements = [];
-				currentLine = null;
+				measurement = null;
 			}
 			else
 			{
-				currentLine = new Measurement(measurements[0]);
-				scene.add(currentLine);
+				var position = new Vector3();
+				position.setFromMatrixPosition(cursor.matrix);
+				measurement = new Measurement(position);
+				scene.add(measurement);
 			}
 		}
 	});
@@ -229,8 +208,8 @@ function initialize()
 
 	var depthButton = GUIUtils.createButton("./assets/icon/3d.svg", 10, 250, 70, 70, function()
 	{
-		showDepthDebug = !showDepthDebug;
-		depthCanvas.style.display = showDepthDebug ? "block" : "none";
+		debugDepth = !debugDepth;
+		depthCanvas.style.display = debugDepth ? "block" : "none";
 	});
 	container.appendChild(depthButton);
 
@@ -238,23 +217,17 @@ function initialize()
 	{
 		if(pose !== null)
 		{
-			var position = new Vector3(0, 3, 0);
-			// position.copy(pose.transform.position);
-			// console.log(position);
-
 			var direction = new Vector3(0, 0, 0);
-			// direction.copy(pose.transform.orientation);
-			// direction.normalize();
+			direction.copy(pose.transform.orientation);
+			direction.normalize();
 
-			var speed = 3.0;
-			direction.multiplyScalar(speed);
-
-			var geometry = new SphereBufferGeometry(0.05, 16, 16);
-			var shape = new Sphere(0.05);
+			var geometry = new SphereBufferGeometry(0.05, 24, 24);
 			var material = new MeshNormalMaterial();
 
+			var shape = new Sphere(0.05);
+
 			var ball = new PhysicsObject(geometry, material, world);
-			ball.position.set(position.x, position.y, position.z);
+			ball.position.set(0, 0, 0);
 			ball.body.velocity.set(direction.x, direction.y, direction.z);
 			ball.addShape(shape);
 			ball.initialize();
@@ -343,7 +316,7 @@ function render(time, frame)
 		return;
 	}
 
-	world.step(0.016);
+	world.step(0.0166);
 
 	scene.traverse(function(child)
 	{
@@ -384,17 +357,7 @@ function render(time, frame)
 		hitTestSourceRequested = true;
 	}
 
-	if (cursor.visible)
-	{
-		var position = new Vector3();
-		position.setFromMatrixPosition(cursor.matrix);
 
-		// TODO <FLOOR HEIGHT>
-		/*if (position.y < floor.position.y)
-		{
-			floor.position.y = position.y;
-		}*/
-	}
 
 	// Process Hit test
 	if (hitTestSource)
@@ -405,15 +368,23 @@ function render(time, frame)
 			var hit = hitTestResults[0];
 			cursor.visible = true;
 			cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
+
+			// Update physics floor plane
+			var position = new Vector3();
+			position.setFromMatrixPosition(cursor.matrix);
+			if (position.y < floor.position.y)
+			{
+				floor.position.y = position.y;
+			}
 		}
 		else
 		{
 			cursor.visible = false;
 		}
 
-		if (currentLine)
+		if (measurement)
 		{
-			currentLine.setPointFromMatrix(cursor.matrix);
+			measurement.setPointFromMatrix(cursor.matrix);
 		}
 	}
 

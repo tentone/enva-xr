@@ -1,4 +1,4 @@
-import {DataTexture, UnsignedShort4444Type} from "three";
+import {DataTexture, RGBFormat} from "three";
 
 /**
  * Stores the raw depth values in a 16 bit value packed texture.
@@ -9,9 +9,9 @@ export class DepthDataTexture extends DataTexture
 {
 	constructor(width, height) {
 		const size = width * height;
-		const data = new Unit16Array(size);
+		const data = new Uint8Array(3 * size);
 
-		super(data, width, height, UnsignedShort4444Type);
+		super(data, width, height, RGBFormat);
 	}
 
 	updateDepth(depth)

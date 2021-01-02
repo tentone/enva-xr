@@ -18,7 +18,7 @@ export class XRManager
 			currentSession = session;
 		}
 
-		function onSessionEnded( /*event*/ )
+		function onSessionEnded(event)
 		{
 			currentSession.removeEventListener("end", onSessionEnded);
 			currentSession = null;

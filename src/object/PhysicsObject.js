@@ -14,12 +14,14 @@ export class PhysicsObject extends Mesh
 	{
 		super(geometry, material);
 
+		this.frustumCulled = false;
+
 		/**
 		 * Physics body contains the following attributes:
 		 */
 		this.body = new Body();
 		this.body.type = Body.DYNAMIC;
-		this.body.mass = 0.3;
+		this.body.mass = 1.0;
 
 		/**
 		 * Physics object position mode, indicates how coordinates from the physics engine are transformed into object coordinates.
@@ -102,10 +104,12 @@ export class PhysicsObject extends Mesh
 	 */
 	addShape(shape)
 	{
-		if (shape instanceof Shape)
+		if (!(shape instanceof Shape))
 		{
-			this.body.addShape(shape);
+			throw new Error("Shape received is not of CANNON.Shape type");
 		}
+
+		this.body.addShape(shape);
 	};
 }
 
