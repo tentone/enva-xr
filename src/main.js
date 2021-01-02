@@ -1,10 +1,10 @@
-import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera, BoxBufferGeometry, MeshNormalMaterial, SphereBufferGeometry, AmbientLight} from "three";
+import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera, BoxBufferGeometry, MeshNormalMaterial, SphereBufferGeometry, AmbientLight, Matrix4} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {AugmentedCanvasMaterial} from "./material/AugmentedCanvasMaterial.js";
-import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3} from "cannon";
+import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3, Quaternion} from "cannon";
 import {PhysicsObject} from "./object/PhysicsObject.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {Measurement} from "./object/Measurement.js";
@@ -217,9 +217,17 @@ function initialize()
 	{
 		if(pose !== null)
 		{
-			var direction = new Vector3(0, 0, 0);
-			direction.copy(pose.transform.orientation);
-			direction.normalize();
+			var viewOrientation = pose.transform.orientation;
+			var viewPosition = pose.transform.position;
+
+			var orientation = new Quaternion(viewOrientation.x, viewOrientation.y, viewOrientation.z, viewOrientation.w);
+
+			var direction = new Vector3(0.0, 0.0, -1.0);
+			direction.applyQuaternion(orientation);
+			direction.multiplyScalar(5.0);
+
+			var position = new Vector3(viewPosition.x, viewPosition.y, viewPosition.z);
+
 
 			var geometry = new SphereBufferGeometry(0.05, 24, 24);
 			var material = new MeshNormalMaterial();
@@ -227,7 +235,7 @@ function initialize()
 			var shape = new Sphere(0.05);
 
 			var ball = new PhysicsObject(geometry, material, world);
-			ball.position.set(0, 0, 0);
+			ball.position.copy(position);
 			ball.body.velocity.set(direction.x, direction.y, direction.z);
 			ball.addShape(shape);
 			ball.initialize();

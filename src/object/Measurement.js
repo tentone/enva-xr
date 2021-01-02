@@ -64,7 +64,6 @@ export class Measurement extends Line
 		positions[0] = this.measurements[0].x;
 		positions[1] = this.measurements[0].y;
 		positions[2] = this.measurements[0].z;
-
 		positions[3] = this.measurements[1].x;
 		positions[4] = this.measurements[1].y;
 		positions[5] = this.measurements[1].z;
