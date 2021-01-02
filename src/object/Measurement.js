@@ -1,5 +1,4 @@
 import {BufferGeometry, Line, Line3, LineBasicMaterial, Vector3} from "three";
-import {BillboardGroup} from "./BillboardGroup.js";
 import {Text} from "troika-three-text"
 
 /**
@@ -27,16 +26,16 @@ export class Measurement extends Line
 		 */
 		this.measurements = [point.clone(), point.clone()];
 
-		this.group = new BillboardGroup();
-		this.add(this.group);
-
+		/**
+		 * Text used to display the measurement value.
+		 */
 		this.text = new Text();
 		this.text.fontSize = 0.1
 		this.text.color = 0xFFFFFF;
 		this.text.anchorX = "center";
 		this.text.anchorY = "middle";
 		this.text.rotation.set(Math.PI, Math.PI, Math.PI);
-		this.group.add(this.text);
+		this.add(this.text);
 	}
 
 	/**
@@ -78,8 +77,8 @@ export class Measurement extends Line
 		var distance = Math.round(this.measurements[0].distanceTo(this.measurements[1]) * 100);
 		var line = new Line3(this.measurements[0], this.measurements[1]);
 
-		line.getCenter(this.group.position);
-		this.group.position.y += 0.1;
+		line.getCenter(this.text.position);
+		this.text.position.y += 0.1;
 
 		this.text.text = distance + " cm";
 		this.text.sync();

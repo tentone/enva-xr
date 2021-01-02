@@ -228,10 +228,8 @@ function initialize()
 
 			var position = new Vector3(viewPosition.x, viewPosition.y, viewPosition.z);
 
-
 			var geometry = new SphereBufferGeometry(0.05, 24, 24);
 			var material = new MeshNormalMaterial();
-
 			var shape = new Sphere(0.05);
 
 			var ball = new PhysicsObject(geometry, material, world);

@@ -5,6 +5,8 @@ export class BillboardGroup extends Mesh
 	constructor()
 	{
 		super(new BufferGeometry(), new MeshBasicMaterial());
+
+		this.frustumCulled = false;
 	}
 
 	onBeforeRender(renderer, scene, camera, geometry, material, group)
