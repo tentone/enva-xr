@@ -1,12 +1,12 @@
 import {ShaderMaterial} from "three"
-import AugmentedMaterialFragment from "./AugmentedMaterialFragment.glsl";
-import AugmentedMaterialVertex from "./AugmentedMaterialVertex.glsl";
+import AugmentedCanvasMaterialFragment from "./AugmentedCanvasMaterialFragment.glsl";
+import AugmentedCanvasMaterialVertex from "./AugmentedCanvasMaterialVertex.glsl";
 
 /**
  * Shader material used to combine virtual and real scene with depth blending.
  *
  */
-export class AugmentedMaterial extends ShaderMaterial
+export class AugmentedCanvasMaterial extends ShaderMaterial
 {
 	constructor(colorMap, depthMap)
 	{
@@ -19,8 +19,8 @@ export class AugmentedMaterial extends ShaderMaterial
 				uNear: {value: 1.0},
 				uFar: {value: 1.0}
 			},
-			vertexShader: AugmentedMaterialVertex,
-			fragmentShader: AugmentedMaterialFragment
+			vertexShader: AugmentedCanvasMaterialVertex,
+			fragmentShader: AugmentedCanvasMaterialFragment
 		});
 
 		this.depthWrite = true;

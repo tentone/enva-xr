@@ -1,9 +1,5 @@
 import {Vector3,
 	Vector2,
-	Line3,
-	LineBasicMaterial,
-	BufferGeometry,
-	Line,
 	Mesh,
 	Euler,
 	WebGLRenderer,
@@ -12,19 +8,16 @@ import {Vector3,
 	BoxBufferGeometry,
 	MeshNormalMaterial,
 	SphereBufferGeometry,
-	AmbientLight,
-	DataTexture} from "three";
+	AmbientLight} from "three";
 import {XRManager} from "./utils/XRManager.js";
-import {BillboardGroup} from "./object/BillboardGroup.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
-import {Text} from "troika-three-text"
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import {AugmentedMaterial} from "./material/AugmentedMaterial.js";
+import {AugmentedCanvasMaterial} from "./material/AugmentedCanvasMaterial.js";
 import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane} from "cannon";
 import {PhysicsObject} from "./object/PhysicsObject.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
-import { Measurement } from "./object/Measurement.js";
+import {Measurement} from "./object/Measurement.js";
 
 /**
  * Physics world used for interaction.
@@ -60,13 +53,6 @@ var depthCanvas = null;
  * Depth canvas texture with the calculated depth used to debug.
  */
 var depthTexture = null;
-
-/**
- * Texture with raw depth information packed in 16bit data.
- *
- * Contains depth data in millimeter.
- */
-var depthDataTexture = null;
 
 /**
  * Camera used to view the scene.
@@ -170,7 +156,7 @@ function loadGLTFMesh(url, scene, position, rotation, scale) {
 		{
 			if (child instanceof Mesh)
 			{
-				child.material = new AugmentedMaterial(child.material.map, depthTexture);
+				child.material = new AugmentedCanvasMaterial(child.material.map, depthTexture);
 				child.scale.set(scale, scale, scale);
 				child.position.copy(position);
 				child.rotation.copy(rotation);
@@ -205,24 +191,6 @@ function initialize()
 
 			if (measurements.length == 2)
 			{
-				var distance = Math.round(measurements[0].distanceTo(measurements[1]) * 100);
-				var line = new Line3(measurements[0], measurements[1]);
-
-				var group = new BillboardGroup();
-				line.getCenter(group.position);
-				group.position.y += 0.1;
-				scene.add(group);
-
-				var text = new Text();
-				text.text = distance + " cm";
-				text.fontSize = 0.1
-				text.color = 0xFFFFFF;
-				text.anchorX = "center";
-				text.anchorY = "middle";
-				text.rotation.set(Math.PI, Math.PI, Math.PI);
-				text.sync();
-				group.add(text);
-
 				measurements = [];
 				currentLine = null;
 			}
@@ -304,8 +272,6 @@ function initialize()
 
 	depthTexture = new DepthCanvasTexture(depthCanvas);
 
-	depthDataTexture = new DataTexture();
-
 	var button = document.createElement("div");
 	button.style.position = "absolute";
 	button.style.backgroundColor = "#FF6666";
@@ -381,7 +347,7 @@ function render(time, frame)
 
 	scene.traverse(function(child)
 	{
-		if(child.isMesh && child.material && child.material instanceof AugmentedMaterial)
+		if(child.isMesh && child.material && child.material instanceof AugmentedCanvasMaterial)
 		{
 			child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
 			child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);

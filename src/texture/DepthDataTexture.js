@@ -16,15 +16,6 @@ export class DepthDataTexture extends DataTexture
 
 	updateDepth(depth)
 	{
-		for(var x = 0; x < depth.width; x++)
-		{
-			for(var y = 0; y < depth.height; y++)
-			{
-				var distance = depth.getDepth(x, y);
-
-				// TODO <ADD CODE HERE>
-			}
-		}
 
 	}
 

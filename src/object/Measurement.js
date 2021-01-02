@@ -1,4 +1,6 @@
-import {BufferGeometry, Line, LineBasicMaterial} from "three";
+import {BufferGeometry, Line, Line3, LineBasicMaterial, Vector3} from "three";
+import {BillboardGroup} from "./BillboardGroup.js";
+import {Text} from "troika-three-text"
 
 /**
  * Represents a measurement from a point to another.
@@ -7,6 +9,11 @@ export class Measurement extends Line
 {
 	constructor(point)
 	{
+		if (!point)
+		{
+			point = new Vector3(0, 0, 0);
+		}
+
 		var geometry = new BufferGeometry().setFromPoints([point, point]);
 
 		super(geometry, new LineBasicMaterial(
@@ -18,7 +25,18 @@ export class Measurement extends Line
 		/**
 		 * List of points that compose the measurement.
 		 */
-		this.measurements = [point, point];
+		this.measurements = [point.clone(), point.clone()];
+
+		this.group = new BillboardGroup();
+		this.add(this.group);
+
+		this.text = new Text();
+		this.text.fontSize = 0.1
+		this.text.color = 0xFFFFFF;
+		this.text.anchorX = "center";
+		this.text.anchorY = "middle";
+		this.text.rotation.set(Math.PI, Math.PI, Math.PI);
+		this.group.add(this.text);
 	}
 
 	/**
@@ -30,12 +48,28 @@ export class Measurement extends Line
 	 */
 	setPointFromMatrix(matrix)
 	{
+		this.measurements[1].set(matrix.elements[12], matrix.elements[13], matrix.elements[14])
+
+		this.updateGeometry();
+		this.updateText();
+	}
+
+	/**
+	 * Update the line geometry of the measurement to match the measurements array.
+	 *
+	 * Also recalculates the bouding sphere of the geometry to ensure proper camera culling.
+	 */
+	updateGeometry() {
 		var positions = this.geometry.attributes.position.array;
-		positions[3] = matrix.elements[12]
-		positions[4] = matrix.elements[13]
-		positions[5] = matrix.elements[14]
+		positions[0] = this.measurements[0].x;
+		positions[1] = this.measurements[0].y;
+		positions[2] = this.measurements[0].z;
+
+		positions[3] = this.measurements[1].x;
+		positions[4] = this.measurements[1].y;
+		positions[5] = this.measurements[1].z;
 		this.geometry.attributes.position.needsUpdate = true;
-		// this.geometry.computeBoundingSphere();
+		this.geometry.computeBoundingSphere();
 	}
 
 	/**
@@ -45,19 +79,10 @@ export class Measurement extends Line
 		var distance = Math.round(this.measurements[0].distanceTo(this.measurements[1]) * 100);
 		var line = new Line3(this.measurements[0], this.measurements[1]);
 
-		var group = new BillboardGroup();
-		line.getCenter(group.position);
-		group.position.y += 0.1;
-		this.add(group);
+		line.getCenter(this.group.position);
+		this.group.position.y += 0.1;
 
-		var text = new Text();
-		text.text = distance + " cm";
-		text.fontSize = 0.1
-		text.color = 0xFFFFFF;
-		text.anchorX = "center";
-		text.anchorY = "middle";
-		text.rotation.set(Math.PI, Math.PI, Math.PI);
-		text.sync();
-		group.add(text);
+		this.text.text = distance + " cm";
+		this.text.sync();
 	}
 }

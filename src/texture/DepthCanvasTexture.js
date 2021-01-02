@@ -40,8 +40,8 @@ export class DepthCanvasTexture extends CanvasTexture
 			}
 		}
 
-		depthTexture.needsUpdate = true;
 		context.putImageData(image, 0, 0);
+		this.needsUpdate = true;
 	}
 
 }

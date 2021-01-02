@@ -13,4 +13,6 @@ export class Cursor extends Mesh
 		this.matrixAutoUpdate = false;
 		this.visible = false;
 	}
+
+
 }
