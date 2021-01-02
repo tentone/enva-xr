@@ -7,11 +7,11 @@ uniform float uHeight;
 uniform float uNear;
 uniform float uFar;
 
-uniform sampler2D colorMap;
-uniform sampler2D depthMap;
+uniform sampler2D uColorTexture;
+uniform sampler2D uDepthTexture;
 
 void main() {
-	vec4 pixel = texture2D(colorMap, vUv);
+	vec4 pixel = texture2D(uColorTexture, vUv);
 
 	// Alpha test
 	if (pixel.a < 0.3) {
@@ -27,7 +27,7 @@ void main() {
 	z = max(z, 0.0);
 	z = min(z, 1.0);
 
-	vec4 depthPixel = texture2D(depthMap, vec2(x, y));
+	vec4 depthPixel = texture2D(uDepthTexture, vec2(x, y));
 	if (depthPixel.x < z) {
 		// gl_FragColor = vec4(1.0, pixel.gb, 1.0);
 		// return;

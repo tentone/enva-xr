@@ -12,9 +12,9 @@ export class AugmentedCanvasMaterial extends ShaderMaterial
 	{
 		super({
 			uniforms: {
-				colorMap: {value: colorMap},
-                depthMap: {value: depthMap},
-                uWidth: {value: 1.0},
+				uColorTexture: {value: colorMap},
+				uDepthTexture: {value: depthMap},
+				uWidth: {value: 1.0},
 				uHeight: {value: 1.0},
 				uNear: {value: 1.0},
 				uFar: {value: 1.0}

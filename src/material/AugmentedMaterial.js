@@ -1,4 +1,4 @@
-import {ShaderMaterial} from "three"
+import {ShaderMaterial, Matrix4} from "three"
 import AugmentedMaterialFragment from "./AugmentedMaterialFragment.glsl";
 import AugmentedMaterialVertex from "./AugmentedMaterialVertex.glsl";
 
@@ -13,8 +13,9 @@ export class AugmentedMaterial extends ShaderMaterial
 	{
 		super({
 			uniforms: {
-				colorMap: {value: colorMap},
-				depthMap: {value: depthMap},
+				uColorTexture: {value: colorMap},
+				uDepthTexture: {value: depthMap},
+				uUvTransform: {value: new Matrix4()}
 			},
 			vertexShader: AugmentedMaterialVertex,
 			fragmentShader: AugmentedMaterialFragment

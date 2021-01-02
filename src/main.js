@@ -1,4 +1,6 @@
-import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera, BoxBufferGeometry, MeshNormalMaterial, SphereBufferGeometry, AmbientLight, Matrix4} from "three";
+import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
+	BoxBufferGeometry, MeshNormalMaterial, SphereBufferGeometry, DirectionalLight,
+	LightProbe, MeshStandardMaterial, DoubleSide} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {Cursor} from "./object/Cursor.js";
@@ -8,6 +10,12 @@ import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3
 import {PhysicsObject} from "./object/PhysicsObject.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {Measurement} from "./object/Measurement.js";
+import {DepthDataTexture} from "./texture/DepthDataTexture.js";
+
+/**
+ * Light probe used to acess the lighting estimation for the scene.
+ */
+var xrLightProbe = null;
 
 /**
  * Physics world used for interaction.
@@ -45,6 +53,11 @@ var depthCanvas = null;
 var depthTexture = null;
 
 /**
+ * Depth data texture.
+ */
+var depthDataTexture = null;
+
+/**
  * Camera used to view the scene.
  */
 var camera = new PerspectiveCamera(60, 1, 0.1, 10);
@@ -53,6 +66,12 @@ var camera = new PerspectiveCamera(60, 1, 0.1, 10);
  * Scene to draw into the screen.
  */
 var scene = new Scene();
+
+var directionalLight = new DirectionalLight();
+scene.add(directionalLight);
+
+var lightProbe = new LightProbe();
+scene.add(lightProbe);
 
 /**
  * WebGL renderer used to draw the scene.
@@ -141,7 +160,12 @@ function loadGLTFMesh(url, scene, position, rotation, scale) {
 		{
 			if (child instanceof Mesh)
 			{
-				child.material = new AugmentedCanvasMaterial(child.material.map, depthTexture);
+				child.material = new MeshStandardMaterial({
+					alphaTest: 0.3,
+					side: DoubleSide,
+					map: child.material.map
+				});
+				// new AugmentedCanvasMaterial(child.material.map, depthTexture);
 				child.scale.set(scale, scale, scale);
 				child.position.copy(position);
 				child.rotation.copy(rotation);
@@ -156,7 +180,6 @@ function initialize()
 	createWorld();
 
 	resolution.set(window.innerWidth, window.innerHeight);
-	scene.add(new AmbientLight(0xFFFFFF, 1));
 
 	var container = document.createElement("div");
 	container.style.width = "100%";
@@ -251,6 +274,8 @@ function initialize()
 
 	depthTexture = new DepthCanvasTexture(depthCanvas);
 
+	depthDataTexture = new DepthDataTexture();
+
 	var button = document.createElement("div");
 	button.style.position = "absolute";
 	button.style.backgroundColor = "#FF6666";
@@ -267,7 +292,7 @@ function initialize()
 		{
 			optionalFeatures: ["dom-overlay"],
 			domOverlay: {root: container},
-			requiredFeatures: ["hit-test", "depth-sensing"]
+			requiredFeatures: ["hit-test", "depth-sensing", "light-estimation"]
 		});
 	};
 	document.body.appendChild(button);
@@ -322,7 +347,7 @@ function render(time, frame)
 		return;
 	}
 
-	world.step(0.0166);
+	world.step(0.166);
 
 	scene.traverse(function(child)
 	{
@@ -332,7 +357,6 @@ function render(time, frame)
 			child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
 			child.material.uniforms.uNear.value = camera.near;
 			child.material.uniforms.uFar.value = camera.far;
-
 			child.material.uniformsNeedUpdate = true;
 		}
 	});
@@ -354,6 +378,11 @@ function render(time, frame)
 			});
 		});
 
+		session.requestLightProbe().then(function(probe)
+		{
+			xrLightProbe = probe;
+		});
+
 		session.addEventListener("end", function()
 		{
 			hitTestSourceRequested = false;
@@ -363,6 +392,28 @@ function render(time, frame)
 		hitTestSourceRequested = true;
 	}
 
+
+	if (xrLightProbe)
+	{
+		let lightEstimate = frame.getLightEstimate(xrLightProbe);
+		if (lightEstimate)
+		{
+			let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
+
+			directionalLight.position.set(lightEstimate.primaryLightDirection.x,
+										   lightEstimate.primaryLightDirection.y,
+										   lightEstimate.primaryLightDirection.z);
+
+			directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity,
+										   lightEstimate.primaryLightIntensity.y / intensity,
+										   lightEstimate.primaryLightIntensity.z / intensity);
+			directionalLight.intensity = intensity;
+
+			lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
+
+			console.log("Light estimate", lightEstimate);
+		}
+	}
 
 
 	// Process Hit test
@@ -404,6 +455,10 @@ function render(time, frame)
 			var depthData = frame.getDepthInformation(view);
 			if(depthData)
 			{
+				// Float32Array
+				// console.log(depthData.normTextureFromNormView.matrix);
+
+				// Update depth canvas texture
 				depthTexture.updateDepth(depthData, camera.near, camera.far);
 			}
 		}

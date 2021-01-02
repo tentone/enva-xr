@@ -1,4 +1,4 @@
-import {DataTexture, RGBFormat} from "three";
+import {DataTexture} from "three";
 
 /**
  * Stores the raw depth values in a 16 bit value packed texture.
@@ -7,16 +7,22 @@ import {DataTexture, RGBFormat} from "three";
  */
 export class DepthDataTexture extends DataTexture
 {
-	constructor(width, height) {
-		const size = width * height;
-		const data = new Uint8Array(3 * size);
-
-		super(data, width, height, RGBFormat);
-	}
-
-	updateDepth(depth)
+	constructor()
 	{
-
+		super();
 	}
 
+	/**
+	 * Update the texture with new depth data.
+	 *
+	 * Depth data is retrieved from the WebXR API.
+	 *
+	 * @param {*} depthData
+	 */
+	updateDepth(depthData)
+	{
+		this.image.width = depthData.width;
+		this.image.height = depthData.height;
+		this.image.data = new Uint8Array(dataBuffer.buffer, dataBuffer.byteOffset, dataBuffer.byteLength);
+	}
 }
