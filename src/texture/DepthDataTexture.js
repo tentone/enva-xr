@@ -1,4 +1,4 @@
-import {DataTexture} from "three";
+import {DataTexture, LuminanceAlphaFormat, UnsignedByteType} from "three";
 
 /**
  * Stores the raw depth values in a 16 bit value packed texture.
@@ -9,7 +9,11 @@ export class DepthDataTexture extends DataTexture
 {
 	constructor()
 	{
-		super();
+		var width = 160;
+		var height = 90;
+		var data = new Uint8Array(width * height);
+
+		super(data, width, height, LuminanceAlphaFormat, UnsignedByteType);
 	}
 
 	/**
@@ -21,8 +25,8 @@ export class DepthDataTexture extends DataTexture
 	 */
 	updateDepth(depthData)
 	{
-		this.image.width = depthData.width;
-		this.image.height = depthData.height;
+		var dataBuffer = depthData.data;
 		this.image.data = new Uint8Array(dataBuffer.buffer, dataBuffer.byteOffset, dataBuffer.byteLength);
+		this.needsUpdate = true;
 	}
 }

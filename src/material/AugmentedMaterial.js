@@ -15,6 +15,8 @@ export class AugmentedMaterial extends ShaderMaterial
 			uniforms: {
 				uColorTexture: {value: colorMap},
 				uDepthTexture: {value: depthMap},
+				uWidth: {value: 1.0},
+				uHeight: {value: 1.0},
 				uUvTransform: {value: new Matrix4()}
 			},
 			vertexShader: AugmentedMaterialVertex,

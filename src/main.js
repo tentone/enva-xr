@@ -11,6 +11,7 @@ import {PhysicsObject} from "./object/PhysicsObject.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {Measurement} from "./object/Measurement.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture.js";
+import { AugmentedMaterial } from "./material/AugmentedMaterial.js";
 
 /**
  * Light probe used to acess the lighting estimation for the scene.
@@ -81,7 +82,7 @@ var renderer = null;
 /**
  * WebXR hit test source, (null until requested).
  */
-var hitTestSource = null;
+var xrHitTestSource = null;
 
 /**
  * Indicates if a hit test source was requested.
@@ -160,12 +161,13 @@ function loadGLTFMesh(url, scene, position, rotation, scale) {
 		{
 			if (child instanceof Mesh)
 			{
-				child.material = new MeshStandardMaterial({
+				/* child.material = new MeshStandardMaterial({
 					alphaTest: 0.3,
 					side: DoubleSide,
 					map: child.material.map
-				});
-				// new AugmentedCanvasMaterial(child.material.map, depthTexture);
+				}); */
+				child.material = new AugmentedMaterial(child.material.map, depthDataTexture);
+				// child.material = new AugmentedCanvasMaterial(child.material.map, depthTexture);
 				child.scale.set(scale, scale, scale);
 				child.position.copy(position);
 				child.rotation.copy(rotation);
@@ -351,13 +353,22 @@ function render(time, frame)
 
 	scene.traverse(function(child)
 	{
-		if(child.isMesh && child.material && child.material instanceof AugmentedCanvasMaterial)
+		if(child.isMesh && child.material)
 		{
-			child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
-			child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
-			child.material.uniforms.uNear.value = camera.near;
-			child.material.uniforms.uFar.value = camera.far;
-			child.material.uniformsNeedUpdate = true;
+			if(child.material instanceof AugmentedMaterial)
+			{
+				child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
+				child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
+				child.material.uniformsNeedUpdate = true;
+			}
+			else if(child.material instanceof AugmentedCanvasMaterial)
+			{
+				child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
+				child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
+				child.material.uniforms.uNear.value = camera.near;
+				child.material.uniforms.uFar.value = camera.far;
+				child.material.uniformsNeedUpdate = true;
+			}
 		}
 	});
 
@@ -374,7 +385,7 @@ function render(time, frame)
 				space: referenceSpace
 			}).then(function(source)
 			{
-				hitTestSource = source;
+				xrHitTestSource = source;
 			});
 		});
 
@@ -386,7 +397,7 @@ function render(time, frame)
 		session.addEventListener("end", function()
 		{
 			hitTestSourceRequested = false;
-			hitTestSource = null;
+			xrHitTestSource = null;
 		});
 
 		hitTestSourceRequested = true;
@@ -400,26 +411,19 @@ function render(time, frame)
 		{
 			let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
 
-			directionalLight.position.set(lightEstimate.primaryLightDirection.x,
-										   lightEstimate.primaryLightDirection.y,
-										   lightEstimate.primaryLightDirection.z);
-
-			directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity,
-										   lightEstimate.primaryLightIntensity.y / intensity,
-										   lightEstimate.primaryLightIntensity.z / intensity);
+			directionalLight.position.set(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
+			directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
 			directionalLight.intensity = intensity;
 
 			lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
-
-			console.log("Light estimate", lightEstimate);
 		}
 	}
 
 
 	// Process Hit test
-	if (hitTestSource)
+	if (xrHitTestSource)
 	{
-		var hitTestResults = frame.getHitTestResults(hitTestSource);
+		var hitTestResults = frame.getHitTestResults(xrHitTestSource);
 		if (hitTestResults.length)
 		{
 			var hit = hitTestResults[0];
@@ -455,8 +459,17 @@ function render(time, frame)
 			var depthData = frame.getDepthInformation(view);
 			if(depthData)
 			{
-				// Float32Array
-				// console.log(depthData.normTextureFromNormView.matrix);
+				// Update normal matrix
+				scene.traverse(function(child)
+				{
+					if(child.isMesh && child.material && child.material instanceof AugmentedMaterial)
+					{
+						child.material.uniforms.uUvTransform.value.fromArray(depthData.normTextureFromNormView.matrix);
+						child.material.uniformsNeedUpdate = true;
+					}
+				});
+
+				depthDataTexture.updateDepth(depthData);
 
 				// Update depth canvas texture
 				depthTexture.updateDepth(depthData, camera.near, camera.far);

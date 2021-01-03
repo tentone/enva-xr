@@ -21,13 +21,14 @@ void main() {
 	// Normalize x, y to range [0, 1]
 	float x = gl_FragCoord.x / uWidth;
 	float y = gl_FragCoord.y / uHeight;
+	vec2 depthUV = vec2(x, y);
 
 	// Calculate depth [0, 1]
 	float z = (vDepth - uNear) / (uFar - uNear);
 	z = max(z, 0.0);
 	z = min(z, 1.0);
 
-	vec4 depthPixel = texture2D(uDepthTexture, vec2(x, y));
+	vec4 depthPixel = texture2D(uDepthTexture, depthUV);
 	if (depthPixel.x < z) {
 		// gl_FragColor = vec4(1.0, pixel.gb, 1.0);
 		// return;
