@@ -1,4 +1,4 @@
-import {DataTexture, LuminanceAlphaFormat, UnsignedByteType} from "three";
+import {DataTexture, LuminanceAlphaFormat, UnsignedByteType, NearestFilter, LinearFilter} from "three";
 
 /**
  * Stores the raw depth values in a 16 bit value packed texture.
@@ -14,6 +14,9 @@ export class DepthDataTexture extends DataTexture
 		var data = new Uint8Array(width * height);
 
 		super(data, width, height, LuminanceAlphaFormat, UnsignedByteType);
+
+		this.magFilter = LinearFilter;
+		this.minFilter = LinearFilter; // LinearFilter
 	}
 
 	/**
