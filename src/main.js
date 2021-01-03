@@ -29,11 +29,6 @@ var world = null;
 var floor = null;
 
 /**
- * Physics depth particles. Matches the same size of the depth map provided by WebXR.
- */
-var depthParticles = null;
-
-/**
  * If true the depth data is shown.
  */
 var debugDepth = true;
@@ -336,21 +331,9 @@ function resize()
 	renderer.setPixelRatio(window.devicePixelRatio);
 }
 
-/**
- * Update logic and render scene into the screen.
- *
- * @param {*} time
- * @param {*} frame
- */
-function render(time, frame)
+// Update uniforms of materials to match the screen size and camera configuration
+function updateUniforms()
 {
-	if (!frame)
-	{
-		return;
-	}
-
-	world.step(0.166);
-
 	scene.traverse(function(child)
 	{
 		if(child.isMesh && child.material)
@@ -371,6 +354,24 @@ function render(time, frame)
 			}
 		}
 	});
+}
+
+/**
+ * Update logic and render scene into the screen.
+ *
+ * @param {*} time
+ * @param {*} frame
+ */
+function render(time, frame)
+{
+	if (!frame)
+	{
+		return;
+	}
+
+	updateUniforms();
+
+	world.step(0.166);
 
 	var referenceSpace = renderer.xr.getReferenceSpace();
 	var session = renderer.xr.getSession();
@@ -404,6 +405,7 @@ function render(time, frame)
 	}
 
 
+	// Process lighting condition from probe
 	if (xrLightProbe)
 	{
 		let lightEstimate = frame.getLightEstimate(xrLightProbe);
@@ -418,7 +420,6 @@ function render(time, frame)
 			lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
 		}
 	}
-
 
 	// Process Hit test
 	if (xrHitTestSource)
@@ -479,29 +480,5 @@ function render(time, frame)
 
 	renderer.render(scene, camera);
 }
-
-/**
- * Update the physics particle model to match the depth information.
- */
-function updateDepthPhysics(depth)
-{
-	if(depthParticles === null)
-	{
-        depthParticles = new Array(depth.width * depth.height);
-    }
-
-	var i = 0;
-    for(var x = 0; x < depth.width; x++)
-    {
-        for(var y = 0; y < depth.height; y++)
-        {
-			// TODO <UPDATE PARTICLE>
-			var distance = depth.getDepth(x, y);
-			depthParticles[i] = distance;
-			i++;
-        }
-	}
-}
-
 
 initialize();
