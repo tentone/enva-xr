@@ -16,7 +16,7 @@ export class DepthDataTexture extends DataTexture
 		super(data, width, height, LuminanceAlphaFormat, UnsignedByteType);
 
 		this.magFilter = LinearFilter;
-		this.minFilter = LinearFilter; // LinearFilter
+		this.minFilter = LinearFilter;
 	}
 
 	/**
