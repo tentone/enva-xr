@@ -101,6 +101,11 @@ var resolution = new Vector2();
 
 export class App
 {
+    constructor()
+    {
+
+    }
+
 	/**
 	 * Create and setup webgl renderer object.
 	 *
