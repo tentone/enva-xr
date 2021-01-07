@@ -1,6 +1,6 @@
 import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
 	BoxBufferGeometry, MeshNormalMaterial, SphereBufferGeometry, DirectionalLight,
-	LightProbe} from "three";
+	LightProbe, DoubleSide, MeshStandardMaterial, Matrix4} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {Cursor} from "./object/Cursor.js";
@@ -70,6 +70,11 @@ var lightProbe = new LightProbe();
 scene.add(lightProbe);
 
 /**
+ * Time of the last frame.
+ */
+var lastTime = 0;
+
+/**
  * WebGL renderer used to draw the scene.
  */
 var renderer = null;
@@ -101,11 +106,6 @@ var resolution = new Vector2();
 
 export class App
 {
-    constructor()
-    {
-
-    }
-
 	/**
 	 * Create and setup webgl renderer object.
 	 *
@@ -132,6 +132,9 @@ export class App
 		renderer.xr.enabled = true;
 	}
 
+	/**
+	 * Create physics world for collistion simulation.
+	 */
 	createWorld()
 	{
 		world = new World();
@@ -154,12 +157,62 @@ export class App
 		world.addBody(floor);
 	}
 
+	createMaterial(colorMap, depthMap) {
+		var material = new MeshStandardMaterial({
+			alphaTest: 0.3,
+			side: DoubleSide,
+			map: colorMap
+		});
+
+		material.userData = {
+			uDepthTexture: {value: depthMap},
+			uWidth: {value: 1.0},
+			uHeight: {value: 1.0},
+			uUvTransform: {value: new Matrix4()}
+		};
+
+		material.onBeforeCompile = (shader) =>
+		{
+			// Pass uniforms from userData to the
+			for (let i in material.userData)
+			{
+				shader.uniforms[i] = material.userData[i];
+			}
+
+
+			console.log(shader)
+
+
+			// Inject uniforms
+			shader.fragmentShader = `
+			uniform sampler2D uDepthTexture;
+			uniform float uWidth;
+			uniform float uHeight;
+			uniform mat4 uUvTransform;
+			` + shader.fragmentShader;
+
+			// Inject depth logic
+			shader.fragmentShader =  shader.fragmentShader.replace('#include <dithering_fragment>', `
+			#include <dithering_fragment>
+			`);
+
+
+
+			// vertexShader
+			shader.vertexShader =  shader.vertexShader.replace('#include <fog_vertex>', `
+			#include <fog_vertex>
+			`);
+		}
+
+		return material;
+	}
+
 	loadGLTFMesh(url, scene, position, rotation, scale) {
 
 		const loader = new GLTFLoader();
-		loader.load(url, function(gltf)
+		loader.load(url, (gltf) =>
 		{
-			gltf.scene.traverse(function(child)
+			gltf.scene.traverse((child) =>
 			{
 				if (child instanceof Mesh)
 				{
@@ -168,7 +221,8 @@ export class App
 						side: DoubleSide,
 						map: child.material.map
 					}); */
-					child.material = new AugmentedMaterial(child.material.map, depthDataTexture);
+					child.material = this.createMaterial(child.material.map, depthDataTexture);
+					// child.material = new AugmentedMaterial(child.material.map, depthDataTexture);
 					// child.material = new AugmentedCanvasMaterial(child.material.map, depthTexture);
 					child.scale.set(scale, scale, scale);
 					child.position.copy(position);
@@ -181,7 +235,7 @@ export class App
 
 	initialize()
 	{
-		createWorld();
+		this.createWorld();
 
 		resolution.set(window.innerWidth, window.innerHeight);
 
@@ -209,26 +263,26 @@ export class App
 		});
 		container.appendChild(rulerButton);
 
-		var treeButton = GUIUtils.createButton("./assets/icon/tree.svg", 10, 90, 70, 70, function()
+		var treeButton = GUIUtils.createButton("./assets/icon/tree.svg", 10, 90, 70, 70, () =>
 		{
 			if (cursor.visible)
 			{
 				var position = new Vector3();
 				position.setFromMatrixPosition(cursor.matrix);
 
-				loadGLTFMesh("./assets/3d/tree/scene.gltf", scene, position, new Euler(0, 0, 0), 0.002);
+				this.loadGLTFMesh("./assets/3d/tree/scene.gltf", scene, position, new Euler(0, 0, 0), 0.002);
 			}
 		});
 		container.appendChild(treeButton);
 
-		var flowerButton = GUIUtils.createButton("./assets/icon/flower.svg", 10, 170, 70, 70, function()
+		var flowerButton = GUIUtils.createButton("./assets/icon/flower.svg", 10, 170, 70, 70, () =>
 		{
 			if (cursor.visible)
 			{
 				var position = new Vector3();
 				position.setFromMatrixPosition(cursor.matrix);
 
-				loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(Math.PI, 0, 0), 0.007);
+				this.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(Math.PI, 0, 0), 0.007);
 			}
 		});
 		container.appendChild(flowerButton);
@@ -303,7 +357,7 @@ export class App
 
 		var canvas = document.createElement("canvas");
 		document.body.appendChild(canvas);
-		createRenderer(canvas);
+		this.createRenderer(canvas);
 
 		var box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial());
 		box.scale.set(0.1, 0.1, 0.1);
@@ -319,9 +373,11 @@ export class App
 		cursor = new Cursor();
 		scene.add(cursor);
 
-		window.addEventListener("resize", resize, false);
+		window.addEventListener("resize", () => {this.resize();}, false);
 
-		renderer.setAnimationLoop(render);
+		renderer.setAnimationLoop((time, frame) => {
+			this.render(time, frame);
+		});
 	}
 
 	/**
@@ -371,14 +427,18 @@ export class App
 	 */
 	render(time, frame)
 	{
+
+		let delta = time - lastTime;
+		lastTime = time;
+
 		if (!frame)
 		{
 			return;
 		}
 
-		updateUniforms();
+		this.updateUniforms();
 
-		world.step(0.166);
+		world.step(delta / 1e3);
 
 		var referenceSpace = renderer.xr.getReferenceSpace();
 		var session = renderer.xr.getSession();
