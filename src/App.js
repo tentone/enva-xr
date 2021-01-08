@@ -261,12 +261,17 @@ export class App
 					}), depthDataTexture);*/
 					// child.material = new AugmentedMaterial(child.material.map, depthDataTexture);
 					// child.material = new AugmentedCanvasMaterial(child.material.map, depthTexture);
-					child.scale.set(scale, scale, scale);
-					child.position.copy(position);
-					child.rotation.copy(rotation);
-					scene.add(child);
+
 				}
 			});
+
+			console.log(gltf);
+
+			var object = gltf.scene.children[0];
+			object.scale.set(scale, scale, scale);
+			object.position.copy(position);
+			object.rotation.copy(rotation);
+			scene.add(object);
 		});
 	}
 
@@ -299,13 +304,23 @@ export class App
 			}
 		}));
 
+		container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
+		{
+			if (cursor.visible)
+			{
+				var position = new Vector3();
+				position.setFromMatrixPosition(cursor.matrix);
+				this.loadGLTFMesh("./assets/3d/car/scene.gltf", scene, position, new Euler(-Math.PI / 2, 0, 0), 0.01);
+			}
+		}));
+
+
 		container.appendChild(GUIUtils.createButton("./assets/icon/tree.svg", () =>
 		{
 			if (cursor.visible)
 			{
 				var position = new Vector3();
 				position.setFromMatrixPosition(cursor.matrix);
-
 				this.loadGLTFMesh("./assets/3d/tree/scene.gltf", scene, position, new Euler(0, 0, 0), 0.002);
 			}
 		}));
@@ -316,8 +331,7 @@ export class App
 			{
 				var position = new Vector3();
 				position.setFromMatrixPosition(cursor.matrix);
-
-				this.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(Math.PI, 0, 0), 0.007);
+				this.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(-Math.PI / 2, 0, 0), 0.007);
 			}
 		}));
 

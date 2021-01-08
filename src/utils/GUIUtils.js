@@ -12,15 +12,13 @@ export class GUIUtils {
 	 */
 	static createButton(imageSrc, onclick)
 	{
-		y += 80;
-
 		var button = document.createElement("div");
 		button.style.width = w + "px";
 		button.style.height = h + "px";
 		button.style.position = "absolute";
 		button.style.left = x + "px";
 		button.style.bottom = y + "px";
-		button.style.backgroundColor = "#FFFFFF66";
+		button.style.backgroundColor = "#FFFFFF33";
 		button.style.borderRadius = "20px";
 		button.onclick = onclick;
 
@@ -32,6 +30,8 @@ export class GUIUtils {
 		icon.style.left = "10%";
 		icon.style.position = "absolute";
 		button.appendChild(icon);
+
+		y += 80;
 
 		return button;
 	}
