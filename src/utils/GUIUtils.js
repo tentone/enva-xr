@@ -1,3 +1,8 @@
+var w = 70;
+var h = 70;
+var x = 10;
+var y = 10;
+
 export class GUIUtils {
 	/**
 	 * Create a button with an icon.
@@ -5,8 +10,10 @@ export class GUIUtils {
 	 * @param {*} imageSrc
 	 * @param {*} onclick
 	 */
-	static createButton(imageSrc, x, y, w, h, onclick)
+	static createButton(imageSrc, onclick)
 	{
+		y += 80;
+
 		var button = document.createElement("div");
 		button.style.width = w + "px";
 		button.style.height = h + "px";

@@ -109,6 +109,11 @@ var resolution = new Vector2();
  */
 var glContext = null;
 
+/**
+ * XRWebGLBinding object used get additional gl data.
+ */
+var xrGlBinding = null;
+
 export class App
 {
 	/**
@@ -199,7 +204,7 @@ export class App
 			` + shader.fragmentShader;
 
 			// Fragment depth logic
-			shader.fragmentShader =  shader.fragmentShader.replace('void main',
+			shader.fragmentShader =  shader.fragmentShader.replace("void main",
 			`float getDepthInMillimeters(in sampler2D depthText, in vec2 uv)
 			{
 				vec2 packedDepth = texture2D(depthText, uv).ra;
@@ -209,7 +214,7 @@ export class App
 			void main`);
 
 
-			shader.fragmentShader =  shader.fragmentShader.replace('#include <dithering_fragment>', `
+			shader.fragmentShader =  shader.fragmentShader.replace("#include <dithering_fragment>", `
 			#include <dithering_fragment>
 
 			// Normalize x, y to range [0, 1]
@@ -229,7 +234,7 @@ export class App
 			` + shader.vertexShader;
 
 			// Vertex depth logic
-			shader.vertexShader =  shader.vertexShader.replace('#include <fog_vertex>', `
+			shader.vertexShader =  shader.vertexShader.replace("#include <fog_vertex>", `
 			#include <fog_vertex>
 
 			vDepth = gl_Position.z;
@@ -248,11 +253,12 @@ export class App
 			{
 				if (child instanceof Mesh)
 				{
-					child.material = this.createAugmentedMaterial(new MeshStandardMaterial({
+					child.material = this.createAugmentedMaterial(child.material, depthDataTexture);
+					/*new MeshStandardMaterial({
 						alphaTest: 0.3,
 						side: DoubleSide,
 						map: child.material.map
-					}), depthDataTexture);
+					}), depthDataTexture);*/
 					// child.material = new AugmentedMaterial(child.material.map, depthDataTexture);
 					// child.material = new AugmentedCanvasMaterial(child.material.map, depthTexture);
 					child.scale.set(scale, scale, scale);
@@ -275,7 +281,7 @@ export class App
 		container.style.height = "100%";
 		document.body.appendChild(container);
 
-		var rulerButton = GUIUtils.createButton("./assets/icon/ruler.svg", 10, 10, 70, 70, function()
+		container.appendChild(GUIUtils.createButton("./assets/icon/ruler.svg", function()
 		{
 			if (cursor.visible)
 			{
@@ -291,10 +297,9 @@ export class App
 					scene.add(measurement);
 				}
 			}
-		});
-		container.appendChild(rulerButton);
+		}));
 
-		var treeButton = GUIUtils.createButton("./assets/icon/tree.svg", 10, 90, 70, 70, () =>
+		container.appendChild(GUIUtils.createButton("./assets/icon/tree.svg", () =>
 		{
 			if (cursor.visible)
 			{
@@ -303,10 +308,9 @@ export class App
 
 				this.loadGLTFMesh("./assets/3d/tree/scene.gltf", scene, position, new Euler(0, 0, 0), 0.002);
 			}
-		});
-		container.appendChild(treeButton);
+		}));
 
-		var flowerButton = GUIUtils.createButton("./assets/icon/flower.svg", 10, 170, 70, 70, () =>
+		container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg",  () =>
 		{
 			if (cursor.visible)
 			{
@@ -315,17 +319,15 @@ export class App
 
 				this.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(Math.PI, 0, 0), 0.007);
 			}
-		});
-		container.appendChild(flowerButton);
+		}));
 
-		var depthButton = GUIUtils.createButton("./assets/icon/3d.svg", 10, 250, 70, 70, function()
+		container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", function()
 		{
 			debugDepth = !debugDepth;
 			depthCanvas.style.display = debugDepth ? "block" : "none";
-		});
-		container.appendChild(depthButton);
+		}));
 
-		var physicsButton = GUIUtils.createButton("./assets/icon/cube.svg", 10, 330, 70, 70, function()
+		container.appendChild(GUIUtils.createButton("./assets/icon/cube.svg", function()
 		{
 			if(pose !== null)
 			{
@@ -351,8 +353,7 @@ export class App
 				ball.initialize();
 				scene.add(ball);
 			}
-		});
-		container.appendChild(physicsButton);
+		}));
 
 		depthCanvas = document.createElement("canvas");
 		depthCanvas.style.position = "absolute";
@@ -480,7 +481,9 @@ export class App
 		var referenceSpace = renderer.xr.getReferenceSpace();
 		var session = renderer.xr.getSession();
 
-		var glBinding = new XRWebGLBinding(session, glContext);
+		if (!xrGlBinding) {
+			xrGlBinding = new XRWebGLBinding(session, glContext);
+		}
 
 		// Request hit test source
 		if (!hitTestSourceRequested)
@@ -496,9 +499,15 @@ export class App
 				});
 			});
 
-			session.requestLightProbe().then(function(probe)
+			session.requestLightProbe().then((probe) =>
 			{
 				xrLightProbe = probe;
+
+				// Get cube map for reflections
+				/*xrLightProbe.addEventListener("reflectionchange", () => {
+					// var glCubeMap = xrGlBinding.getReflectionCubeMap(xrLightProbe);
+					// console.log(glCubeMap);
+				});*/
 			});
 
 			session.addEventListener("end", function()
