@@ -157,13 +157,15 @@ export class App
 		world.addBody(floor);
 	}
 
-	createMaterial(colorMap, depthMap) {
-		var material = new MeshStandardMaterial({
-			alphaTest: 0.3,
-			side: DoubleSide,
-			map: colorMap
-		});
-
+	/**
+	 * Create a augmented reality occlusion enabled material from a standard three.js material.
+	 *
+	 * Can be used to test multiple material models with the AR functionality.
+	 *
+	 * @param {*} colorMap
+	 * @param {*} depthMap
+	 */
+	createAugmentedMaterial(material, depthMap) {
 		material.userData = {
 			uDepthTexture: {value: depthMap},
 			uWidth: {value: 1.0},
@@ -180,10 +182,6 @@ export class App
 			{
 				shader.uniforms[i] = material.userData[i];
 			}
-
-
-			console.log(shader)
-
 
 			// Fragment variables
 			shader.fragmentShader = `
@@ -245,12 +243,11 @@ export class App
 			{
 				if (child instanceof Mesh)
 				{
-					/* child.material = new MeshStandardMaterial({
+					child.material = this.createAugmentedMaterial(new MeshStandardMaterial({
 						alphaTest: 0.3,
 						side: DoubleSide,
 						map: child.material.map
-					}); */
-					child.material = this.createMaterial(child.material.map, depthDataTexture);
+					}), depthDataTexture);
 					// child.material = new AugmentedMaterial(child.material.map, depthDataTexture);
 					// child.material = new AugmentedCanvasMaterial(child.material.map, depthTexture);
 					child.scale.set(scale, scale, scale);
