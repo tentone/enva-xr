@@ -104,6 +104,11 @@ var measurement = null;
  */
 var resolution = new Vector2();
 
+/**
+ * WebGL 2.0 context used to render.
+ */
+var glContext = null;
+
 export class App
 {
 	/**
@@ -113,11 +118,11 @@ export class App
 	 */
 	createRenderer(canvas)
 	{
-		var context = canvas.getContext("webgl2", {xrCompatible: true});
+		glContext = canvas.getContext("webgl2", {xrCompatible: true});
 
 		renderer = new WebGLRenderer(
 		{
-			context: context,
+			context: glContext,
 			antialias: true,
 			alpha: true,
 			canvas: canvas,
@@ -475,6 +480,8 @@ export class App
 		var referenceSpace = renderer.xr.getReferenceSpace();
 		var session = renderer.xr.getSession();
 
+		var glBinding = new XRWebGLBinding(session, glContext);
+
 		// Request hit test source
 		if (!hitTestSourceRequested)
 		{
@@ -511,11 +518,9 @@ export class App
 			if (lightEstimate)
 			{
 				let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
-
 				directionalLight.position.set(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
 				directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
 				directionalLight.intensity = intensity;
-
 				lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
 			}
 		}
