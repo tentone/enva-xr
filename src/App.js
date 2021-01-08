@@ -171,6 +171,8 @@ export class App
 			uUvTransform: {value: new Matrix4()}
 		};
 
+		material.isAgumentedMaterial = true;
+
 		material.onBeforeCompile = (shader) =>
 		{
 			// Pass uniforms from userData to the
@@ -183,24 +185,51 @@ export class App
 			console.log(shader)
 
 
-			// Inject uniforms
+			// Fragment variables
 			shader.fragmentShader = `
 			uniform sampler2D uDepthTexture;
 			uniform float uWidth;
 			uniform float uHeight;
 			uniform mat4 uUvTransform;
+
+			varying float vDepth;
 			` + shader.fragmentShader;
 
-			// Inject depth logic
+			// Fragment depth logic
+			shader.fragmentShader =  shader.fragmentShader.replace('void main',
+			`float getDepthInMillimeters(in sampler2D depthText, in vec2 uv)
+			{
+				vec2 packedDepth = texture2D(depthText, uv).ra;
+				return dot(packedDepth, vec2(255.0, 256.0 * 255.0));
+			}
+
+			void main`);
+
+
 			shader.fragmentShader =  shader.fragmentShader.replace('#include <dithering_fragment>', `
 			#include <dithering_fragment>
+
+			// Normalize x, y to range [0, 1]
+			float x = gl_FragCoord.x / uWidth;
+			float y = gl_FragCoord.y / uHeight;
+			vec2 depthUV = (uUvTransform * vec4(vec2(x, y), 0, 1)).xy;
+
+			float depth = getDepthInMillimeters(uDepthTexture, depthUV) / 1000.0;
+			if (depth < vDepth) {
+				discard;
+			}
 			`);
 
+			// Vertex variables
+			shader.vertexShader = `
+			varying float vDepth;
+			` + shader.vertexShader;
 
-
-			// vertexShader
+			// Vertex depth logic
 			shader.vertexShader =  shader.vertexShader.replace('#include <fog_vertex>', `
 			#include <fog_vertex>
+
+			vDepth = gl_Position.z;
 			`);
 		}
 
@@ -395,7 +424,7 @@ export class App
 	}
 
 	// Update uniforms of materials to match the screen size and camera configuration
-	updateUniforms()
+	updateUniforms(normTextureFromNormViewMatrix)
 	{
 		scene.traverse(function(child)
 		{
@@ -405,6 +434,7 @@ export class App
 				{
 					child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
 					child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
+					child.material.uniforms.uUvTransform.value.fromArray(normTextureFromNormViewMatrix);
 					child.material.uniformsNeedUpdate = true;
 				}
 				else if(child.material instanceof AugmentedCanvasMaterial)
@@ -413,6 +443,13 @@ export class App
 					child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
 					child.material.uniforms.uNear.value = camera.near;
 					child.material.uniforms.uFar.value = camera.far;
+					child.material.uniformsNeedUpdate = true;
+				}
+				else if(child.material.isAgumentedMaterial)
+				{
+					child.material.userData.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
+					child.material.userData.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
+					child.material.userData.uUvTransform.value.fromArray(normTextureFromNormViewMatrix);
 					child.material.uniformsNeedUpdate = true;
 				}
 			}
@@ -435,8 +472,6 @@ export class App
 		{
 			return;
 		}
-
-		this.updateUniforms();
 
 		world.step(delta / 1e3);
 
@@ -527,20 +562,12 @@ export class App
 				var depthData = frame.getDepthInformation(view);
 				if(depthData)
 				{
-					// Update normal matrix
-					scene.traverse(function(child)
-					{
-						if(child.isMesh && child.material && child.material instanceof AugmentedMaterial)
-						{
-							child.material.uniforms.uUvTransform.value.fromArray(depthData.normTextureFromNormView.matrix);
-							child.material.uniformsNeedUpdate = true;
-						}
-					});
-
+					// Update textures
 					depthDataTexture.updateDepth(depthData);
-
-					// Update depth canvas texture
 					depthTexture.updateDepth(depthData, camera.near, camera.far);
+
+					// Update normal matrix
+					this.updateUniforms(depthData.normTextureFromNormView.matrix);
 				}
 			}
 		}
