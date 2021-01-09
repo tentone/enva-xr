@@ -3,6 +3,7 @@ import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
 	LightProbe, DoubleSide, MeshStandardMaterial, Matrix4} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
+import {ObjectUtils} from "./utils/ObjectUtils.js";
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {AugmentedCanvasMaterial} from "./material/AugmentedCanvasMaterial.js";
@@ -64,6 +65,11 @@ var camera = new PerspectiveCamera(60, 1, 0.1, 10);
 var scene = new Scene();
 
 var directionalLight = new DirectionalLight();
+directionalLight.castShadow = true;
+directionalLight.shadow.mapSize.width = 512;
+directionalLight.shadow.mapSize.height = 512;
+directionalLight.shadow.camera.near = 0.5;
+directionalLight.shadow.camera.far = 500;
 scene.add(directionalLight);
 
 var lightProbe = new LightProbe();
@@ -137,6 +143,7 @@ export class App
 		});
 
 		renderer.shadowMap.enabled = false;
+
 		renderer.setPixelRatio(window.devicePixelRatio);
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.xr.enabled = true;
@@ -253,12 +260,9 @@ export class App
 			{
 				if (child instanceof Mesh)
 				{
+					child.receiveShadow = true;
+					child.castShadow = true;
 					child.material = this.createAugmentedMaterial(child.material, depthDataTexture);
-					/*new MeshStandardMaterial({
-						alphaTest: 0.3,
-						side: DoubleSide,
-						map: child.material.map
-					}), depthDataTexture);*/
 					// child.material = new AugmentedMaterial(child.material.map, depthDataTexture);
 					// child.material = new AugmentedCanvasMaterial(child.material.map, depthTexture);
 				}
@@ -266,12 +270,18 @@ export class App
 
 			var object = gltf.scene.children[0];
 
-			var box = calculateBoundingBox(object);
-			console.log(box);
+			var box = ObjectUtils.calculateBoundingBox(object);
 
-			object.scale.set(scale, scale, scale);
+			var center = box.max.clone();
+			center.add(box.min);
+			center.multiplyScalar(scale);
+			center.multiplyScalar(0.5);
+
 			object.position.copy(position);
+			object.position.sub(center);
+			object.scale.set(scale, scale, scale);
 			object.rotation.copy(rotation);
+
 			scene.add(object);
 		});
 	}
@@ -305,6 +315,18 @@ export class App
 			}
 		}));
 
+
+		container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", function()
+		{
+			debugDepth = !debugDepth;
+			depthCanvas.style.display = debugDepth ? "block" : "none";
+		}));
+
+		container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", function()
+		{
+			renderer.shadowMap.enabled = !renderer.shadowMap.enabled;
+		}));
+
 		container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
 		{
 			if (cursor.visible)
@@ -333,12 +355,6 @@ export class App
 				position.setFromMatrixPosition(cursor.matrix);
 				this.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(-Math.PI / 2, 0, 0), 0.007);
 			}
-		}));
-
-		container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", function()
-		{
-			debugDepth = !debugDepth;
-			depthCanvas.style.display = debugDepth ? "block" : "none";
 		}));
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/cube.svg", function()
