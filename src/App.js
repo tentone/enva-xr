@@ -64,10 +64,6 @@ var camera = new PerspectiveCamera(60, 1, 0.1, 10);
  */
 var scene = new Scene();
 
-
-var ambientLight = new AmbientLight(0x333333);
-scene.add(ambientLight);
-
 var directionalLight = new DirectionalLight();
 scene.add(directionalLight);
 
@@ -243,9 +239,6 @@ export class App
 	 * @param {*} depthMap
 	 */
 	createAugmentedMaterial(material, depthMap) {
-
-		material.side = DoubleSide;
-
 		material.userData = {
 			uDepthTexture: {value: depthMap},
 			uWidth: {value: 1.0},
@@ -321,39 +314,44 @@ export class App
 		return material;
 	}
 
-	loadGLTFMesh(url, scene, position, rotation, scale) {
-
-		const loader = new GLTFLoader();
-		loader.loadAsync(url).then((gltf) =>
+	loadGLTFMesh(url, scene, rotation, scale) {
+		if (cursor.visible)
 		{
-			var object = gltf.scene;
-			scene.add(object);
+			var position = new Vector3();
+			position.setFromMatrixPosition(cursor.matrix);
 
-			object.traverse((child) =>
+			const loader = new GLTFLoader();
+			loader.loadAsync(url).then((gltf) =>
 			{
-				if (child instanceof Mesh)
+				var object = gltf.scene;
+				scene.add(object);
+
+				object.traverse((child) =>
 				{
-					child.material = this.createAugmentedMaterial(child.material, depthDataTexture);
-				}
+					if (child instanceof Mesh)
+					{
+						child.material = this.createAugmentedMaterial(child.material, depthDataTexture);
+					}
+				});
+
+				object.scale.set(scale, scale, scale);
+				object.rotation.copy(rotation);
+				object.updateMatrix();
+				object.updateMatrixWorld(true);
+
+				var box = ObjectUtils.calculateBoundingBox(object);
+				var center = new Vector3();
+				box.getCenter(center);
+
+				var size = new Vector3();
+				box.getSize(size);
+
+				console.log(center, size);
+
+				object.position.set(-center.x, -center.y / 2, -center.z);
+				object.position.add(position);
 			});
-
-			object.scale.set(scale, scale, scale);
-			object.rotation.copy(rotation);
-			object.updateMatrix();
-			object.updateMatrixWorld(true);
-
-			var box = ObjectUtils.calculateBoundingBox(object);
-			var center = new Vector3();
-			box.getCenter(center);
-
-			var size = new Vector3();
-			box.getSize(size);
-
-			console.log(center, size);
-
-			object.position.set(-center.x, -center.y / 2, -center.z);
-			object.position.add(position);
-		});
+		}
 	}
 
 	resetDepthCanvas()
@@ -419,53 +417,33 @@ export class App
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
 		{
-			if (cursor.visible)
-			{
-				var position = new Vector3();
-				position.setFromMatrixPosition(cursor.matrix);
-				this.loadGLTFMesh("./assets/3d/car/scene.gltf", scene, position, new Euler(-Math.PI / 2, 0, 0), 0.01);
-			}
+			this.loadGLTFMesh("./assets/3d/car/scene.gltf", scene, new Euler(0, 0, 0), 0.003);
 		}));
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
 		{
-			if (cursor.visible)
-			{
-				var position = new Vector3();
-				position.setFromMatrixPosition(cursor.matrix);
-				this.loadGLTFMesh("./assets/3d/gltf/WaterBottle.glb", scene, position, new Euler(0, 0, 0), 1.0);
-			}
+			this.loadGLTFMesh("./assets/3d/gltf/WaterBottle.glb", scene, new Euler(0, 0, 0), 1.0);
 		}));
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/tripod.svg", () =>
 		{
-			if (cursor.visible)
-			{
-				var position = new Vector3();
-				position.setFromMatrixPosition(cursor.matrix);
-				this.loadGLTFMesh("./assets/3d/gltf/AntiqueCamera.glb", scene, position, new Euler(0, 0, 0), 0.1);
-			}
+			this.loadGLTFMesh("./assets/3d/gltf/AntiqueCamera.glb", scene, new Euler(0, 0, 0), 0.1);
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/boombox.svg", () =>
+		container.appendChild(GUIUtils.createButton("./assets/icon/dots.svg", () =>
 		{
-			if (cursor.visible)
-			{
-				var position = new Vector3();
-				position.setFromMatrixPosition(cursor.matrix);
-				this.loadGLTFMesh("./assets/3d/gltf/BoomBox.glb", scene, position, new Euler(0, 0, 0), 10.0);
-			}
+			this.loadGLTFMesh("./assets/3d/gltf/MetalRoughSpheresNoTextures.glb", scene, new Euler(0, 0, 0), 100.0);
+		}));
+
+		container.appendChild(GUIUtils.createButton("./assets/icon/fish.svg", () =>
+		{
+			this.loadGLTFMesh("./assets/3d/gltf/BarramundiFish.glb", scene, new Euler(0, 0, 0), 1.0);
 		}));
 
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg",  () =>
 		{
-			if (cursor.visible)
-			{
-				var position = new Vector3();
-				position.setFromMatrixPosition(cursor.matrix);
-				this.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, position, new Euler(-Math.PI / 2, 0, 0), 0.007);
-			}
+			this.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, new Euler(0, 0, 0), 0.007);
 		}));
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/cube.svg", function()
@@ -636,9 +614,10 @@ export class App
 			if (lightEstimate)
 			{
 				let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
-				directionalLight.position.set(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
+				directionalLight.position.set(lightEstimate.primaryLightDirection.x * 10, lightEstimate.primaryLightDirection.y * 10, lightEstimate.primaryLightDirection.z * 10);
 				directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
 				directionalLight.intensity = intensity;
+
 				lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
 			}
 		}
