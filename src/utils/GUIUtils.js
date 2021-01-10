@@ -1,5 +1,5 @@
-var w = 70;
-var h = 70;
+var w = 60;
+var h = 60;
 var x = 10;
 var y = 10;
 
@@ -20,6 +20,8 @@ export class GUIUtils {
 		button.style.bottom = y + "px";
 		button.style.backgroundColor = "#FFFFFF33";
 		button.style.borderRadius = "20px";
+		button.style.opacity = "0.1";
+		button.style.zIndex = "1000";
 		button.onclick = onclick;
 
 		var icon = document.createElement("img");
@@ -31,7 +33,7 @@ export class GUIUtils {
 		icon.style.position = "absolute";
 		button.appendChild(icon);
 
-		y += 80;
+		y += w + 5;
 
 		return button;
 	}

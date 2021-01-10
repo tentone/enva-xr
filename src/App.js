@@ -1,18 +1,18 @@
 import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
-	BoxBufferGeometry, MeshNormalMaterial, SphereBufferGeometry, DirectionalLight,
-	LightProbe, DoubleSide, MeshStandardMaterial, Matrix4} from "three";
+	MeshNormalMaterial, SphereBufferGeometry, DirectionalLight,
+	LightProbe, MeshBasicMaterial, MeshDepthMaterial, Matrix4, DoubleSide, AmbientLight} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {ObjectUtils} from "./utils/ObjectUtils.js";
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import {AugmentedCanvasMaterial} from "./material/AugmentedCanvasMaterial.js";
 import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3, Quaternion} from "cannon";
 import {PhysicsObject} from "./object/PhysicsObject.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {Measurement} from "./object/Measurement.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture.js";
-import {AugmentedMaterial} from "./material/AugmentedMaterial.js";
+
+var container = null;
 
 /**
  * Light probe used to acess the lighting estimation for the scene.
@@ -32,7 +32,7 @@ var floor = null;
 /**
  * If true the depth data is shown.
  */
-var debugDepth = true;
+var debugDepth = false;
 
 /**
  * XR Viewer pose object.
@@ -64,12 +64,11 @@ var camera = new PerspectiveCamera(60, 1, 0.1, 10);
  */
 var scene = new Scene();
 
+
+var ambientLight = new AmbientLight(0x333333);
+scene.add(ambientLight);
+
 var directionalLight = new DirectionalLight();
-directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.width = 512;
-directionalLight.shadow.mapSize.height = 512;
-directionalLight.shadow.camera.near = 0.5;
-directionalLight.shadow.camera.far = 500;
 scene.add(directionalLight);
 
 var lightProbe = new LightProbe();
@@ -120,8 +119,69 @@ var glContext = null;
  */
 var xrGlBinding = null;
 
+var NORMAL = 0;
+var DEBUG_ZBUFFER = 1;
+var DEBUG_AR_DEPTH = 2;
+var DEBUG_NO_OCCLUSION = 3;
+var DEBUG_CAMERA_IMAGE = 4;
+
+var mode = NORMAL;
+
 export class App
 {
+	nextMode()
+	{
+		mode++;
+
+		if (mode === DEBUG_CAMERA_IMAGE)
+		{
+			mode = NORMAL;
+		}
+
+		if (mode === NORMAL) {
+			scene.overrideMaterial = null;
+			scene.traverse(function(child)
+			{
+				if(child.isMesh && child.material && child.material.isAgumentedMaterial)
+				{
+					child.material.userData.uOcclusionEnabled.value = true;
+					child.material.uniformsNeedUpdate = true;
+				}
+			});
+		}
+		else if (mode === DEBUG_ZBUFFER)
+		{
+			scene.overrideMaterial = new MeshDepthMaterial();
+		}
+		else if (mode === DEBUG_AR_DEPTH)
+		{
+			scene.overrideMaterial = null;
+			debugDepth = true;
+			depthCanvas.style.width = "100%";
+			depthCanvas.style.height = "100%";
+			depthCanvas.style.right = "0px";
+			depthCanvas.style.bottom = "0px";
+			depthCanvas.style.borderRadius = "0px";
+		}
+		else if (mode === DEBUG_NO_OCCLUSION)
+		{
+			this.resetDepthCanvas();
+			scene.overrideMaterial = null;
+			scene.traverse(function(child)
+			{
+				if(child.isMesh && child.material && child.material.isAgumentedMaterial)
+				{
+					child.material.userData.uOcclusionEnabled.value = false;
+					child.material.uniformsNeedUpdate = true;
+				}
+			});
+		}
+		else if (mode === DEBUG_CAMERA_IMAGE)
+		{
+			scene.overrideMaterial = new MeshBasicMaterial({transparent: true, opacity: 0.0});
+		}
+	}
+
 	/**
 	 * Create and setup webgl renderer object.
 	 *
@@ -183,11 +243,15 @@ export class App
 	 * @param {*} depthMap
 	 */
 	createAugmentedMaterial(material, depthMap) {
+
+		material.side = DoubleSide;
+
 		material.userData = {
 			uDepthTexture: {value: depthMap},
 			uWidth: {value: 1.0},
 			uHeight: {value: 1.0},
-			uUvTransform: {value: new Matrix4()}
+			uUvTransform: {value: new Matrix4()},
+			uOcclusionEnabled: {value: true}
 		};
 
 		material.isAgumentedMaterial = true;
@@ -207,6 +271,8 @@ export class App
 			uniform float uHeight;
 			uniform mat4 uUvTransform;
 
+			uniform bool uOcclusionEnabled;
+
 			varying float vDepth;
 			` + shader.fragmentShader;
 
@@ -224,14 +290,18 @@ export class App
 			shader.fragmentShader =  shader.fragmentShader.replace("#include <dithering_fragment>", `
 			#include <dithering_fragment>
 
-			// Normalize x, y to range [0, 1]
-			float x = gl_FragCoord.x / uWidth;
-			float y = gl_FragCoord.y / uHeight;
-			vec2 depthUV = (uUvTransform * vec4(vec2(x, y), 0, 1)).xy;
+			if(uOcclusionEnabled)
+			{
+				// Normalize x, y to range [0, 1]
+				float x = gl_FragCoord.x / uWidth;
+				float y = gl_FragCoord.y / uHeight;
+				vec2 depthUV = (uUvTransform * vec4(vec2(x, y), 0, 1)).xy;
 
-			float depth = getDepthInMillimeters(uDepthTexture, depthUV) / 1000.0;
-			if (depth < vDepth) {
-				discard;
+				float depth = getDepthInMillimeters(uDepthTexture, depthUV) / 1000.0;
+				if (depth < vDepth)
+				{
+					discard;
+				}
 			}
 			`);
 
@@ -254,36 +324,53 @@ export class App
 	loadGLTFMesh(url, scene, position, rotation, scale) {
 
 		const loader = new GLTFLoader();
-		loader.load(url, (gltf) =>
+		loader.loadAsync(url).then((gltf) =>
 		{
-			gltf.scene.traverse((child) =>
+			var object = gltf.scene;
+			scene.add(object);
+
+			object.traverse((child) =>
 			{
 				if (child instanceof Mesh)
 				{
-					child.receiveShadow = true;
-					child.castShadow = true;
 					child.material = this.createAugmentedMaterial(child.material, depthDataTexture);
-					// child.material = new AugmentedMaterial(child.material.map, depthDataTexture);
-					// child.material = new AugmentedCanvasMaterial(child.material.map, depthTexture);
 				}
 			});
 
-			var object = gltf.scene.children[0];
-
-			var box = ObjectUtils.calculateBoundingBox(object);
-
-			var center = box.max.clone();
-			center.add(box.min);
-			center.multiplyScalar(scale);
-			center.multiplyScalar(0.5);
-
-			object.position.copy(position);
-			object.position.sub(center);
 			object.scale.set(scale, scale, scale);
 			object.rotation.copy(rotation);
+			object.updateMatrix();
+			object.updateMatrixWorld(true);
 
-			scene.add(object);
+			var box = ObjectUtils.calculateBoundingBox(object);
+			var center = new Vector3();
+			box.getCenter(center);
+
+			var size = new Vector3();
+			box.getSize(size);
+
+			console.log(center, size);
+
+			object.position.set(-center.x, -center.y / 2, -center.z);
+			object.position.add(position);
 		});
+	}
+
+	resetDepthCanvas()
+	{
+		if(!depthCanvas)
+		{
+			depthCanvas = document.createElement("canvas");
+			container.appendChild(depthCanvas);
+			depthTexture = new DepthCanvasTexture(depthCanvas);
+		}
+
+		depthCanvas.style.position = "absolute";
+		depthCanvas.style.right = "10px";
+		depthCanvas.style.bottom = "10px";
+		depthCanvas.style.borderRadius = "20px";
+		depthCanvas.style.width = "180px";
+		depthCanvas.style.height = "320px";
 	}
 
 	initialize()
@@ -292,7 +379,10 @@ export class App
 
 		resolution.set(window.innerWidth, window.innerHeight);
 
-		var container = document.createElement("div");
+		container = document.createElement("div");
+		container.style.position = "absolute";
+		container.style.top = "0px";
+		container.style.left = "0px";
 		container.style.width = "100%";
 		container.style.height = "100%";
 		document.body.appendChild(container);
@@ -316,15 +406,15 @@ export class App
 		}));
 
 
+		container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", () =>
+		{
+			this.nextMode();
+		}));
+
 		container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", function()
 		{
 			debugDepth = !debugDepth;
 			depthCanvas.style.display = debugDepth ? "block" : "none";
-		}));
-
-		container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", function()
-		{
-			renderer.shadowMap.enabled = !renderer.shadowMap.enabled;
 		}));
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
@@ -337,15 +427,36 @@ export class App
 			}
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/tree.svg", () =>
+		container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
 		{
 			if (cursor.visible)
 			{
 				var position = new Vector3();
 				position.setFromMatrixPosition(cursor.matrix);
-				this.loadGLTFMesh("./assets/3d/tree/scene.gltf", scene, position, new Euler(-Math.PI / 2, 0, 0), 0.002);
+				this.loadGLTFMesh("./assets/3d/gltf/WaterBottle.glb", scene, position, new Euler(0, 0, 0), 1.0);
 			}
 		}));
+
+		container.appendChild(GUIUtils.createButton("./assets/icon/tripod.svg", () =>
+		{
+			if (cursor.visible)
+			{
+				var position = new Vector3();
+				position.setFromMatrixPosition(cursor.matrix);
+				this.loadGLTFMesh("./assets/3d/gltf/AntiqueCamera.glb", scene, position, new Euler(0, 0, 0), 0.1);
+			}
+		}));
+
+		container.appendChild(GUIUtils.createButton("./assets/icon/boombox.svg", () =>
+		{
+			if (cursor.visible)
+			{
+				var position = new Vector3();
+				position.setFromMatrixPosition(cursor.matrix);
+				this.loadGLTFMesh("./assets/3d/gltf/BoomBox.glb", scene, position, new Euler(0, 0, 0), 10.0);
+			}
+		}));
+
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg",  () =>
 		{
@@ -385,14 +496,7 @@ export class App
 			}
 		}));
 
-		depthCanvas = document.createElement("canvas");
-		depthCanvas.style.position = "absolute";
-		depthCanvas.style.right = "10px";
-		depthCanvas.style.bottom = "10px";
-		depthCanvas.style.borderRadius = "20px";
-		container.appendChild(depthCanvas);
-
-		depthTexture = new DepthCanvasTexture(depthCanvas);
+		this.resetDepthCanvas();
 
 		depthDataTexture = new DepthDataTexture();
 
@@ -400,11 +504,12 @@ export class App
 		button.style.position = "absolute";
 		button.style.backgroundColor = "#FF6666";
 		button.style.width = "100%";
-		button.style.height = "20%";
-		button.style.borderRadius = "20px";
+		button.style.height = "100%";
+		button.style.top = "0px";
+		button.style.left = "0px";
 		button.style.textAlign = "center";
 		button.style.fontFamily = "Arial";
-		button.style.fontSize = "50px";
+		button.style.fontSize = "10vh";
 		button.innerText = "Enter AR";
 		button.onclick = function()
 		{
@@ -421,22 +526,14 @@ export class App
 		document.body.appendChild(canvas);
 		this.createRenderer(canvas);
 
-		var box = new Mesh(new BoxBufferGeometry(), new MeshNormalMaterial());
-		box.scale.set(0.1, 0.1, 0.1);
-		box.position.x = 2;
-		scene.add(box);
-
-		var sphere = new Mesh(new SphereBufferGeometry(), new MeshNormalMaterial());
-		sphere.scale.set(0.1, 0.1, 0.1);
-		sphere.position.z = 2;
-		scene.add(sphere);
-
 		// Cursor to select objects
 		cursor = new Cursor();
 		scene.add(cursor);
 
+		// Resize renderer
 		window.addEventListener("resize", () => {this.resize();}, false);
 
+		// Render loop
 		renderer.setAnimationLoop((time, frame) => {
 			this.render(time, frame);
 		});
@@ -457,34 +554,16 @@ export class App
 	}
 
 	// Update uniforms of materials to match the screen size and camera configuration
-	updateUniforms(normTextureFromNormViewMatrix)
+	updateAugmentedMaterialUniforms(normTextureFromNormViewMatrix)
 	{
 		scene.traverse(function(child)
 		{
-			if(child.isMesh && child.material)
+			if(child.isMesh && child.material && child.material.isAgumentedMaterial)
 			{
-				if(child.material instanceof AugmentedMaterial)
-				{
-					child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
-					child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
-					child.material.uniforms.uUvTransform.value.fromArray(normTextureFromNormViewMatrix);
-					child.material.uniformsNeedUpdate = true;
-				}
-				else if(child.material instanceof AugmentedCanvasMaterial)
-				{
-					child.material.uniforms.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
-					child.material.uniforms.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
-					child.material.uniforms.uNear.value = camera.near;
-					child.material.uniforms.uFar.value = camera.far;
-					child.material.uniformsNeedUpdate = true;
-				}
-				else if(child.material.isAgumentedMaterial)
-				{
-					child.material.userData.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
-					child.material.userData.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
-					child.material.userData.uUvTransform.value.fromArray(normTextureFromNormViewMatrix);
-					child.material.uniformsNeedUpdate = true;
-				}
+				child.material.userData.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
+				child.material.userData.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
+				child.material.userData.uUvTransform.value.fromArray(normTextureFromNormViewMatrix);
+				child.material.uniformsNeedUpdate = true;
 			}
 		});
 	}
@@ -605,10 +684,14 @@ export class App
 				{
 					// Update textures
 					depthDataTexture.updateDepth(depthData);
-					depthTexture.updateDepth(depthData, camera.near, camera.far);
+
+					// Draw canvas texture depth
+					if (debugDepth) {
+						depthTexture.updateDepth(depthData, camera.near, camera.far);
+					}
 
 					// Update normal matrix
-					this.updateUniforms(depthData.normTextureFromNormView.matrix);
+					this.updateAugmentedMaterialUniforms(depthData.normTextureFromNormView.matrix);
 				}
 			}
 		}

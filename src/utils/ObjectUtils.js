@@ -48,9 +48,6 @@ export class ObjectUtils {
 				children.geometry.computeBoundingBox();
 				bounding = children.geometry.boundingBox.clone();
 				bounding.applyMatrix4(children.matrixWorld);
-
-				children.geometry.computeBoundingBox();
-				bounding = children.geometry.boundingBox;
 			}
 
 			// Update bouding box size

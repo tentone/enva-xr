@@ -17,8 +17,6 @@ export class DepthCanvasTexture extends CanvasTexture
 
 		canvas.width = depth.height;
 		canvas.height = depth.width;
-		canvas.style.width = (2 * canvas.width) + "px";
-		canvas.style.height = (2 * canvas.height) + "px";
 
 		var context = canvas.getContext("2d");
 		var image = context.getImageData(0, 0, canvas.width, canvas.height);
