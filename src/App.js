@@ -1,6 +1,6 @@
 import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
 	MeshNormalMaterial, SphereBufferGeometry, DirectionalLight,
-	LightProbe, MeshBasicMaterial, MeshDepthMaterial, Matrix4, DoubleSide, AmbientLight} from "three";
+	LightProbe, MeshBasicMaterial, MeshDepthMaterial, Matrix4} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {ObjectUtils} from "./utils/ObjectUtils.js";
