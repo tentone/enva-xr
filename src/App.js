@@ -1,6 +1,7 @@
 import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
 	MeshNormalMaterial, SphereBufferGeometry, DirectionalLight,
-	LightProbe, MeshBasicMaterial, MeshDepthMaterial, Matrix4} from "three";
+	LightProbe, MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry, ShadowMaterial, BasicShadowMap,
+    PCFShadowMap, PCFSoftShadowMap, VSMShadowMap} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {ObjectUtils} from "./utils/ObjectUtils.js";
@@ -65,10 +66,34 @@ var camera = new PerspectiveCamera(60, 1, 0.1, 10);
 var scene = new Scene();
 
 var directionalLight = new DirectionalLight();
+directionalLight.castShadow = true;
+directionalLight.shadow.mapSize.width = 1024;
+directionalLight.shadow.mapSize.width = 1024;
+directionalLight.shadow.camera.far = 50;
+directionalLight.shadow.camera.near = 0.1;
+directionalLight.shadow.camera.left = -5;
+directionalLight.shadow.camera.right = 5;
+directionalLight.shadow.camera.bottom = -5;
+directionalLight.shadow.camera.top = 5;
 scene.add(directionalLight);
 
 var lightProbe = new LightProbe();
 scene.add(lightProbe);
+
+/**
+ * Mesh used as floor.
+ */
+var shadowMaterial = new ShadowMaterial({opacity: 0.6});
+shadowMaterial.onBeforeCompile(function(shader)
+{
+    console.log(shader, shadowMaterial);
+});
+
+var floorMesh = new Mesh(new PlaneBufferGeometry(50, 50, 1, 1), shadowMaterial);
+floorMesh.rotation.set(-Math.PI / 2, 0, 0);
+floorMesh.castShadow = false;
+floorMesh.receiveShadow = true;
+scene.add(floorMesh);
 
 /**
  * Time of the last frame.
@@ -198,7 +223,10 @@ export class App
 			precision: "highp"
 		});
 
-		renderer.shadowMap.enabled = false;
+		renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = PCFSoftShadowMap;
+        renderer.sortObjects = false;
+        renderer.physicallyCorrectLights = true;
 
 		renderer.setPixelRatio(window.devicePixelRatio);
 		renderer.setSize(window.innerWidth, window.innerHeight);
@@ -330,6 +358,8 @@ export class App
 				{
 					if (child instanceof Mesh)
 					{
+                        child.castShadow = true;
+                        child.receiveShadow = true;
 						child.material = this.createAugmentedMaterial(child.material, depthDataTexture);
 					}
 				});
@@ -401,8 +431,13 @@ export class App
 					scene.add(measurement);
 				}
 			}
-		}));
+        }));
 
+		container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg",  () =>
+		{
+            renderer.shadowMap.enabled = !renderer.shadowMap.enabled;
+            renderer.shadowMap.needsUpdate = true;
+		}));
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", () =>
 		{
@@ -613,8 +648,11 @@ export class App
 			let lightEstimate = frame.getLightEstimate(xrLightProbe);
 			if (lightEstimate)
 			{
+                let directionalPosition = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
+                directionalPosition.multiplyScalar(3);
+
 				let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
-				directionalLight.position.set(lightEstimate.primaryLightDirection.x * 10, lightEstimate.primaryLightDirection.y * 10, lightEstimate.primaryLightDirection.z * 10);
+				directionalLight.position.copy(directionalPosition);
 				directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
 				directionalLight.intensity = intensity;
 
@@ -637,7 +675,8 @@ export class App
 				position.setFromMatrixPosition(cursor.matrix);
 				if (position.y < floor.position.y)
 				{
-					floor.position.y = position.y;
+                    floor.position.y = position.y;
+                    floorMesh.position.y = position.y;
 				}
 			}
 			else
