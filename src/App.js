@@ -140,6 +140,11 @@ var glContext = null;
  */
 var xrGlBinding = null;
 
+/**
+ * Rendering canvas.
+ */
+var canvas = null;
+
 var NORMAL = 0;
 var DEBUG_ZBUFFER = 1;
 var DEBUG_AR_DEPTH = 2;
@@ -208,8 +213,11 @@ export class App
 	 *
 	 * @param {*} canvas
 	 */
-	createRenderer(canvas)
+	createRenderer()
 	{
+        canvas = document.createElement("canvas");
+        document.body.appendChild(canvas);
+
 		glContext = canvas.getContext("webgl2", {xrCompatible: true});
 
 		renderer = new WebGLRenderer(
@@ -232,6 +240,29 @@ export class App
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		renderer.xr.enabled = true;
 	}
+
+    forceContextLoss()
+    {
+        try
+        {
+            if (renderer !== null)
+            {
+                renderer.dispose();
+                renderer.forceContextLoss();
+                renderer = null;
+            }
+        }
+        catch (e)
+        {
+            renderer = null;
+            console.log("Failed to destroy WebGL context.");
+        }
+
+        if(canvas !== null) {
+            document.body.removeChild(canvas);
+        }
+    };
+
 
 	/**
 	 * Create physics world for collistion simulation.
@@ -437,9 +468,16 @@ export class App
 		{
             renderer.shadowMap.enabled = !renderer.shadowMap.enabled;
             renderer.shadowMap.needsUpdate = true;
+            scene.traverse(function (child)
+            {
+                if (child.material)
+                {
+                    child.material.needsUpdate = true;
+                }
+            })
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", () =>
+		container.appendChild(GUIUtils.createButton("./assets/icon/bug.svg", () =>
 		{
 			this.nextMode();
 		}));
@@ -535,9 +573,7 @@ export class App
 		};
 		document.body.appendChild(button);
 
-		var canvas = document.createElement("canvas");
-		document.body.appendChild(canvas);
-		this.createRenderer(canvas);
+		this.createRenderer();
 
 		// Cursor to select objects
 		cursor = new Cursor();
