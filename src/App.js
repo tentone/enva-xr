@@ -153,9 +153,19 @@ var DEBUG_CAMERA_IMAGE = 4;
 
 var mode = NORMAL;
 
+
 export class App
 {
-	nextMode()
+
+    changeShadowType()
+    {
+        BasicShadowMap
+        PCFShadowMap
+        PCFSoftShadowMap
+        VSMShadowMap
+    }
+
+	toggleDebugMode()
 	{
 		mode++;
 
@@ -479,7 +489,7 @@ export class App
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/bug.svg", () =>
 		{
-			this.nextMode();
+			this.toggleDebugMode();
 		}));
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", function()
