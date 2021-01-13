@@ -67,14 +67,14 @@ var scene = new Scene();
 
 var directionalLight = new DirectionalLight();
 directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.width = 1024;
-directionalLight.shadow.mapSize.width = 1024;
-directionalLight.shadow.camera.far = 50;
+directionalLight.shadow.mapSize.width = 2048;
+directionalLight.shadow.mapSize.width = 2048;
+directionalLight.shadow.camera.far = 20;
 directionalLight.shadow.camera.near = 0.1;
-directionalLight.shadow.camera.left = -5;
-directionalLight.shadow.camera.right = 5;
-directionalLight.shadow.camera.bottom = -5;
-directionalLight.shadow.camera.top = 5;
+directionalLight.shadow.camera.left = -3;
+directionalLight.shadow.camera.right = 3;
+directionalLight.shadow.camera.bottom = -3;
+directionalLight.shadow.camera.top = 3;
 scene.add(directionalLight);
 
 var lightProbe = new LightProbe();
