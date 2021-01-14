@@ -1,7 +1,8 @@
 import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
-	MeshNormalMaterial, SphereBufferGeometry, DirectionalLight,
-	LightProbe, MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry, ShadowMaterial, BasicShadowMap,
-    PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, MeshPhysicalMaterial} from "three";
+	MeshNormalMaterial, SphereBufferGeometry, DirectionalLight, TextureLoader,
+	LightProbe, MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
+	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap,
+	MeshPhysicalMaterial} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {ObjectUtils} from "./utils/ObjectUtils.js";
@@ -66,35 +67,16 @@ var camera = new PerspectiveCamera(60, 1, 0.1, 10);
  */
 var scene = new Scene();
 
-var directionalLight = new DirectionalLight();
-directionalLight.castShadow = true;
-directionalLight.shadow.mapSize.width = 2048;
-directionalLight.shadow.mapSize.width = 2048;
-directionalLight.shadow.camera.far = 20;
-directionalLight.shadow.camera.near = 0.1;
-directionalLight.shadow.camera.left = -3;
-directionalLight.shadow.camera.right = 3;
-directionalLight.shadow.camera.bottom = -3;
-directionalLight.shadow.camera.top = 3;
-scene.add(directionalLight);
+var directionalLight;
 
-var lightProbe = new LightProbe();
-scene.add(lightProbe);
+var lightProbe;
 
 /**
  * Mesh used as floor.
  */
-var shadowMaterial = new ShadowMaterial({opacity: 0.6});
-shadowMaterial.onBeforeCompile(function(shader)
-{
-    console.log(shader, shadowMaterial);
-});
+var shadowMaterial;
 
-var floorMesh = new Mesh(new PlaneBufferGeometry(50, 50, 1, 1), shadowMaterial);
-floorMesh.rotation.set(-Math.PI / 2, 0, 0);
-floorMesh.castShadow = false;
-floorMesh.receiveShadow = true;
-scene.add(floorMesh);
+var floorMesh;
 
 /**
  * Time of the last frame.
@@ -157,13 +139,43 @@ var mode = NORMAL;
 
 export class App
 {
+	createScene()
+	{
+		depthDataTexture = new DepthDataTexture();
+
+		directionalLight = new DirectionalLight();
+		directionalLight.castShadow = true;
+		directionalLight.shadow.mapSize.width = 2048;
+		directionalLight.shadow.mapSize.height = 2048;
+		directionalLight.shadow.camera.far = 20;
+		directionalLight.shadow.camera.near = 0.1;
+		directionalLight.shadow.camera.left = -3;
+		directionalLight.shadow.camera.right = 3;
+		directionalLight.shadow.camera.bottom = -3;
+		directionalLight.shadow.camera.top = 3;
+		scene.add(directionalLight);
+
+		lightProbe = new LightProbe();
+		scene.add(lightProbe);
+
+		shadowMaterial = new ShadowMaterial({opacity: 0.6});
+		shadowMaterial = this.createAugmentedMaterial(shadowMaterial, depthDataTexture);
+
+		floorMesh = new Mesh(new PlaneBufferGeometry(50, 50, 1, 1), shadowMaterial);
+		floorMesh.rotation.set(-Math.PI / 2, 0, 0);
+		floorMesh.castShadow = false;
+		floorMesh.receiveShadow = true;
+		scene.add(floorMesh);
+
+	}
 
     changeShadowType()
     {
-        BasicShadowMap
-        PCFShadowMap
-        PCFSoftShadowMap
-        VSMShadowMap
+		// TODO <ADD CODE HERE>
+        BasicShadowMap;
+        PCFShadowMap;
+        PCFSoftShadowMap;
+        VSMShadowMap;
     }
 
 	toggleDebugMode()
@@ -321,6 +333,9 @@ export class App
 
 		material.onBeforeCompile = (shader) =>
 		{
+
+			console.log(shader);
+
 			// Pass uniforms from userData to the
 			for (let i in material.userData)
 			{
@@ -339,6 +354,13 @@ export class App
 			varying float vDepth;
 			` + shader.fragmentShader;
 
+
+			var fragmentEntryPoint = "#include <dithering_fragment>";
+			if(material instanceof ShadowMaterial)
+			{
+				fragmentEntryPoint = "#include <fog_fragment>";
+			}
+
 			// Fragment depth logic
 			shader.fragmentShader =  shader.fragmentShader.replace("void main",
 			`float getDepthInMillimeters(in sampler2D depthText, in vec2 uv)
@@ -350,8 +372,8 @@ export class App
 			void main`);
 
 
-			shader.fragmentShader =  shader.fragmentShader.replace("#include <dithering_fragment>", `
-			#include <dithering_fragment>
+			shader.fragmentShader =  shader.fragmentShader.replace(fragmentEntryPoint, `
+			${fragmentEntryPoint}
 
 			if(uOcclusionEnabled)
 			{
@@ -425,8 +447,12 @@ export class App
 
 				const shape = threeToCannon(object, {type: threeToCannon.Type.BOX});
 				const body = new Body();
-				body.type = Body.DYNAMIC;
-				body.mass = 1.0;
+				body.type = Body.STATIC;
+				body.position.copy(object.position);
+				body.velocity.set(0, 0, 0);
+				body.quaternion.copy(object.quaternion);
+				body.addShape(shape);
+				world.addBody(body);
 			});
 		}
 	}
@@ -450,6 +476,7 @@ export class App
 
 	initialize()
 	{
+		this.createScene();
 		this.createWorld();
 
 		resolution.set(window.innerWidth, window.innerHeight);
@@ -535,7 +562,7 @@ export class App
 			this.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, new Euler(0, 0, 0), 0.007);
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/rocks.svg", function()
+		container.appendChild(GUIUtils.createButton("./assets/icon/rocks.svg", () =>
 		{
 			if(pose !== null)
 			{
@@ -554,18 +581,20 @@ export class App
 
 				var geometry = new SphereBufferGeometry(0.05, 24, 24);
 				var material = new MeshPhysicalMaterial({
-					map: new THREE.TextureLoader().load('assets/texture/ball/color.jpg'),
+					map: new TextureLoader().load('assets/texture/ball/color.jpg'),
 					roughness: 1.0,
 					metalness: 0.0,
-					roughnessMap: new THREE.TextureLoader().load('assets/texture/ball/roughness.jpg'),
-					normalMap: new THREE.TextureLoader().load('assets/texture/ball/normal.png'),
+					roughnessMap: new TextureLoader().load('assets/texture/ball/roughness.jpg'),
+					normalMap: new TextureLoader().load('assets/texture/ball/normal.png'),
 				});
 
-				material = this.createAugmentedMaterial(material);
+				material = this.createAugmentedMaterial(material, depthDataTexture);
 
 				var shape = new Sphere(0.05);
 
 				var ball = new PhysicsObject(geometry, material, world);
+				ball.castShadow = true;
+				ball.receiveShadow = true;
 				ball.position.copy(position);
 				ball.body.velocity.set(direction.x, direction.y, direction.z);
 				ball.addShape(shape);
@@ -575,8 +604,6 @@ export class App
 		}));
 
 		this.resetDepthCanvas();
-
-		depthDataTexture = new DepthDataTexture();
 
 		var button = document.createElement("div");
 		button.style.position = "absolute";
