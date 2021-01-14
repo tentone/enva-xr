@@ -20,7 +20,7 @@ export class GUIUtils {
 		button.style.bottom = y + "px";
 		button.style.backgroundColor = "#FFFFFF33";
 		button.style.borderRadius = "20px";
-		button.style.opacity = "0.1";
+		button.style.opacity = "0.3";
 		button.style.zIndex = "1000";
 		button.onclick = onclick;
 

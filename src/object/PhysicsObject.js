@@ -1,4 +1,4 @@
-import {Body, Shape} from "cannon";
+import {Body, Shape} from "cannon-es";
 import {Vector3, Mesh, Quaternion, Matrix4} from "three";
 
 /**

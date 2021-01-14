@@ -1,17 +1,18 @@
 import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
 	MeshNormalMaterial, SphereBufferGeometry, DirectionalLight,
 	LightProbe, MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry, ShadowMaterial, BasicShadowMap,
-    PCFShadowMap, PCFSoftShadowMap, VSMShadowMap} from "three";
+    PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, MeshPhysicalMaterial} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {ObjectUtils} from "./utils/ObjectUtils.js";
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3, Quaternion} from "cannon";
+import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3, Quaternion} from "cannon-es";
 import {PhysicsObject} from "./object/PhysicsObject.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {Measurement} from "./object/Measurement.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture.js";
+import {threeToCannon} from 'three-to-cannon';
 
 var container = null;
 
@@ -343,7 +344,7 @@ export class App
 			`float getDepthInMillimeters(in sampler2D depthText, in vec2 uv)
 			{
 				vec2 packedDepth = texture2D(depthText, uv).ra;
-				return dot(packedDepth, vec2(255.0, 256.0 * 255.0));
+				return dot(packedDepth, vec2(255.0, 65280.0));
 			}
 
 			void main`);
@@ -417,10 +418,15 @@ export class App
 				var size = new Vector3();
 				box.getSize(size);
 
-				console.log(center, size);
-
 				object.position.set(-center.x, -center.y / 2, -center.z);
 				object.position.add(position);
+				object.updateMatrix();
+				object.updateMatrixWorld(true);
+
+				const shape = threeToCannon(object, {type: threeToCannon.Type.BOX});
+				const body = new Body();
+				body.type = Body.DYNAMIC;
+				body.mass = 1.0;
 			});
 		}
 	}
@@ -529,7 +535,7 @@ export class App
 			this.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, new Euler(0, 0, 0), 0.007);
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/cube.svg", function()
+		container.appendChild(GUIUtils.createButton("./assets/icon/rocks.svg", function()
 		{
 			if(pose !== null)
 			{
@@ -538,14 +544,25 @@ export class App
 
 				var orientation = new Quaternion(viewOrientation.x, viewOrientation.y, viewOrientation.z, viewOrientation.w);
 
+				var speed = 1.0;
+
 				var direction = new Vector3(0.0, 0.0, -1.0);
 				direction.applyQuaternion(orientation);
-				direction.multiplyScalar(5.0);
+				direction.multiplyScalar(speed);
 
 				var position = new Vector3(viewPosition.x, viewPosition.y, viewPosition.z);
 
 				var geometry = new SphereBufferGeometry(0.05, 24, 24);
-				var material = new MeshNormalMaterial();
+				var material = new MeshPhysicalMaterial({
+					map: new THREE.TextureLoader().load('assets/texture/ball/color.jpg'),
+					roughness: 1.0,
+					metalness: 0.0,
+					roughnessMap: new THREE.TextureLoader().load('assets/texture/ball/roughness.jpg'),
+					normalMap: new THREE.TextureLoader().load('assets/texture/ball/normal.png'),
+				});
+
+				material = this.createAugmentedMaterial(material);
+
 				var shape = new Sphere(0.05);
 
 				var ball = new PhysicsObject(geometry, material, world);
