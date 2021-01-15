@@ -1,6 +1,6 @@
 import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
-	MeshNormalMaterial, SphereBufferGeometry, DirectionalLight, TextureLoader,
-	LightProbe, MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
+	SphereBufferGeometry, DirectionalLight, TextureLoader, LightProbe,
+	MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
 	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap,
 	MeshPhysicalMaterial} from "three";
 import {XRManager} from "./utils/XRManager.js";
@@ -14,6 +14,7 @@ import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {Measurement} from "./object/Measurement.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture.js";
 import {threeToCannon} from 'three-to-cannon';
+import cannonDebugger from 'cannon-es-debugger'
 
 var container = null;
 
@@ -303,6 +304,11 @@ export class App
 		world.solver.tolerance = 0.01;
 		world.solver.iterations = 7;
 
+		cannonDebugger(scene, world.bodies, {
+			color: 0x00ff00,
+			autoUpdate: true
+		});
+
 		floor = new Body();
 		floor.type = Body.STATIC;
 		floor.position.set(0, 0, 0);
@@ -406,7 +412,7 @@ export class App
 		return material;
 	}
 
-	loadGLTFMesh(url, scene, rotation, scale) {
+	loadGLTFMesh(url, scene, rotation, scale, physicsType = threeToCannon.Type.HULL) {
 		if (cursor.visible)
 		{
 			var position = new Vector3();
@@ -445,7 +451,7 @@ export class App
 				object.updateMatrix();
 				object.updateMatrixWorld(true);
 
-				const shape = threeToCannon(object, {type: threeToCannon.Type.BOX});
+				const shape = threeToCannon(object, {type: physicsType});
 				const body = new Body();
 				body.type = Body.STATIC;
 				body.position.copy(object.position);
