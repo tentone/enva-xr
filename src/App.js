@@ -68,8 +68,14 @@ var camera = new PerspectiveCamera(60, 1, 0.1, 10);
  */
 var scene = new Scene();
 
+/**
+ * Directional shadow casting light.
+ */
 var directionalLight;
 
+/**
+ * Light probe object using spherical harmonics.
+ */
 var lightProbe;
 
 /**
@@ -77,6 +83,9 @@ var lightProbe;
  */
 var shadowMaterial;
 
+/**
+ * Mesh used to cast shadows into the floor.
+ */
 var floorMesh;
 
 /**
@@ -146,14 +155,14 @@ export class App
 
 		directionalLight = new DirectionalLight();
 		directionalLight.castShadow = true;
-		directionalLight.shadow.mapSize.width = 2048;
-		directionalLight.shadow.mapSize.height = 2048;
+		directionalLight.shadow.mapSize.width = 512;
+		directionalLight.shadow.mapSize.height = 512;
 		directionalLight.shadow.camera.far = 20;
 		directionalLight.shadow.camera.near = 0.1;
-		directionalLight.shadow.camera.left = -3;
-		directionalLight.shadow.camera.right = 3;
-		directionalLight.shadow.camera.bottom = -3;
-		directionalLight.shadow.camera.top = 3;
+		directionalLight.shadow.camera.left = -2;
+		directionalLight.shadow.camera.right = 2;
+		directionalLight.shadow.camera.bottom = -2;
+		directionalLight.shadow.camera.top = 2;
 		scene.add(directionalLight);
 
 		lightProbe = new LightProbe();
@@ -172,11 +181,10 @@ export class App
 
     changeShadowType()
     {
-		// TODO <ADD CODE HERE>
-        BasicShadowMap;
+        /* BasicShadowMap;
         PCFShadowMap;
         PCFSoftShadowMap;
-        VSMShadowMap;
+        VSMShadowMap; */
     }
 
 	toggleDebugMode()
@@ -304,10 +312,10 @@ export class App
 		world.solver.tolerance = 0.01;
 		world.solver.iterations = 7;
 
-		cannonDebugger(scene, world.bodies, {
+		/*cannonDebugger(scene, world.bodies, {
 			color: 0x00ff00,
 			autoUpdate: true
-		});
+		});*/
 
 		floor = new Body();
 		floor.type = Body.STATIC;
@@ -412,7 +420,7 @@ export class App
 		return material;
 	}
 
-	loadGLTFMesh(url, scene, rotation, scale, physicsType = threeToCannon.Type.HULL) {
+	loadGLTFMesh(url, scene, rotation, scale) {
 		if (cursor.visible)
 		{
 			var position = new Vector3();
@@ -451,12 +459,12 @@ export class App
 				object.updateMatrix();
 				object.updateMatrixWorld(true);
 
-				const shape = threeToCannon(object, {type: physicsType});
+				const shape = threeToCannon(object, {type: threeToCannon.Type.BOX});
 				const body = new Body();
 				body.type = Body.STATIC;
-				body.position.copy(object.position);
+				body.position.set(object.position.x, object.position.y + size.y / 2, object.position.z);
 				body.velocity.set(0, 0, 0);
-				body.quaternion.copy(object.quaternion);
+				//body.quaternion.copy(object.quaternion);
 				body.addShape(shape);
 				world.addBody(body);
 			});
@@ -577,7 +585,7 @@ export class App
 
 				var orientation = new Quaternion(viewOrientation.x, viewOrientation.y, viewOrientation.z, viewOrientation.w);
 
-				var speed = 1.0;
+				var speed = 2.0;
 
 				var direction = new Vector3(0.0, 0.0, -1.0);
 				direction.applyQuaternion(orientation);
