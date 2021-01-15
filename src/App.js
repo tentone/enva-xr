@@ -1,5 +1,5 @@
 import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
-	SphereBufferGeometry, DirectionalLight, TextureLoader, LightProbe,
+	SphereBufferGeometry, DirectionalLight, TextureLoader, AmbientLightProbe,
 	MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
 	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap,
 	MeshPhysicalMaterial} from "three";
@@ -155,17 +155,17 @@ export class App
 
 		directionalLight = new DirectionalLight();
 		directionalLight.castShadow = true;
-		directionalLight.shadow.mapSize.width = 512;
-		directionalLight.shadow.mapSize.height = 512;
+		// directionalLight.shadow.normalBias = 0.001;
+		directionalLight.shadow.mapSize.set(1024, 1024);
 		directionalLight.shadow.camera.far = 20;
 		directionalLight.shadow.camera.near = 0.1;
-		directionalLight.shadow.camera.left = -2;
-		directionalLight.shadow.camera.right = 2;
-		directionalLight.shadow.camera.bottom = -2;
-		directionalLight.shadow.camera.top = 2;
+		directionalLight.shadow.camera.left = -5;
+		directionalLight.shadow.camera.right = 5;
+		directionalLight.shadow.camera.bottom = -5;
+		directionalLight.shadow.camera.top = 5;
 		scene.add(directionalLight);
 
-		lightProbe = new LightProbe();
+		lightProbe = new AmbientLightProbe();
 		scene.add(lightProbe);
 
 		shadowMaterial = new ShadowMaterial({opacity: 0.6});
