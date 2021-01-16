@@ -704,6 +704,9 @@ export class App
 
 		world.step(delta / 1e3);
 
+		var start = performance.now();
+
+        /*
 		var referenceSpace = renderer.xr.getReferenceSpace();
 		var session = renderer.xr.getSession();
 
@@ -730,10 +733,10 @@ export class App
 				xrLightProbe = probe;
 
 				// Get cube map for reflections
-				/*xrLightProbe.addEventListener("reflectionchange", () => {
+				// xrLightProbe.addEventListener("reflectionchange", () => {
 					// var glCubeMap = xrGlBinding.getReflectionCubeMap(xrLightProbe);
 					// console.log(glCubeMap);
-				});*/
+				// });
 			});
 
 			session.addEventListener("end", function()
@@ -817,7 +820,19 @@ export class App
 				}
 			}
 		}
+        */
 
 		renderer.render(scene, camera);
+
+		var end = performance.now();
+        perf.push(end - start);
+        while (perf.length > 600) {
+            perf.shift();
+        }
+
+        var avg = perf.reduce(function(a, b){return a + b;}, 0) / perf.length;
+		console.log(avg + " ms");
 	}
 }
+
+var perf = [];
