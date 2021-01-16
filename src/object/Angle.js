@@ -4,7 +4,7 @@ import {Text} from "troika-three-text"
 /**
  * Represents a measurement from a point to another.
  */
-export class Measurement extends Line
+export class Angle extends Line
 {
 	constructor(point)
 	{
@@ -13,7 +13,7 @@ export class Measurement extends Line
 			point = new Vector3(0, 0, 0);
 		}
 
-		var geometry = new BufferGeometry().setFromPoints([point, point]);
+		var geometry = new BufferGeometry().setFromPoints([point, point, point]);
 
 		super(geometry, new LineBasicMaterial(
 		{
@@ -24,7 +24,7 @@ export class Measurement extends Line
 		/**
 		 * List of points that compose the measurement.
 		 */
-		this.points = [point.clone(), point.clone()];
+		this.points = [point.clone(), point.clone(), point.clone()];
 
 		/**
 		 * Text used to display the measurement value.
@@ -66,21 +66,53 @@ export class Measurement extends Line
 		positions[3] = this.points[1].x;
 		positions[4] = this.points[1].y;
 		positions[5] = this.points[1].z;
+		positions[6] = this.points[2].x;
+		positions[7] = this.points[2].y;
+		positions[8] = this.points[2].z;
 		this.geometry.attributes.position.needsUpdate = true;
 		this.geometry.computeBoundingSphere();
 	}
 
 	/**
+	 * Update the label text and position.
+	 */
+	getAngle() {
+		var a = this.points[0];
+		var b = this.points[1];
+		var c = this.points[2];
+
+		const v1 = new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+		const v2 = new Vector3(c.x - b.x, c.y - b.y, c.z - b.z);
+
+		const v1mag = Math.sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z);
+		const v1norm = new Vector3(v1.x / v1mag, v1.y / v1mag, v1.z / v1mag);
+
+		const v2mag = Math.sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z);
+		const v2norm = new Vector3(v2.x / v2mag, v2.y / v2mag, v2.z / v2mag);
+
+		const res = v1norm.x * v2norm.x + v1norm.y * v2norm.y + v1norm.z * v2norm.z;
+
+		let angle = Math.acos(res);
+		angle *= 180 / Math.PI;
+
+		return angle;
+	}
+
+
+	/**
 	 * Update the text of the measurement.
 	 */
 	updateText() {
-		var distance = Math.round(this.points[0].distanceTo(this.points[1]) * 100);
-		var line = new Line3(this.points[0], this.points[1]);
+		var center = new Vector3();
+		for (var i = 0; i < this.points.length; i++) {
+			center.add(this.points[i]);
+		}
+		center.divideScalar(this.points.length);
 
-		line.getCenter(this.text.position);
+		this.text.position.copy(center);
 		this.text.position.y += 0.1;
 
-		this.text.text = distance + " cm";
+		this.text.text = this.getAngle() + " deg";
 		this.text.sync();
 	}
 }
