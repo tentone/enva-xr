@@ -737,8 +737,7 @@ export class App
 
 		renderer.clear(true, true, true);
 
-
-		var start = performance.now();
+		// var start = performance.now();
 
 		var session = renderer.xr.getSession();
 		var referenceSpace = renderer.xr.getReferenceSpace();
@@ -866,14 +865,14 @@ export class App
 		renderer.render(scene, camera);
 
 		// Average the execution time
-		var end = performance.now();
-		perf.push(end - start);
-		while (perf.length > 200) {
+		//var end = performance.now();
+
+		perf.push(delta);
+		while (perf.length > 20) {
 			perf.shift();
 		}
 		var avg = perf.reduce(function(a, b){return a + b;}, 0) / perf.length;
 		console.log(avg + " ms");
-
 		console.log(renderer.info.render)
 
 	}
