@@ -2,8 +2,7 @@ import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
 	SphereBufferGeometry, DirectionalLight, TextureLoader, AmbientLightProbe,
 	MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
 	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap,
-	MeshPhysicalMaterial,
-	AmbientLight} from "three";
+	MeshPhysicalMaterial, AmbientLight} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {ObjectUtils} from "./utils/ObjectUtils.js";
@@ -142,8 +141,10 @@ var xrGlBinding = null;
  */
 var canvas = null;
 
-var performanceCounter = [];
+var performanceCounterFull = [];
+var performanceCounterRender = [];
 var performanceCounterEnabled = false;
+var performanceCounterSamples = 100;
 
 var NORMAL = 0;
 var DEBUG_ZBUFFER = 1;
@@ -159,7 +160,7 @@ export class App
 	{
 		depthDataTexture = new DepthDataTexture();
 
-		/*directionalLight = new DirectionalLight();
+		directionalLight = new DirectionalLight();
 		directionalLight.castShadow = true;
 		directionalLight.shadow.mapSize.set(1024, 1024);
 		directionalLight.shadow.camera.far = 20;
@@ -171,20 +172,20 @@ export class App
 		scene.add(directionalLight);
 
 		lightProbe = new AmbientLightProbe();
-		scene.add(lightProbe);*/
+		scene.add(lightProbe);
 
-		var ambient = new AmbientLight(0xFFFFFF);
+		/*var ambient = new AmbientLight(0xFFFFFF);
 		ambient.intensity = 1.0;
-		scene.add(ambient);
+		scene.add(ambient);*/
 
-		/*shadowMaterial = new ShadowMaterial({opacity: 0.6});
+		shadowMaterial = new ShadowMaterial({opacity: 0.5});
 		shadowMaterial = this.createAugmentedMaterial(shadowMaterial, depthDataTexture);
 
-		floorMesh = new Mesh(new PlaneBufferGeometry(50, 50, 1, 1), shadowMaterial);
+		floorMesh = new Mesh(new PlaneBufferGeometry(100, 100, 1, 1), shadowMaterial);
 		floorMesh.rotation.set(-Math.PI / 2, 0, 0);
 		floorMesh.castShadow = false;
 		floorMesh.receiveShadow = true;
-		scene.add(floorMesh);*/
+		scene.add(floorMesh);
 
 	}
 
@@ -385,8 +386,6 @@ export class App
 
 		material.onBeforeCompile = (shader) =>
 		{
-			console.log(shader);
-
 			// Pass uniforms from userData to the
 			for (let i in material.userData)
 			{
@@ -474,10 +473,18 @@ export class App
 					if (child instanceof Mesh)
 					{
                         child.castShadow = true;
-                        child.receiveShadow = true;
+						child.receiveShadow = true;
+
+						/*
 						child.material = new MeshBasicMaterial({
 							map: child.material.map
 						});
+						*/
+
+						child.material = this.createAugmentedMaterial(new MeshBasicMaterial({
+							map: child.material.map
+						}), depthDataTexture);
+
 						// child.material =  this.createAugmentedMaterial(child.material, depthDataTexture);
 					}
 				});
@@ -563,7 +570,8 @@ export class App
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg",  () =>
 		{
-			performanceCounter = [];
+			performanceCounterFull = [];
+			performanceCounterRender = [];
 			performanceCounterEnabled = true;
 		}));
 
@@ -741,11 +749,10 @@ export class App
 			return;
 		}
 
-		// renderer.clear(true, true, true);
-
+		// Update physics world
 		// world.step(delta / 1e3);
 
-		// var start = performance.now();
+		var start = performance.now();
 
 		var session = renderer.xr.getSession();
 		var referenceSpace = renderer.xr.getReferenceSpace();
@@ -771,7 +778,7 @@ export class App
 				});
 			});
 
-			/*
+
 			session.requestLightProbe().then((probe) =>
 			{
 				xrLightProbe = probe;
@@ -782,7 +789,7 @@ export class App
 					// console.log(glCubeMap);
 				// });
 			});
-			*/
+
 
 			session.addEventListener("end", function()
 			{
@@ -795,14 +802,13 @@ export class App
 
 
 		// Process lighting condition from probe
-		/*
 		if (xrLightProbe)
 		{
 			let lightEstimate = frame.getLightEstimate(xrLightProbe);
 			if (lightEstimate)
 			{
                 let directionalPosition = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
-                directionalPosition.multiplyScalar(3);
+                directionalPosition.multiplyScalar(5);
 
 				let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
 				directionalLight.position.copy(directionalPosition);
@@ -812,7 +818,6 @@ export class App
 				lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
 			}
 		}
-		*/
 
 		// Process Hit test
 		if (xrHitTestSource)
@@ -847,7 +852,7 @@ export class App
 		}
 
 		// Handle depth
-		/* var viewerPose = frame.getViewerPose(referenceSpace);
+		var viewerPose = frame.getViewerPose(referenceSpace);
 		if (viewerPose)
 		{
 			pose = viewerPose;
@@ -868,22 +873,25 @@ export class App
 					this.updateAugmentedMaterialUniforms(depthData.normTextureFromNormView.matrix);
 				}
 			}
-		}*/
+		}
 
 		renderer.render(scene, camera);
 
+		var end = performance.now();
+
 		if(performanceCounterEnabled) {
-			performanceCounter.push(delta);
+			performanceCounterFull.push(delta);
+			performanceCounterRender.push(end - start);
 
-			if (performanceCounter.length >= 100) {
+			if (performanceCounterFull.length >= performanceCounterSamples) {
+
 				performanceCounterEnabled = false;
-				var avg = performanceCounter.reduce(function(a, b){return a + b;}, 0) / performanceCounter.length;
+				var avgFull = performanceCounterFull.reduce(function(a, b){return a + b;}, 0) / performanceCounterFull.length;
+				var avgRender = performanceCounterRender.reduce(function(a, b){return a + b;}, 0) / performanceCounterRender.length;
 
-				console.log(avg + ", " + renderer.info.render.calls + ", " + renderer.info.render.triangles);
+				console.log(avgFull + ", " + avgRender + ", " + renderer.info.render.calls + ", " + renderer.info.render.triangles);
 			}
 		}
-		// Average the execution time
-		//var end = performance.now();
 	}
 }
 
