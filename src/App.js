@@ -817,6 +817,7 @@ export class App
 				cursor.visible = true;
 				cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 
+				/*
 				// Update physics floor plane
 				var position = new Vector3();
 				position.setFromMatrixPosition(cursor.matrix);
@@ -825,6 +826,7 @@ export class App
                     floor.position.y = position.y;
                     floorMesh.position.y = position.y;
 				}
+				*/
 			}
 			else
 			{
