@@ -158,8 +158,8 @@ export class App
 {
 	createScene()
 	{
-		/*
-		depthDataTexture = new DepthDataTexture();
+
+        depthDataTexture = new DepthDataTexture();
 
 		directionalLight = new DirectionalLight();
 		directionalLight.castShadow = true;
@@ -183,11 +183,11 @@ export class App
 		floorMesh.castShadow = false;
 		floorMesh.receiveShadow = true;
 		scene.add(floorMesh);
-		*/
 
-		var ambient = new AmbientLight(0xFFFFFF);
+
+		/*var ambient = new AmbientLight(0xFFFFFF);
 		ambient.intensity = 1.0;
-		scene.add(ambient);
+		scene.add(ambient);*/
 	}
 
     changeShadowType()
@@ -302,7 +302,7 @@ export class App
             stencil: true
 		});
 
-		renderer.shadowMap.enabled = false;
+		renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = PCFSoftShadowMap;
         renderer.sortObjects = false;
         renderer.physicallyCorrectLights = true;
@@ -476,19 +476,18 @@ export class App
                         child.castShadow = true;
 						child.receiveShadow = true;
 
-
+                        /*
 						child.material = new MeshBasicMaterial({
 							map: child.material.map
 						});
 
 
-						/*
 						child.material = this.createAugmentedMaterial(new MeshBasicMaterial({
 							map: child.material.map
 						}), depthDataTexture);
-						*/
 
-						// child.material =  this.createAugmentedMaterial(child.material, depthDataTexture);
+                        */
+                        child.material =  this.createAugmentedMaterial(child.material, depthDataTexture);
 					}
 				});
 
@@ -514,7 +513,6 @@ export class App
 				body.type = Body.STATIC;
 				body.position.set(object.position.x, object.position.y + size.y / 2, object.position.z);
 				body.velocity.set(0, 0, 0);
-				//body.quaternion.copy(object.quaternion);
 				body.addShape(shape);
 				world.addBody(body);
 			});
@@ -633,7 +631,7 @@ export class App
 
 				var orientation = new Quaternion(viewOrientation.x, viewOrientation.y, viewOrientation.z, viewOrientation.w);
 
-				var speed = 2.0;
+				var speed = 0.0;
 
 				var direction = new Vector3(0.0, 0.0, -1.0);
 				direction.applyQuaternion(orientation);
@@ -753,7 +751,7 @@ export class App
 		}
 
 		// Update physics world
-		// world.step(delta / 1e3);
+		world.step(delta / 1e3);
 
 		var start = performance.now();
 
@@ -781,7 +779,6 @@ export class App
 				});
 			});
 
-			/*
 			session.requestLightProbe().then((probe) =>
 			{
 				xrLightProbe = probe;
@@ -792,7 +789,6 @@ export class App
 					// console.log(glCubeMap);
 				// });
 			});
-			*/
 
 			session.addEventListener("end", function()
 			{
@@ -805,7 +801,6 @@ export class App
 
 
 		// Process lighting condition from probe
-		/*
 		if (xrLightProbe)
 		{
 			let lightEstimate = frame.getLightEstimate(xrLightProbe);
@@ -822,7 +817,6 @@ export class App
 				lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
 			}
 		}
-		*/
 
 		// Process Hit test
 		if (xrHitTestSource)
@@ -834,7 +828,7 @@ export class App
 				cursor.visible = true;
 				cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 
-				/*
+
 				// Update physics floor plane
 				var position = new Vector3();
 				position.setFromMatrixPosition(cursor.matrix);
@@ -843,7 +837,6 @@ export class App
                     floor.position.y = position.y;
                     floorMesh.position.y = position.y;
 				}
-				*/
 			}
 			else
 			{
@@ -857,7 +850,6 @@ export class App
 		}
 
 		// Handle depth
-		/*
 		var viewerPose = frame.getViewerPose(referenceSpace);
 		if (viewerPose)
 		{
@@ -880,7 +872,6 @@ export class App
 				}
 			}
 		}
-		*/
 
 		renderer.render(scene, camera);
 
@@ -896,7 +887,7 @@ export class App
 				var avgFull = performanceCounterFull.reduce(function(a, b){return a + b;}, 0) / performanceCounterFull.length;
 				var avgRender = performanceCounterRender.reduce(function(a, b){return a + b;}, 0) / performanceCounterRender.length;
 
-				console.log(avgFull + ", " + avgRender + ", " + renderer.info.render.calls + ", " + renderer.info.render.triangles);
+				console.log(avgFull + ", " + avgRender + ", " + renderer.info.render.calls + ", " + renderer.info.render.triangles + ", " + renderer.info.memory.geometries + ", " + renderer.info.memory.textures);
 			}
 		}
 	}
