@@ -1,3 +1,6 @@
+/**
+ * XR session running.
+ */
 let currentSession = null;
 
 export class XRManager
@@ -7,30 +10,36 @@ export class XRManager
 	 *
 	 * @param {*} renderer
 	 * @param {*} sessionInit
+	 * @param {*} onError
 	 */
-	static start(renderer, sessionInit = {})
+	static start(renderer, sessionInit = {}, onError = function(){})
 	{
-		function onSessionStarted(session)
-		{
-			session.addEventListener("end", onSessionEnded);
-			renderer.xr.setReferenceSpaceType("local");
-			renderer.xr.setSession(session);
-			currentSession = session;
-		}
-
-		function onSessionEnded(event)
-		{
-			currentSession.removeEventListener("end", onSessionEnded);
-			currentSession = null;
-		}
-
 		if (currentSession === null)
 		{
-			navigator.xr.requestSession("immersive-ar", sessionInit).then(onSessionStarted);
+			function onSessionStarted(session)
+			{
+				session.addEventListener("end", onSessionEnded);
+				renderer.xr.setReferenceSpaceType("local");
+				renderer.xr.setSession(session);
+				currentSession = session;
+			}
+
+			function onSessionEnded(event)
+			{
+				currentSession.removeEventListener("end", onSessionEnded);
+				currentSession = null;
+			}
+
+			navigator.xr.requestSession("immersive-ar", sessionInit).then(onSessionStarted).catch(onError);
 		}
-		else
+	}
+
+	static end()
+	{
+		if (!currentSession === null)
 		{
 			currentSession.end();
+			currentSession = null;
 		}
 	}
 }

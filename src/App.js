@@ -2,7 +2,8 @@ import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
 	SphereBufferGeometry, DirectionalLight, TextureLoader, AmbientLightProbe,
 	MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
 	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap,
-	MeshPhysicalMaterial} from "three";
+	MeshPhysicalMaterial,
+	AmbientLight} from "three";
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./utils/GUIUtils.js";
 import {ObjectUtils} from "./utils/ObjectUtils.js";
@@ -16,6 +17,9 @@ import {DepthDataTexture} from "./texture/DepthDataTexture.js";
 import {threeToCannon} from 'three-to-cannon';
 import cannonDebugger from 'cannon-es-debugger'
 
+/**
+ * DOM container.
+ */
 var container = null;
 
 /**
@@ -138,6 +142,9 @@ var xrGlBinding = null;
  */
 var canvas = null;
 
+
+var perf = [];
+
 var NORMAL = 0;
 var DEBUG_ZBUFFER = 1;
 var DEBUG_AR_DEPTH = 2;
@@ -146,16 +153,14 @@ var DEBUG_CAMERA_IMAGE = 4;
 
 var mode = NORMAL;
 
-
 export class App
 {
 	createScene()
 	{
 		depthDataTexture = new DepthDataTexture();
 
-		directionalLight = new DirectionalLight();
+		/*directionalLight = new DirectionalLight();
 		directionalLight.castShadow = true;
-		// directionalLight.shadow.normalBias = 0.001;
 		directionalLight.shadow.mapSize.set(1024, 1024);
 		directionalLight.shadow.camera.far = 20;
 		directionalLight.shadow.camera.near = 0.1;
@@ -166,25 +171,52 @@ export class App
 		scene.add(directionalLight);
 
 		lightProbe = new AmbientLightProbe();
-		scene.add(lightProbe);
+		scene.add(lightProbe);*/
 
-		shadowMaterial = new ShadowMaterial({opacity: 0.6});
+		var ambient = new AmbientLight(0xFFFFFF);
+		scene.add(ambient);
+
+		/*shadowMaterial = new ShadowMaterial({opacity: 0.6});
 		shadowMaterial = this.createAugmentedMaterial(shadowMaterial, depthDataTexture);
 
 		floorMesh = new Mesh(new PlaneBufferGeometry(50, 50, 1, 1), shadowMaterial);
 		floorMesh.rotation.set(-Math.PI / 2, 0, 0);
 		floorMesh.castShadow = false;
 		floorMesh.receiveShadow = true;
-		scene.add(floorMesh);
+		scene.add(floorMesh);*/
 
 	}
 
     changeShadowType()
     {
-        /* BasicShadowMap;
-        PCFShadowMap;
-        PCFSoftShadowMap;
-        VSMShadowMap; */
+		if (!renderer.shadowMap.enabled) {
+			renderer.shadowMap.enabled = true;
+			renderer.shadowMap.type = BasicShadowMap;
+		}
+		else if(renderer.shadowMap.type === BasicShadowMap) {
+			renderer.shadowMap.type = PCFShadowMap;
+		}
+		else if(renderer.shadowMap.type === PCFShadowMap) {
+			renderer.shadowMap.type = PCFSoftShadowMap;
+		}
+		else if(renderer.shadowMap.type === PCFSoftShadowMap) {
+			renderer.shadowMap.type = VSMShadowMap;
+		}
+		else if(renderer.shadowMap.type === VSMShadowMap) {
+			renderer.shadowMap.enabled = false;
+			renderer.shadowMap.type = BasicShadowMap;
+		}
+
+		renderer.shadowMap.needsUpdate = true;
+		scene.traverse(function (child)
+		{
+			if (child.material)
+			{
+				child.material.needsUpdate = true;
+			}
+		})
+
+		console.log("Shadow type changed to " + renderer.shadowMap.type);
     }
 
 	toggleDebugMode()
@@ -260,10 +292,14 @@ export class App
 			canvas: canvas,
 			depth: true,
 			powerPreference: "high-performance",
-			precision: "highp"
+            precision: "highp",
+            preserveDrawingBuffer: false,
+            premultipliedAlpha: true,
+            logarithmicDepthBuffer: false,
+            stencil: true
 		});
 
-		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.enabled = false;
         renderer.shadowMap.type = PCFSoftShadowMap;
         renderer.sortObjects = false;
         renderer.physicallyCorrectLights = true;
@@ -275,6 +311,7 @@ export class App
 
     forceContextLoss()
     {
+
         try
         {
             if (renderer !== null)
@@ -287,7 +324,7 @@ export class App
         catch (e)
         {
             renderer = null;
-            console.log("Failed to destroy WebGL context.");
+            alert("Failed to destroy WebGL context.");
         }
 
         if(canvas !== null) {
@@ -335,6 +372,8 @@ export class App
 	 * @param {*} depthMap
 	 */
 	createAugmentedMaterial(material, depthMap) {
+		return material;
+
 		material.userData = {
 			uDepthTexture: {value: depthMap},
 			uWidth: {value: 1.0},
@@ -347,7 +386,6 @@ export class App
 
 		material.onBeforeCompile = (shader) =>
 		{
-
 			console.log(shader);
 
 			// Pass uniforms from userData to the
@@ -369,7 +407,7 @@ export class App
 			` + shader.fragmentShader;
 
 
-			var fragmentEntryPoint = "#include <dithering_fragment>";
+			var fragmentEntryPoint = "#include <clipping_planes_fragment>";
 			if(material instanceof ShadowMaterial)
 			{
 				fragmentEntryPoint = "#include <fog_fragment>";
@@ -523,15 +561,7 @@ export class App
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg",  () =>
 		{
-            renderer.shadowMap.enabled = !renderer.shadowMap.enabled;
-            renderer.shadowMap.needsUpdate = true;
-            scene.traverse(function (child)
-            {
-                if (child.material)
-                {
-                    child.material.needsUpdate = true;
-                }
-            })
+			this.changeShadowType();
 		}));
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/bug.svg", () =>
@@ -569,7 +599,6 @@ export class App
 		{
 			this.loadGLTFMesh("./assets/3d/gltf/BarramundiFish.glb", scene, new Euler(0, 0, 0), 1.0);
 		}));
-
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg",  () =>
 		{
@@ -636,7 +665,10 @@ export class App
 			{
 				optionalFeatures: ["dom-overlay"],
 				domOverlay: {root: container},
-				requiredFeatures: ["hit-test", "depth-sensing", "light-estimation"]
+				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"]
+			}, function(error)
+			{
+				alert("Error starting the AR session. " + error);
 			});
 		};
 		document.body.appendChild(button);
@@ -693,7 +725,6 @@ export class App
 	 */
 	render(time, frame)
 	{
-
 		let delta = time - lastTime;
 		lastTime = time;
 
@@ -702,17 +733,22 @@ export class App
 			return;
 		}
 
-		world.step(delta / 1e3);
+		// world.step(delta / 1e3);
+
+		renderer.clear(true, true, true);
+
 
 		var start = performance.now();
 
-        /*
-		var referenceSpace = renderer.xr.getReferenceSpace();
 		var session = renderer.xr.getSession();
+		var referenceSpace = renderer.xr.getReferenceSpace();
 
-		if (!xrGlBinding) {
+		/*
+		if (!xrGlBinding)
+		{
 			xrGlBinding = new XRWebGLBinding(session, glContext);
 		}
+		*/
 
 		// Request hit test source
 		if (!hitTestSourceRequested)
@@ -728,6 +764,7 @@ export class App
 				});
 			});
 
+			/*
 			session.requestLightProbe().then((probe) =>
 			{
 				xrLightProbe = probe;
@@ -738,6 +775,7 @@ export class App
 					// console.log(glCubeMap);
 				// });
 			});
+			*/
 
 			session.addEventListener("end", function()
 			{
@@ -750,6 +788,7 @@ export class App
 
 
 		// Process lighting condition from probe
+		/*
 		if (xrLightProbe)
 		{
 			let lightEstimate = frame.getLightEstimate(xrLightProbe);
@@ -766,6 +805,7 @@ export class App
 				lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
 			}
 		}
+		*/
 
 		// Process Hit test
 		if (xrHitTestSource)
@@ -798,7 +838,7 @@ export class App
 		}
 
 		// Handle depth
-		var viewerPose = frame.getViewerPose(referenceSpace);
+		/* var viewerPose = frame.getViewerPose(referenceSpace);
 		if (viewerPose)
 		{
 			pose = viewerPose;
@@ -819,20 +859,21 @@ export class App
 					this.updateAugmentedMaterialUniforms(depthData.normTextureFromNormView.matrix);
 				}
 			}
-		}
-        */
+		}*/
 
 		renderer.render(scene, camera);
 
+		// Average the execution time
 		var end = performance.now();
-        perf.push(end - start);
-        while (perf.length > 600) {
-            perf.shift();
-        }
-
-        var avg = perf.reduce(function(a, b){return a + b;}, 0) / perf.length;
+		perf.push(end - start);
+		while (perf.length > 200) {
+			perf.shift();
+		}
+		var avg = perf.reduce(function(a, b){return a + b;}, 0) / perf.length;
 		console.log(avg + " ms");
+
+		console.log(renderer.info.render)
+
 	}
 }
 
-var perf = [];
