@@ -158,6 +158,7 @@ export class App
 {
 	createScene()
 	{
+		/*
 		depthDataTexture = new DepthDataTexture();
 
 		directionalLight = new DirectionalLight();
@@ -174,10 +175,6 @@ export class App
 		lightProbe = new AmbientLightProbe();
 		scene.add(lightProbe);
 
-		/*var ambient = new AmbientLight(0xFFFFFF);
-		ambient.intensity = 1.0;
-		scene.add(ambient);*/
-
 		shadowMaterial = new ShadowMaterial({opacity: 0.5});
 		shadowMaterial = this.createAugmentedMaterial(shadowMaterial, depthDataTexture);
 
@@ -186,7 +183,11 @@ export class App
 		floorMesh.castShadow = false;
 		floorMesh.receiveShadow = true;
 		scene.add(floorMesh);
+		*/
 
+		var ambient = new AmbientLight(0xFFFFFF);
+		ambient.intensity = 1.0;
+		scene.add(ambient);
 	}
 
     changeShadowType()
@@ -475,15 +476,17 @@ export class App
                         child.castShadow = true;
 						child.receiveShadow = true;
 
-						/*
+
 						child.material = new MeshBasicMaterial({
 							map: child.material.map
 						});
-						*/
 
+
+						/*
 						child.material = this.createAugmentedMaterial(new MeshBasicMaterial({
 							map: child.material.map
 						}), depthDataTexture);
+						*/
 
 						// child.material =  this.createAugmentedMaterial(child.material, depthDataTexture);
 					}
@@ -778,7 +781,7 @@ export class App
 				});
 			});
 
-
+			/*
 			session.requestLightProbe().then((probe) =>
 			{
 				xrLightProbe = probe;
@@ -789,7 +792,7 @@ export class App
 					// console.log(glCubeMap);
 				// });
 			});
-
+			*/
 
 			session.addEventListener("end", function()
 			{
@@ -802,6 +805,7 @@ export class App
 
 
 		// Process lighting condition from probe
+		/*
 		if (xrLightProbe)
 		{
 			let lightEstimate = frame.getLightEstimate(xrLightProbe);
@@ -818,6 +822,7 @@ export class App
 				lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
 			}
 		}
+		*/
 
 		// Process Hit test
 		if (xrHitTestSource)
@@ -852,6 +857,7 @@ export class App
 		}
 
 		// Handle depth
+		/*
 		var viewerPose = frame.getViewerPose(referenceSpace);
 		if (viewerPose)
 		{
@@ -874,6 +880,7 @@ export class App
 				}
 			}
 		}
+		*/
 
 		renderer.render(scene, camera);
 
