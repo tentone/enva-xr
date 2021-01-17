@@ -142,8 +142,8 @@ var xrGlBinding = null;
  */
 var canvas = null;
 
-
-var perf = [];
+var performanceCounter = [];
+var performanceCounterEnabled = false;
 
 var NORMAL = 0;
 var DEBUG_ZBUFFER = 1;
@@ -174,6 +174,7 @@ export class App
 		scene.add(lightProbe);*/
 
 		var ambient = new AmbientLight(0xFFFFFF);
+		ambient.intensity = 1.0;
 		scene.add(ambient);
 
 		/*shadowMaterial = new ShadowMaterial({opacity: 0.6});
@@ -372,8 +373,6 @@ export class App
 	 * @param {*} depthMap
 	 */
 	createAugmentedMaterial(material, depthMap) {
-		return material;
-
 		material.userData = {
 			uDepthTexture: {value: depthMap},
 			uWidth: {value: 1.0},
@@ -476,7 +475,10 @@ export class App
 					{
                         child.castShadow = true;
                         child.receiveShadow = true;
-						child.material = this.createAugmentedMaterial(child.material, depthDataTexture);
+						child.material = new MeshBasicMaterial({
+							map: child.material.map
+						});
+						// child.material =  this.createAugmentedMaterial(child.material, depthDataTexture);
 					}
 				});
 
@@ -558,6 +560,12 @@ export class App
 				}
 			}
         }));
+
+		container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg",  () =>
+		{
+			performanceCounter = [];
+			performanceCounterEnabled = true;
+		}));
 
 		container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg",  () =>
 		{
@@ -733,9 +741,9 @@ export class App
 			return;
 		}
 
-		// world.step(delta / 1e3);
+		// renderer.clear(true, true, true);
 
-		renderer.clear(true, true, true);
+		// world.step(delta / 1e3);
 
 		// var start = performance.now();
 
@@ -864,17 +872,18 @@ export class App
 
 		renderer.render(scene, camera);
 
+		if(performanceCounterEnabled) {
+			performanceCounter.push(delta);
+
+			if (performanceCounter.length >= 100) {
+				performanceCounterEnabled = false;
+				var avg = performanceCounter.reduce(function(a, b){return a + b;}, 0) / performanceCounter.length;
+
+				console.log(avg + ", " + renderer.info.render.calls + ", " + renderer.info.render.triangles);
+			}
+		}
 		// Average the execution time
 		//var end = performance.now();
-
-		perf.push(delta);
-		while (perf.length > 20) {
-			perf.shift();
-		}
-		var avg = perf.reduce(function(a, b){return a + b;}, 0) / perf.length;
-		console.log(avg + " ms");
-		console.log(renderer.info.render)
-
 	}
 }
 
