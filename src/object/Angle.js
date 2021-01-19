@@ -98,7 +98,6 @@ export class Angle extends Line
 		return angle;
 	}
 
-
 	/**
 	 * Update the text of the measurement.
 	 */

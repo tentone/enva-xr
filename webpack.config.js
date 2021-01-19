@@ -2,17 +2,30 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const source = Path.resolve(__dirname, ".");
+const output = Path.resolve(__dirname, "build");
+
 module.exports = {
   entry: ['./src/main.js'],
   output: {
     filename: '[name].bundle.js',
-    path: path.resolve(__dirname, 'docs')
+    path: output
   },
   devServer: {
-    contentBase: path.resolve(__dirname, '.'),
+    contentBase: source,
     hot: true
   },
   plugins: [
+	new CopyPlugin({
+		patterns: [
+			{
+				from: source + "/files",
+				to: output + "/assets",
+				force: true
+			}
+		],
+		options: {concurrency: 100}
+	}),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html'

@@ -1,5 +1,8 @@
 import {CanvasTexture} from "three";
 
+/**
+ * Canvas texture to stored depth data obtained from the WebXR API.
+ */
 export class DepthCanvasTexture extends CanvasTexture
 {
 	constructor(canvas) {

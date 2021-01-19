@@ -1,9 +1,11 @@
-import {DataTexture, LuminanceAlphaFormat, UnsignedByteType, NearestFilter, LinearFilter} from "three";
+import {DataTexture, LuminanceAlphaFormat, UnsignedByteType, LinearFilter} from "three";
 
 /**
  * Stores the raw depth values in a 16 bit value packed texture.
  *
  * The distance to the camera is stored in millimeters.
+ *
+ * This depth has to be unpacked in shader and multiplied by the normalization matrix to obtain rectified UV coordinates.
  */
 export class DepthDataTexture extends DataTexture
 {

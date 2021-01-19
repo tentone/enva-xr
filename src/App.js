@@ -2,9 +2,9 @@ import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
 	SphereBufferGeometry, DirectionalLight, TextureLoader, AmbientLightProbe,
 	MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
 	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap,
-	MeshPhysicalMaterial, AmbientLight} from "three";
+	MeshPhysicalMaterial} from "three";
 import {XRManager} from "./utils/XRManager.js";
-import {GUIUtils} from "./utils/GUIUtils.js";
+import {GUIUtils} from "./gui/GUIUtils.js";
 import {ObjectUtils} from "./utils/ObjectUtils.js";
 import {Cursor} from "./object/Cursor.js";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
@@ -758,12 +758,11 @@ export class App
 		var session = renderer.xr.getSession();
 		var referenceSpace = renderer.xr.getReferenceSpace();
 
-		/*
-		if (!xrGlBinding)
-		{
-			xrGlBinding = new XRWebGLBinding(session, glContext);
-		}
-		*/
+		// if (!xrGlBinding)
+		// {
+		// 	xrGlBinding = new XRWebGLBinding(session, glContext);
+		// }
+
 
 		// Request hit test source
 		if (!hitTestSourceRequested)
@@ -828,7 +827,6 @@ export class App
 				cursor.visible = true;
 				cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 
-
 				// Update physics floor plane
 				var position = new Vector3();
 				position.setFromMatrixPosition(cursor.matrix);
@@ -876,7 +874,6 @@ export class App
 		renderer.render(scene, camera);
 
 		var end = performance.now();
-
 		if(performanceCounterEnabled) {
 			performanceCounterFull.push(delta);
 			performanceCounterRender.push(end - start);
@@ -886,7 +883,6 @@ export class App
 				performanceCounterEnabled = false;
 				var avgFull = performanceCounterFull.reduce(function(a, b){return a + b;}, 0) / performanceCounterFull.length;
 				var avgRender = performanceCounterRender.reduce(function(a, b){return a + b;}, 0) / performanceCounterRender.length;
-
 				console.log(avgFull + ", " + avgRender + ", " + renderer.info.render.calls + ", " + renderer.info.render.triangles + ", " + renderer.info.memory.geometries + ", " + renderer.info.memory.textures);
 			}
 		}
