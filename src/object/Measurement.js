@@ -47,7 +47,8 @@ export class Measurement extends Line
 	 */
 	setPointFromMatrix(matrix)
 	{
-		this.points[1].set(matrix.elements[12], matrix.elements[13], matrix.elements[14])
+		var position = new Vector3(matrix.elements[12], matrix.elements[13], matrix.elements[14]);
+		this.points[this.points.length - 1].copy(position);
 
 		this.updateGeometry();
 		this.updateText();
@@ -63,9 +64,11 @@ export class Measurement extends Line
 		positions[0] = this.points[0].x;
 		positions[1] = this.points[0].y;
 		positions[2] = this.points[0].z;
+
 		positions[3] = this.points[1].x;
 		positions[4] = this.points[1].y;
 		positions[5] = this.points[1].z;
+
 		this.geometry.attributes.position.needsUpdate = true;
 		this.geometry.computeBoundingSphere();
 	}

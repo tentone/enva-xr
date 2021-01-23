@@ -167,18 +167,17 @@ export class App
 
 	createScene()
 	{
-
         this.depthDataTexture = new DepthDataTexture();
 
 		this.directionalLight = new DirectionalLight();
 		this.directionalLight.castShadow = true;
 		this.directionalLight.shadow.mapSize.set(1024, 1024);
-		this.directionalLight.shadow.this.camera.far = 20;
-		this.directionalLight.shadow.this.camera.near = 0.1;
-		this.directionalLight.shadow.this.camera.left = -5;
-		this.directionalLight.shadow.this.camera.right = 5;
-		this.directionalLight.shadow.this.camera.bottom = -5;
-		this.directionalLight.shadow.this.camera.top = 5;
+		this.directionalLight.shadow.camera.far = 20;
+		this.directionalLight.shadow.camera.near = 0.1;
+		this.directionalLight.shadow.camera.left = -5;
+		this.directionalLight.shadow.camera.right = 5;
+		this.directionalLight.shadow.camera.bottom = -5;
+		this.directionalLight.shadow.camera.top = 5;
 		this.scene.add(this.directionalLight);
 
 		this.lightProbe = new AmbientLightProbe();

@@ -24,7 +24,7 @@ export class Angle extends Line
 		/**
 		 * List of points that compose the measurement.
 		 */
-		this.points = [point.clone(), point.clone(), point.clone()];
+		this.points = [point.clone()];
 
 		/**
 		 * Text used to display the measurement value.
@@ -47,7 +47,8 @@ export class Angle extends Line
 	 */
 	setPointFromMatrix(matrix)
 	{
-		this.points[1].set(matrix.elements[12], matrix.elements[13], matrix.elements[14])
+		var position = new Vector3(matrix.elements[12], matrix.elements[13], matrix.elements[14]);
+		this.points[this.points.length - 1].copy(position);
 
 		this.updateGeometry();
 		this.updateText();
@@ -63,12 +64,17 @@ export class Angle extends Line
 		positions[0] = this.points[0].x;
 		positions[1] = this.points[0].y;
 		positions[2] = this.points[0].z;
-		positions[3] = this.points[1].x;
-		positions[4] = this.points[1].y;
-		positions[5] = this.points[1].z;
-		positions[6] = this.points[2].x;
-		positions[7] = this.points[2].y;
-		positions[8] = this.points[2].z;
+
+		var a = this.points.length > 1 ? 1 : 0;
+		positions[3] = this.points[a].x;
+		positions[4] = this.points[a].y;
+		positions[5] = this.points[a].z;
+
+		var b = this.points.length > 2 ? 2 : a;
+		positions[6] = this.points[b].x;
+		positions[7] = this.points[b].y;
+		positions[8] = this.points[b].z;
+
 		this.geometry.attributes.position.needsUpdate = true;
 		this.geometry.computeBoundingSphere();
 	}
@@ -77,6 +83,11 @@ export class Angle extends Line
 	 * Update the label text and position.
 	 */
 	getAngle() {
+		if (this.points.length < 3)
+		{
+			return 0;
+		}
+
 		var a = this.points[0];
 		var b = this.points[1];
 		var c = this.points[2];
@@ -102,15 +113,21 @@ export class Angle extends Line
 	 * Update the text of the measurement.
 	 */
 	updateText() {
+		if (this.points.length < 3)
+		{
+			this.text.visible = false;
+			return;
+		}
+
 		var center = new Vector3();
 		for (var i = 0; i < this.points.length; i++) {
 			center.add(this.points[i]);
 		}
 		center.divideScalar(this.points.length);
 
+		this.text.visible = true;
 		this.text.position.copy(center);
 		this.text.position.y += 0.1;
-
 		this.text.text = this.getAngle() + " deg";
 		this.text.sync();
 	}
