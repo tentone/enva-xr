@@ -16,202 +16,210 @@ import {DepthDataTexture} from "./texture/DepthDataTexture.js";
 import {threeToCannon} from 'three-to-cannon';
 import cannonDebugger from 'cannon-es-debugger'
 
-/**
- * DOM container.
- */
-var container = null;
-
-/**
- * Light probe used to acess the lighting estimation for the scene.
- */
-var xrLightProbe = null;
-
-/**
- * Physics world used for interaction.
- */
-var world = null;
-
-/**
- * Phsyics floor plane should be set to the lowest plane intersection found.
- */
-var floor = null;
-
-/**
- * If true the depth data is shown.
- */
-var debugDepth = false;
-
-/**
- * XR Viewer pose object.
- */
-var pose = null;
-
-/**
- * Canvas to draw depth information for debug.
- */
-var depthCanvas = null;
-
-/**
- * Depth canvas texture with the calculated depth used to debug.
- */
-var depthTexture = null;
-
-/**
- * Depth data texture.
- */
-var depthDataTexture = null;
-
-/**
- * Camera used to view the scene.
- */
-var camera = new PerspectiveCamera(60, 1, 0.1, 10);
-
-/**
- * Scene to draw into the screen.
- */
-var scene = new Scene();
-
-/**
- * Directional shadow casting light.
- */
-var directionalLight;
-
-/**
- * Light probe object using spherical harmonics.
- */
-var lightProbe;
-
-/**
- * Mesh used as floor.
- */
-var shadowMaterial;
-
-/**
- * Mesh used to cast shadows into the floor.
- */
-var floorMesh;
-
-/**
- * Time of the last frame.
- */
-var lastTime = 0;
-
-/**
- * WebGL renderer used to draw the scene.
- */
-var renderer = null;
-
-/**
- * WebXR hit test source, (null until requested).
- */
-var xrHitTestSource = null;
-
-/**
- * Indicates if a hit test source was requested.
- */
-var hitTestSourceRequested = false;
-
-/**
- * Cursor to hit test the scene.
- */
-var cursor = null;
-
-/**
- * Measurement being created currently.
- */
-var measurement = null;
-
-/**
- * Size of the rendererer.
- */
-var resolution = new Vector2();
-
-/**
- * WebGL 2.0 context used to render.
- */
-var glContext = null;
-
-/**
- * XRWebGLBinding object used get additional gl data.
- */
-var xrGlBinding = null;
-
-/**
- * Rendering canvas.
- */
-var canvas = null;
-
-var performanceCounterFull = [];
-var performanceCounterRender = [];
-var performanceCounterEnabled = false;
-var performanceCounterSamples = 100;
-
 var NORMAL = 0;
 var DEBUG_ZBUFFER = 1;
 var DEBUG_AR_DEPTH = 2;
 var DEBUG_NO_OCCLUSION = 3;
 var DEBUG_CAMERA_IMAGE = 4;
 
-var mode = NORMAL;
-
 export class App
 {
+	constructor()
+	{
+		/**
+		 * DOM this.container.
+		 */
+		this.container = null;
+
+		/**
+		 * Light probe used to acess the lighting estimation for the this.scene.
+		 */
+		this.xrLightProbe = null;
+
+		/**
+		 * Physics this.world used for interaction.
+		 */
+		this.world = null;
+
+		/**
+		 * Phsyics floor plane should be set to the lowest plane intersection found.
+		 */
+		this.floor = null;
+
+		/**
+		 * If true the depth data is shown.
+		 */
+		this.debugDepth = false;
+
+		/**
+		 * XR Viewer pose object.
+		 */
+		this.pose = null;
+
+		/**
+		 * Canvas to draw depth information for debug.
+		 */
+		this.depthCanvas = null;
+
+		/**
+		 * Depth canvas texture with the calculated depth used to debug.
+		 */
+		this.depthTexture = null;
+
+		/**
+		 * Depth data texture.
+		 */
+		this.depthDataTexture = null;
+
+		/**
+		 * Camera used to view the this.scene.
+		 */
+		this.camera = new PerspectiveCamera(60, 1, 0.1, 10);
+
+		/**
+		 * Scene to draw into the screen.
+		 */
+		this.scene = new Scene();
+
+		/**
+		 * Directional shadow casting light.
+		 */
+		this.directionalLight;
+
+		/**
+		 * Light probe object using spherical harmonics.
+		 */
+		this.lightProbe;
+
+		/**
+		 * Mesh used as floor.
+		 */
+		this.shadowMaterial;
+
+		/**
+		 * Mesh used to cast shadows into the floor.
+		 */
+		this.floorMesh;
+
+		/**
+		 * Time of the last frame.
+		 */
+		this.lastTime = 0;
+
+		/**
+		 * WebGL this.renderer used to draw the this.scene.
+		 */
+		this.renderer = null;
+
+		/**
+		 * WebXR hit test source, (null until requested).
+		 */
+		this.xrHitTestSource = null;
+
+		/**
+		 * Indicates if a hit test source was requested.
+		 */
+		this.hitTestSourceRequested = false;
+
+		/**
+		 * Cursor to hit test the this.scene.
+		 */
+		this.cursor = null;
+
+		/**
+		 * Measurement being created currently.
+		 */
+		this.measurement = null;
+
+		/**
+		 * Size of the this.rendererer.
+		 */
+		this.resolution = new Vector2();
+
+		/**
+		 * WebGL 2.0 context used to render.
+		 */
+		this.glContext = null;
+
+		/**
+		 * XRWebGLBinding object used get additional gl data.
+		 */
+		this.xrGlBinding = null;
+
+		/**
+		 * Rendering canvas.
+		 */
+		this.canvas = null;
+
+		this.performanceCounterFull = [];
+		this.performanceCounterRender = [];
+		this.performanceCounterEnabled = false;
+		this.performanceCounterSamples = 100;
+
+		this.NORMAL = 0;
+		this.DEBUG_ZBUFFER = 1;
+		this.DEBUG_AR_DEPTH = 2;
+		this.DEBUG_NO_OCCLUSION = 3;
+		this.DEBUG_CAMERA_IMAGE = 4;
+
+		this.mode = NORMAL;
+	}
+
 	createScene()
 	{
 
-        depthDataTexture = new DepthDataTexture();
+        this.depthDataTexture = new DepthDataTexture();
 
-		directionalLight = new DirectionalLight();
-		directionalLight.castShadow = true;
-		directionalLight.shadow.mapSize.set(1024, 1024);
-		directionalLight.shadow.camera.far = 20;
-		directionalLight.shadow.camera.near = 0.1;
-		directionalLight.shadow.camera.left = -5;
-		directionalLight.shadow.camera.right = 5;
-		directionalLight.shadow.camera.bottom = -5;
-		directionalLight.shadow.camera.top = 5;
-		scene.add(directionalLight);
+		this.directionalLight = new DirectionalLight();
+		this.directionalLight.castShadow = true;
+		this.directionalLight.shadow.mapSize.set(1024, 1024);
+		this.directionalLight.shadow.this.camera.far = 20;
+		this.directionalLight.shadow.this.camera.near = 0.1;
+		this.directionalLight.shadow.this.camera.left = -5;
+		this.directionalLight.shadow.this.camera.right = 5;
+		this.directionalLight.shadow.this.camera.bottom = -5;
+		this.directionalLight.shadow.this.camera.top = 5;
+		this.scene.add(this.directionalLight);
 
-		lightProbe = new AmbientLightProbe();
-		scene.add(lightProbe);
+		this.lightProbe = new AmbientLightProbe();
+		this.scene.add(this.lightProbe);
 
-		shadowMaterial = new ShadowMaterial({opacity: 0.5});
-		shadowMaterial = this.createAugmentedMaterial(shadowMaterial, depthDataTexture);
+		this.shadowMaterial = new ShadowMaterial({opacity: 0.5});
+		this.shadowMaterial = this.createAugmentedMaterial(this.shadowMaterial, this.depthDataTexture);
 
-		floorMesh = new Mesh(new PlaneBufferGeometry(100, 100, 1, 1), shadowMaterial);
-		floorMesh.rotation.set(-Math.PI / 2, 0, 0);
-		floorMesh.castShadow = false;
-		floorMesh.receiveShadow = true;
-		scene.add(floorMesh);
-
+		this.floorMesh = new Mesh(new PlaneBufferGeometry(100, 100, 1, 1), this.shadowMaterial);
+		this.floorMesh.rotation.set(-Math.PI / 2, 0, 0);
+		this.floorMesh.castShadow = false;
+		this.floorMesh.receiveShadow = true;
+		this.scene.add(this.floorMesh);
 
 		/*var ambient = new AmbientLight(0xFFFFFF);
 		ambient.intensity = 1.0;
-		scene.add(ambient);*/
+		this.scene.add(ambient);*/
 	}
 
     changeShadowType()
     {
-		if (!renderer.shadowMap.enabled) {
-			renderer.shadowMap.enabled = true;
-			renderer.shadowMap.type = BasicShadowMap;
+		if (!this.renderer.shadowMap.enabled) {
+			this.renderer.shadowMap.enabled = true;
+			this.renderer.shadowMap.type = BasicShadowMap;
 		}
-		else if(renderer.shadowMap.type === BasicShadowMap) {
-			renderer.shadowMap.type = PCFShadowMap;
+		else if(this.renderer.shadowMap.type === BasicShadowMap) {
+			this.renderer.shadowMap.type = PCFShadowMap;
 		}
-		else if(renderer.shadowMap.type === PCFShadowMap) {
-			renderer.shadowMap.type = PCFSoftShadowMap;
+		else if(this.renderer.shadowMap.type === PCFShadowMap) {
+			this.renderer.shadowMap.type = PCFSoftShadowMap;
 		}
-		else if(renderer.shadowMap.type === PCFSoftShadowMap) {
-			renderer.shadowMap.type = VSMShadowMap;
+		else if(this.renderer.shadowMap.type === PCFSoftShadowMap) {
+			this.renderer.shadowMap.type = VSMShadowMap;
 		}
-		else if(renderer.shadowMap.type === VSMShadowMap) {
-			renderer.shadowMap.enabled = false;
-			renderer.shadowMap.type = BasicShadowMap;
+		else if(this.renderer.shadowMap.type === VSMShadowMap) {
+			this.renderer.shadowMap.enabled = false;
+			this.renderer.shadowMap.type = BasicShadowMap;
 		}
 
-		renderer.shadowMap.needsUpdate = true;
-		scene.traverse(function (child)
+		this.renderer.shadowMap.needsUpdate = true;
+		this.scene.traverse(function (child)
 		{
 			if (child.material)
 			{
@@ -219,21 +227,21 @@ export class App
 			}
 		})
 
-		console.log("Shadow type changed to " + renderer.shadowMap.type);
+		console.log("Shadow type changed to " + this.renderer.shadowMap.type);
     }
 
 	toggleDebugMode()
 	{
-		mode++;
+		this.mode++;
 
-		if (mode === DEBUG_CAMERA_IMAGE)
+		if (this.mode === DEBUG_CAMERA_IMAGE)
 		{
-			mode = NORMAL;
+			this.mode = NORMAL;
 		}
 
-		if (mode === NORMAL) {
-			scene.overrideMaterial = null;
-			scene.traverse(function(child)
+		if (this.mode === NORMAL) {
+			this.scene.overrideMaterial = null;
+			this.scene.traverse(function(child)
 			{
 				if(child.isMesh && child.material && child.material.isAgumentedMaterial)
 				{
@@ -242,25 +250,25 @@ export class App
 				}
 			});
 		}
-		else if (mode === DEBUG_ZBUFFER)
+		else if (this.mode === DEBUG_ZBUFFER)
 		{
-			scene.overrideMaterial = new MeshDepthMaterial();
+			this.scene.overrideMaterial = new MeshDepthMaterial();
 		}
-		else if (mode === DEBUG_AR_DEPTH)
+		else if (this.mode === DEBUG_AR_DEPTH)
 		{
-			scene.overrideMaterial = null;
-			debugDepth = true;
-			depthCanvas.style.width = "100%";
-			depthCanvas.style.height = "100%";
-			depthCanvas.style.right = "0px";
-			depthCanvas.style.bottom = "0px";
-			depthCanvas.style.borderRadius = "0px";
+			this.scene.overrideMaterial = null;
+			this.debugDepth = true;
+			this.depthCanvas.style.width = "100%";
+			this.depthCanvas.style.height = "100%";
+			this.depthCanvas.style.right = "0px";
+			this.depthCanvas.style.bottom = "0px";
+			this.depthCanvas.style.borderRadius = "0px";
 		}
-		else if (mode === DEBUG_NO_OCCLUSION)
+		else if (this.mode === DEBUG_NO_OCCLUSION)
 		{
 			this.resetDepthCanvas();
-			scene.overrideMaterial = null;
-			scene.traverse(function(child)
+			this.scene.overrideMaterial = null;
+			this.scene.traverse(function(child)
 			{
 				if(child.isMesh && child.material && child.material.isAgumentedMaterial)
 				{
@@ -269,30 +277,30 @@ export class App
 				}
 			});
 		}
-		else if (mode === DEBUG_CAMERA_IMAGE)
+		else if (this.mode === DEBUG_CAMERA_IMAGE)
 		{
-			scene.overrideMaterial = new MeshBasicMaterial({transparent: true, opacity: 0.0});
+			this.scene.overrideMaterial = new MeshBasicMaterial({transparent: true, opacity: 0.0});
 		}
 	}
 
 	/**
-	 * Create and setup webgl renderer object.
+	 * Create and setup webgl this.renderer object.
 	 *
 	 * @param {*} canvas
 	 */
 	createRenderer()
 	{
-        canvas = document.createElement("canvas");
-        document.body.appendChild(canvas);
+        this.canvas = document.createElement("canvas");
+        document.body.appendChild(this.canvas);
 
-		glContext = canvas.getContext("webgl2", {xrCompatible: true});
+		this.glContext = this.canvas.getContext("webgl2", {xrCompatible: true});
 
-		renderer = new WebGLRenderer(
+		this.renderer = new WebGLRenderer(
 		{
-			context: glContext,
+			context: this.glContext,
 			antialias: true,
 			alpha: true,
-			canvas: canvas,
+			canvas: this.canvas,
 			depth: true,
 			powerPreference: "high-performance",
             precision: "highp",
@@ -302,14 +310,14 @@ export class App
             stencil: true
 		});
 
-		renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = PCFSoftShadowMap;
-        renderer.sortObjects = false;
-        renderer.physicallyCorrectLights = true;
+		this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = PCFSoftShadowMap;
+        this.renderer.sortObjects = false;
+        this.renderer.physicallyCorrectLights = true;
 
-		renderer.setPixelRatio(window.devicePixelRatio);
-		renderer.setSize(window.innerWidth, window.innerHeight);
-		renderer.xr.enabled = true;
+		this.renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		this.renderer.xr.enabled = true;
 	}
 
     forceContextLoss()
@@ -317,59 +325,59 @@ export class App
 
         try
         {
-            if (renderer !== null)
+            if (this.renderer !== null)
             {
-                renderer.dispose();
-                renderer.forceContextLoss();
-                renderer = null;
+                this.renderer.dispose();
+                this.renderer.forceContextLoss();
+                this.renderer = null;
             }
         }
         catch (e)
         {
-            renderer = null;
+            this.renderer = null;
             alert("Failed to destroy WebGL context.");
         }
 
-        if(canvas !== null) {
-            document.body.removeChild(canvas);
+        if(this.canvas !== null) {
+            document.body.removeChild(this.canvas);
         }
     };
 
 
 	/**
-	 * Create physics world for collistion simulation.
+	 * Create physics this.world for collistion simulation.
 	 */
 	createWorld()
 	{
-		world = new World();
-		world.gravity.set(0, -9.8, 0);
-		world.defaultContactMaterial.contactEquationStiffness = 1e9;
-		world.defaultContactMaterial.contactEquationRelaxation = 4;
-		world.quatNormalizeSkip = 0;
-		world.quatNormalizeFast = false;
-		world.broadphase = new NaiveBroadphase();
-		world.solver = new SplitSolver(new GSSolver());
-		world.solver.tolerance = 0.01;
-		world.solver.iterations = 7;
+		this.world = new World();
+		this.world.gravity.set(0, -9.8, 0);
+		this.world.defaultContactMaterial.contactEquationStiffness = 1e9;
+		this.world.defaultContactMaterial.contactEquationRelaxation = 4;
+		this.world.quatNormalizeSkip = 0;
+		this.world.quatNormalizeFast = false;
+		this.world.broadphase = new NaiveBroadphase();
+		this.world.solver = new SplitSolver(new GSSolver());
+		this.world.solver.tolerance = 0.01;
+		this.world.solver.iterations = 7;
 
-		/*cannonDebugger(scene, world.bodies, {
+		/*cannonDebugger(this.scene, this.world.bodies, {
 			color: 0x00ff00,
 			autoUpdate: true
 		});*/
 
-		floor = new Body();
-		floor.type = Body.STATIC;
-		floor.position.set(0, 0, 0);
-		floor.velocity.set(0, 0, 0);
-		floor.quaternion.setFromAxisAngle(new Vec3(1, 0, 0), -Math.PI / 2)
-		floor.addShape(new Plane());
-		world.addBody(floor);
+		this.floor = new Body();
+		this.floor.type = Body.STATIC;
+		this.floor.position.set(0, 0, 0);
+		this.floor.velocity.set(0, 0, 0);
+		this.floor.quaternion.setFromAxisAngle(new Vec3(1, 0, 0), -Math.PI / 2)
+		this.floor.addShape(new Plane());
+		this.world.addBody(this.floor);
 	}
 
 	/**
 	 * Create a augmented reality occlusion enabled material from a standard three.js material.
 	 *
-	 * Can be used to test multiple material models with the AR functionality.
+	 * Can be used to test multiple material this.models with the AR functionality.
 	 *
 	 * @param {*} colorMap
 	 * @param {*} depthMap
@@ -457,17 +465,17 @@ export class App
 		return material;
 	}
 
-	loadGLTFMesh(url, scene, rotation, scale) {
-		if (cursor.visible)
+	loadGLTFMesh(url, rotation, scale) {
+		if (this.cursor.visible)
 		{
 			var position = new Vector3();
-			position.setFromMatrixPosition(cursor.matrix);
+			position.setFromMatrixPosition(this.cursor.matrix);
 
 			const loader = new GLTFLoader();
 			loader.loadAsync(url).then((gltf) =>
 			{
-				var object = gltf.scene;
-				scene.add(object);
+				var object = gltf.this.scene;
+				this.scene.add(object);
 
 				object.traverse((child) =>
 				{
@@ -481,13 +489,12 @@ export class App
 							map: child.material.map
 						});
 
-
 						child.material = this.createAugmentedMaterial(new MeshBasicMaterial({
 							map: child.material.map
-						}), depthDataTexture);
-
+						}), this.depthDataTexture);
                         */
-                        child.material =  this.createAugmentedMaterial(child.material, depthDataTexture);
+
+                        child.material =  this.createAugmentedMaterial(child.material, this.depthDataTexture);
 					}
 				});
 
@@ -514,26 +521,26 @@ export class App
 				body.position.set(object.position.x, object.position.y + size.y / 2, object.position.z);
 				body.velocity.set(0, 0, 0);
 				body.addShape(shape);
-				world.addBody(body);
+				this.world.addBody(body);
 			});
 		}
 	}
 
 	resetDepthCanvas()
 	{
-		if(!depthCanvas)
+		if(!this.depthCanvas)
 		{
-			depthCanvas = document.createElement("canvas");
-			container.appendChild(depthCanvas);
-			depthTexture = new DepthCanvasTexture(depthCanvas);
+			this.depthCanvas = document.createElement("canvas");
+			this.container.appendChild(this.depthCanvas);
+			this.depthTexture = new DepthCanvasTexture(this.depthCanvas);
 		}
 
-		depthCanvas.style.position = "absolute";
-		depthCanvas.style.right = "10px";
-		depthCanvas.style.bottom = "10px";
-		depthCanvas.style.borderRadius = "20px";
-		depthCanvas.style.width = "180px";
-		depthCanvas.style.height = "320px";
+		this.depthCanvas.style.position = "absolute";
+		this.depthCanvas.style.right = "10px";
+		this.depthCanvas.style.bottom = "10px";
+		this.depthCanvas.style.borderRadius = "20px";
+		this.depthCanvas.style.width = "180px";
+		this.depthCanvas.style.height = "320px";
 	}
 
 	initialize()
@@ -541,88 +548,88 @@ export class App
 		this.createScene();
 		this.createWorld();
 
-		resolution.set(window.innerWidth, window.innerHeight);
+		this.resolution.set(window.innerWidth, window.innerHeight);
 
-		container = document.createElement("div");
-		container.style.position = "absolute";
-		container.style.top = "0px";
-		container.style.left = "0px";
-		container.style.width = "100%";
-		container.style.height = "100%";
-		document.body.appendChild(container);
+		this.container = document.createElement("div");
+		this.container.style.position = "absolute";
+		this.container.style.top = "0px";
+		this.container.style.left = "0px";
+		this.container.style.width = "100%";
+		this.container.style.height = "100%";
+		document.body.appendChild(this.container);
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/ruler.svg", function()
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/ruler.svg", function()
 		{
-			if (cursor.visible)
+			if (this.cursor.visible)
 			{
-				if (measurement)
+				if (this.measurement)
 				{
-					measurement = null;
+					this.measurement = null;
 				}
 				else
 				{
 					var position = new Vector3();
-					position.setFromMatrixPosition(cursor.matrix);
-					measurement = new Measurement(position);
-					scene.add(measurement);
+					position.setFromMatrixPosition(this.cursor.matrix);
+					this.measurement = new Measurement(position);
+					this.scene.add(this.measurement);
 				}
 			}
         }));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg",  () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg",  () =>
 		{
-			performanceCounterFull = [];
-			performanceCounterRender = [];
-			performanceCounterEnabled = true;
+			this.performanceCounterFull = [];
+			this.performanceCounterRender = [];
+			this.performanceCounterEnabled = true;
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg",  () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg",  () =>
 		{
 			this.changeShadowType();
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/bug.svg", () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/bug.svg", () =>
 		{
 			this.toggleDebugMode();
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", function()
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", function()
 		{
-			debugDepth = !debugDepth;
-			depthCanvas.style.display = debugDepth ? "block" : "none";
+			this.debugDepth = !this.debugDepth;
+			this.depthCanvas.style.display = this.debugDepth ? "block" : "none";
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
 		{
-			this.loadGLTFMesh("./assets/3d/car/scene.gltf", scene, new Euler(0, 0, 0), 0.003);
+			this.loadGLTFMesh("./assets/3d/car/this.scene.gltf", new Euler(0, 0, 0), 0.003);
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
 		{
-			this.loadGLTFMesh("./assets/3d/gltf/WaterBottle.glb", scene, new Euler(0, 0, 0), 1.0);
+			this.loadGLTFMesh("./assets/3d/gltf/WaterBottle.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/tripod.svg", () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/tripod.svg", () =>
 		{
-			this.loadGLTFMesh("./assets/3d/gltf/AntiqueCamera.glb", scene, new Euler(0, 0, 0), 0.1);
+			this.loadGLTFMesh("./assets/3d/gltf/AntiqueCamera.glb", new Euler(0, 0, 0), 0.1);
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/dots.svg", () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/dots.svg", () =>
 		{
-			this.loadGLTFMesh("./assets/3d/gltf/MetalRoughSpheresNoTextures.glb", scene, new Euler(0, 0, 0), 100.0);
+			this.loadGLTFMesh("./assets/3d/gltf/MetalRoughSpheresNoTextures.glb", new Euler(0, 0, 0), 100.0);
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/fish.svg", () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/fish.svg", () =>
 		{
-			this.loadGLTFMesh("./assets/3d/gltf/BarramundiFish.glb", scene, new Euler(0, 0, 0), 1.0);
+			this.loadGLTFMesh("./assets/3d/gltf/BarramundiFish.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg",  () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg",  () =>
 		{
-			this.loadGLTFMesh("./assets/3d/flower/scene.gltf", scene, new Euler(0, 0, 0), 0.007);
+			this.loadGLTFMesh("./assets/3d/flower/this.scene.gltf", new Euler(0, 0, 0), 0.007);
 		}));
 
-		container.appendChild(GUIUtils.createButton("./assets/icon/rocks.svg", () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/rocks.svg", () =>
 		{
 			if(pose !== null)
 			{
@@ -648,18 +655,18 @@ export class App
 					normalMap: new TextureLoader().load('assets/texture/ball/normal.png'),
 				});
 
-				material = this.createAugmentedMaterial(material, depthDataTexture);
+				material = this.createAugmentedMaterial(material, this.depthDataTexture);
 
 				var shape = new Sphere(0.05);
 
-				var ball = new PhysicsObject(geometry, material, world);
+				var ball = new PhysicsObject(geometry, material, this.world);
 				ball.castShadow = true;
 				ball.receiveShadow = true;
 				ball.position.copy(position);
 				ball.body.velocity.set(direction.x, direction.y, direction.z);
 				ball.addShape(shape);
 				ball.initialize();
-				scene.add(ball);
+				this.scene.add(ball);
 			}
 		}));
 
@@ -678,10 +685,10 @@ export class App
 		button.innerText = "Enter AR";
 		button.onclick = function()
 		{
-			XRManager.start(renderer,
+			XRManager.start(this.renderer,
 			{
 				optionalFeatures: ["dom-overlay"],
-				domOverlay: {root: container},
+				domOverlay: {root: this.container},
 				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"]
 			}, function(error)
 			{
@@ -693,36 +700,36 @@ export class App
 		this.createRenderer();
 
 		// Cursor to select objects
-		cursor = new Cursor();
-		scene.add(cursor);
+		this.cursor = new Cursor();
+		this.scene.add(this.cursor);
 
-		// Resize renderer
+		// Resize this.renderer
 		window.addEventListener("resize", () => {this.resize();}, false);
 
 		// Render loop
-		renderer.setAnimationLoop((time, frame) => {
+		this.renderer.setAnimationLoop((time, frame) => {
 			this.render(time, frame);
 		});
 	}
 
 	/**
-	 * Resize the canvas and renderer size.
+	 * Resize the canvas and this.renderer size.
 	 */
 	resize()
 	{
-		resolution.set(window.innerWidth, window.innerHeight);
+		this.resolution.set(window.innerWidth, window.innerHeight);
 
-		camera.aspect = resolution.x / resolution.y;
-		camera.updateProjectionMatrix();
+		this.camera.aspect = this.resolution.x / this.resolution.y;
+		this.camera.updateProjectionMatrix();
 
-		renderer.setSize(resolution.x, resolution.y);
-		renderer.setPixelRatio(window.devicePixelRatio);
+		this.renderer.setSize(this.resolution.x, this.resolution.y);
+		this.renderer.setPixelRatio(window.devicePixelRatio);
 	}
 
 	// Update uniforms of materials to match the screen size and camera configuration
 	updateAugmentedMaterialUniforms(normTextureFromNormViewMatrix)
 	{
-		scene.traverse(function(child)
+		this.scene.traverse(function(child)
 		{
 			if(child.isMesh && child.material && child.material.isAgumentedMaterial)
 			{
@@ -735,37 +742,36 @@ export class App
 	}
 
 	/**
-	 * Update logic and render scene into the screen.
+	 * Update logic and render this.scene into the screen.
 	 *
 	 * @param {*} time
 	 * @param {*} frame
 	 */
 	render(time, frame)
 	{
-		let delta = time - lastTime;
-		lastTime = time;
+		let delta = time - this.lastTime;
+		this.lastTime = time;
 
 		if (!frame)
 		{
 			return;
 		}
 
-		// Update physics world
-		world.step(delta / 1e3);
+		// Update physics this.world
+		this.world.step(delta / 1e3);
 
 		var start = performance.now();
 
-		var session = renderer.xr.getSession();
-		var referenceSpace = renderer.xr.getReferenceSpace();
+		var session = this.renderer.xr.getSession();
+		var referenceSpace = this.renderer.xr.getReferenceSpace();
 
-		// if (!xrGlBinding)
+		// if (!this.xrGlBinding)
 		// {
-		// 	xrGlBinding = new XRWebGLBinding(session, glContext);
+		// 	this.xrGlBinding = new XRWebGLBinding(session, this.glContext);
 		// }
 
-
 		// Request hit test source
-		if (!hitTestSourceRequested)
+		if (!this.hitTestSourceRequested)
 		{
 			session.requestReferenceSpace("viewer").then(function(referenceSpace)
 			{
@@ -774,76 +780,76 @@ export class App
 					space: referenceSpace
 				}).then(function(source)
 				{
-					xrHitTestSource = source;
+					this.xrHitTestSource = source;
 				});
 			});
 
 			session.requestLightProbe().then((probe) =>
 			{
-				xrLightProbe = probe;
+				this.xrLightProbe = probe;
 
 				// Get cube map for reflections
-				// xrLightProbe.addEventListener("reflectionchange", () => {
-					// var glCubeMap = xrGlBinding.getReflectionCubeMap(xrLightProbe);
+				// this.xrLightProbe.addEventListener("reflectionchange", () => {
+					// var glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
 					// console.log(glCubeMap);
 				// });
 			});
 
 			session.addEventListener("end", function()
 			{
-				hitTestSourceRequested = false;
-				xrHitTestSource = null;
+				this.hitTestSourceRequested = false;
+				this.xrHitTestSource = null;
 			});
 
-			hitTestSourceRequested = true;
+			this.hitTestSourceRequested = true;
 		}
 
 
 		// Process lighting condition from probe
-		if (xrLightProbe)
+		if (this.xrLightProbe)
 		{
-			let lightEstimate = frame.getLightEstimate(xrLightProbe);
+			let lightEstimate = frame.getLightEstimate(this.xrLightProbe);
 			if (lightEstimate)
 			{
                 let directionalPosition = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
                 directionalPosition.multiplyScalar(5);
 
 				let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
-				directionalLight.position.copy(directionalPosition);
-				directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
-				directionalLight.intensity = intensity;
+				this.directionalLight.position.copy(directionalPosition);
+				this.directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
+				this.directionalLight.intensity = intensity;
 
-				lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
+				this.lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
 			}
 		}
 
 		// Process Hit test
-		if (xrHitTestSource)
+		if (this.xrHitTestSource)
 		{
-			var hitTestResults = frame.getHitTestResults(xrHitTestSource);
+			var hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
 			if (hitTestResults.length)
 			{
 				var hit = hitTestResults[0];
-				cursor.visible = true;
-				cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
+				this.cursor.visible = true;
+				this.cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 
 				// Update physics floor plane
 				var position = new Vector3();
-				position.setFromMatrixPosition(cursor.matrix);
-				if (position.y < floor.position.y)
+				position.setFromMatrixPosition(this.cursor.matrix);
+				if (position.y < this.floor.position.y)
 				{
-                    floor.position.y = position.y;
-                    floorMesh.position.y = position.y;
+                    this.floor.position.y = position.y;
+                    this.floorMesh.position.y = position.y;
 				}
 			}
 			else
 			{
-				cursor.visible = false;
+				this.cursor.visible = false;
 			}
 
-			if (measurement)
+			if (this.measurement)
 			{
-				measurement.setPointFromMatrix(cursor.matrix);
+				this.measurement.setPointFromMatrix(this.cursor.matrix);
 			}
 		}
 
@@ -858,11 +864,11 @@ export class App
 				if(depthData)
 				{
 					// Update textures
-					depthDataTexture.updateDepth(depthData);
+					this.depthDataTexture.updateDepth(depthData);
 
 					// Draw canvas texture depth
-					if (debugDepth) {
-						depthTexture.updateDepth(depthData, camera.near, camera.far);
+					if (this.debugDepth) {
+						this.depthTexture.updateDepth(depthData, this.camera.near, this.camera.far);
 					}
 
 					// Update normal matrix
@@ -871,19 +877,19 @@ export class App
 			}
 		}
 
-		renderer.render(scene, camera);
+		this.renderer.render(this.scene, this.camera);
 
 		var end = performance.now();
-		if(performanceCounterEnabled) {
-			performanceCounterFull.push(delta);
-			performanceCounterRender.push(end - start);
+		if(this.performanceCounterEnabled) {
+			this.performanceCounterFull.push(delta);
+			this.performanceCounterRender.push(end - start);
 
-			if (performanceCounterFull.length >= performanceCounterSamples) {
+			if (this.performanceCounterFull.length >= this.performanceCounterSamples) {
 
-				performanceCounterEnabled = false;
-				var avgFull = performanceCounterFull.reduce(function(a, b){return a + b;}, 0) / performanceCounterFull.length;
-				var avgRender = performanceCounterRender.reduce(function(a, b){return a + b;}, 0) / performanceCounterRender.length;
-				console.log(avgFull + ", " + avgRender + ", " + renderer.info.render.calls + ", " + renderer.info.render.triangles + ", " + renderer.info.memory.geometries + ", " + renderer.info.memory.textures);
+				this.performanceCounterEnabled = false;
+				var avgFull = this.performanceCounterFull.reduce(function(a, b){return a + b;}, 0) / this.performanceCounterFull.length;
+				var avgRender = this.performanceCounterRender.reduce(function(a, b){return a + b;}, 0) / this.performanceCounterRender.length;
+				console.log(avgFull + ", " + avgRender + ", " + this.renderer.info.render.calls + ", " + this.renderer.info.render.triangles + ", " + this.renderer.info.memory.geometries + ", " + this.renderer.info.memory.textures);
 			}
 		}
 	}
