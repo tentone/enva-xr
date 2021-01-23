@@ -360,11 +360,6 @@ export class App
 		this.world.solver.tolerance = 0.01;
 		this.world.solver.iterations = 7;
 
-		/*cannonDebugger(this.scene, this.world.bodies, {
-			color: 0x00ff00,
-			autoUpdate: true
-		});*/
-
 		this.floor = new Body();
 		this.floor.type = Body.STATIC;
 		this.floor.position.set(0, 0, 0);
@@ -372,6 +367,14 @@ export class App
 		this.floor.quaternion.setFromAxisAngle(new Vec3(1, 0, 0), -Math.PI / 2)
 		this.floor.addShape(new Plane());
 		this.world.addBody(this.floor);
+	}
+
+	enablePhysicsDebugger()
+	{
+		cannonDebugger(this.scene, this.world.bodies, {
+			color: 0x00ff00,
+			autoUpdate: true
+		});
 	}
 
 	/**

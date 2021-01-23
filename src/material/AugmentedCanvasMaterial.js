@@ -4,7 +4,6 @@ import AugmentedMaterialVertex from "./AugmentedMaterialVertex.glsl";
 
 /**
  * Shader material used to combine virtual and real scene with depth blending.
- *
  */
 export class AugmentedCanvasMaterial extends ShaderMaterial
 {

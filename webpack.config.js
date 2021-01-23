@@ -1,9 +1,10 @@
-const path = require('path');
-const webpack = require('webpack');
+const Path = require('path');
+const Webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 
-const source = Path.resolve(__dirname, ".");
-const output = Path.resolve(__dirname, "build");
+const source = Path.resolve(__dirname, "./src");
+const output = Path.resolve(__dirname, "./build");
 
 module.exports = {
   entry: ['./src/main.js'],
@@ -19,8 +20,8 @@ module.exports = {
 	new CopyPlugin({
 		patterns: [
 			{
-				from: source + "/files",
-				to: output + "/assets",
+				from: Path.resolve(__dirname, source + "/assets"),
+				to: Path.resolve(__dirname, output + "/assets"),
 				force: true
 			}
 		],
@@ -30,8 +31,8 @@ module.exports = {
       filename: 'index.html',
       template: 'index.html'
     }),
-    new webpack.NamedModulesPlugin(),
-    new webpack.HotModuleReplacementPlugin()
+    new Webpack.NamedModulesPlugin(),
+    new Webpack.HotModuleReplacementPlugin()
   ],
   module: {
 	rules: [

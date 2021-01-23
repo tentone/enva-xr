@@ -5,7 +5,8 @@ import {CanvasTexture} from "three";
  */
 export class DepthCanvasTexture extends CanvasTexture
 {
-	constructor(canvas) {
+	constructor(canvas)
+	{
 		super(canvas);
 	}
 
