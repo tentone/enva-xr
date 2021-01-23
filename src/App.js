@@ -16,10 +16,29 @@ import {DepthDataTexture} from "./texture/DepthDataTexture.js";
 import {threeToCannon} from 'three-to-cannon';
 import cannonDebugger from 'cannon-es-debugger'
 
+/**
+ * Render everything.
+ */
 var NORMAL = 0;
+
+/**
+ * Render Z Depth only.
+ */
 var DEBUG_ZBUFFER = 1;
+
+/**
+ * Render AR depth only.
+ */
 var DEBUG_AR_DEPTH = 2;
+
+/**
+ * No occlusion estimation.
+ */
 var DEBUG_NO_OCCLUSION = 3;
+
+/**
+ * Draw nothign just the AR base image.
+ */
 var DEBUG_CAMERA_IMAGE = 4;
 
 export class App
@@ -156,12 +175,9 @@ export class App
 		this.performanceCounterEnabled = false;
 		this.performanceCounterSamples = 100;
 
-		this.NORMAL = 0;
-		this.DEBUG_ZBUFFER = 1;
-		this.DEBUG_AR_DEPTH = 2;
-		this.DEBUG_NO_OCCLUSION = 3;
-		this.DEBUG_CAMERA_IMAGE = 4;
-
+		/**
+		 * Rendering mode in use.
+		 */
 		this.mode = NORMAL;
 	}
 
@@ -191,13 +207,9 @@ export class App
 		this.floorMesh.castShadow = false;
 		this.floorMesh.receiveShadow = true;
 		this.scene.add(this.floorMesh);
-
-		/*var ambient = new AmbientLight(0xFFFFFF);
-		ambient.intensity = 1.0;
-		this.scene.add(ambient);*/
 	}
 
-    changeShadowType()
+    nextShadowType()
     {
 		if (!this.renderer.shadowMap.enabled) {
 			this.renderer.shadowMap.enabled = true;
@@ -226,10 +238,10 @@ export class App
 			}
 		})
 
-		console.log("Shadow type changed to " + this.renderer.shadowMap.type);
+		// console.log("Shadow type changed to " + this.renderer.shadowMap.type);
     }
 
-	toggleDebugMode()
+	nextRenderMode()
 	{
 		this.mode++;
 
@@ -368,6 +380,11 @@ export class App
 		this.world.addBody(this.floor);
 	}
 
+	/**
+	 * Enable the physics debugger.
+	 *
+	 * Cannot be disabled after its enabled.
+	 */
 	enablePhysicsDebugger()
 	{
 		cannonDebugger(this.scene, this.world.bodies, {
@@ -483,20 +500,9 @@ export class App
 				{
 					if (child instanceof Mesh)
 					{
-                        child.castShadow = true;
+						child.castShadow = true;
 						child.receiveShadow = true;
-
-                        /*
-						child.material = new MeshBasicMaterial({
-							map: child.material.map
-						});
-
-						child.material = this.createAugmentedMaterial(new MeshBasicMaterial({
-							map: child.material.map
-						}), this.depthDataTexture);
-                        */
-
-                        child.material =  this.createAugmentedMaterial(child.material, this.depthDataTexture);
+						child.material =  this.createAugmentedMaterial(child.material, this.depthDataTexture);
 					}
 				});
 
@@ -560,7 +566,7 @@ export class App
 		this.container.style.height = "100%";
 		document.body.appendChild(this.container);
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/ruler.svg", function()
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/ruler.svg", () =>
 		{
 			if (this.cursor.visible)
 			{
@@ -587,15 +593,15 @@ export class App
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg",  () =>
 		{
-			this.changeShadowType();
+			this.nextShadowType();
 		}));
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/bug.svg", () =>
 		{
-			this.toggleDebugMode();
+			this.nextRenderMode();
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", function()
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", () =>
 		{
 			this.debugDepth = !this.debugDepth;
 			this.depthCanvas.style.display = this.debugDepth ? "block" : "none";
@@ -685,7 +691,7 @@ export class App
 		button.style.fontFamily = "Arial";
 		button.style.fontSize = "10vh";
 		button.innerText = "Enter AR";
-		button.onclick = function()
+		button.onclick = () =>
 		{
 			XRManager.start(this.renderer,
 			{
@@ -775,12 +781,12 @@ export class App
 		// Request hit test source
 		if (!this.hitTestSourceRequested)
 		{
-			session.requestReferenceSpace("viewer").then(function(referenceSpace)
+			session.requestReferenceSpace("viewer").then((referenceSpace) =>
 			{
 				session.requestHitTestSource(
 				{
 					space: referenceSpace
-				}).then(function(source)
+				}).then((source) =>
 				{
 					this.xrHitTestSource = source;
 				});
@@ -797,7 +803,7 @@ export class App
 				// });
 			});
 
-			session.addEventListener("end", function()
+			session.addEventListener("end", () =>
 			{
 				this.hitTestSourceRequested = false;
 				this.xrHitTestSource = null;
