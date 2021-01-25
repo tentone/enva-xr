@@ -1,4 +1,4 @@
-import {BufferGeometry, Line, Line3, LineBasicMaterial, Vector3} from "three";
+import {BufferGeometry, Line, LineBasicMaterial, Vector3} from "three";
 import {Text} from "troika-three-text"
 
 /**
