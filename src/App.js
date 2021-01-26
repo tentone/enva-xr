@@ -46,9 +46,9 @@ export class App
 	constructor()
 	{
 		/**
-		 * DOM this.container.
+		 * GUI of the application.
 		 */
-		this.container = null;
+		this.gui = null;
 
 		/**
 		 * Light probe used to acess the lighting estimation for the this.scene.
@@ -539,7 +539,7 @@ export class App
 		if(!this.depthCanvas)
 		{
 			this.depthCanvas = document.createElement("canvas");
-			this.container.appendChild(this.depthCanvas);
+			this.gui.container.appendChild(this.depthCanvas);
 			this.depthTexture = new DepthCanvasTexture(this.depthCanvas);
 		}
 
@@ -558,125 +558,8 @@ export class App
 
 		this.resolution.set(window.innerWidth, window.innerHeight);
 
-		this.container = document.createElement("div");
-		this.container.style.position = "absolute";
-		this.container.style.top = "0px";
-		this.container.style.left = "0px";
-		this.container.style.width = "100%";
-		this.container.style.height = "100%";
-		document.body.appendChild(this.container);
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/ruler.svg", () =>
-		{
-			if (this.cursor.visible)
-			{
-				if (this.measurement)
-				{
-					this.measurement = null;
-				}
-				else
-				{
-					var position = new Vector3();
-					position.setFromMatrixPosition(this.cursor.matrix);
-					this.measurement = new Measurement(position);
-					this.scene.add(this.measurement);
-				}
-			}
-        }));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg",  () =>
-		{
-			this.performanceCounterFull = [];
-			this.performanceCounterRender = [];
-			this.performanceCounterEnabled = true;
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg",  () =>
-		{
-			this.nextShadowType();
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/bug.svg", () =>
-		{
-			this.nextRenderMode();
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", () =>
-		{
-			this.debugDepth = !this.debugDepth;
-			this.depthCanvas.style.display = this.debugDepth ? "block" : "none";
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
-		{
-			this.loadGLTFMesh("./assets/3d/car/this.scene.gltf", new Euler(0, 0, 0), 0.003);
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
-		{
-			this.loadGLTFMesh("./assets/3d/gltf/WaterBottle.glb", new Euler(0, 0, 0), 1.0);
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/tripod.svg", () =>
-		{
-			this.loadGLTFMesh("./assets/3d/gltf/AntiqueCamera.glb", new Euler(0, 0, 0), 0.1);
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/dots.svg", () =>
-		{
-			this.loadGLTFMesh("./assets/3d/gltf/MetalRoughSpheresNoTextures.glb", new Euler(0, 0, 0), 100.0);
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/fish.svg", () =>
-		{
-			this.loadGLTFMesh("./assets/3d/gltf/BarramundiFish.glb", new Euler(0, 0, 0), 1.0);
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg",  () =>
-		{
-			this.loadGLTFMesh("./assets/3d/flower/this.scene.gltf", new Euler(0, 0, 0), 0.007);
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/rocks.svg", () =>
-		{
-			if(pose !== null)
-			{
-				var viewOrientation = pose.transform.orientation;
-				var viewPosition = pose.transform.position;
-
-				var orientation = new Quaternion(viewOrientation.x, viewOrientation.y, viewOrientation.z, viewOrientation.w);
-
-				var speed = 0.0;
-
-				var direction = new Vector3(0.0, 0.0, -1.0);
-				direction.applyQuaternion(orientation);
-				direction.multiplyScalar(speed);
-
-				var position = new Vector3(viewPosition.x, viewPosition.y, viewPosition.z);
-
-				var geometry = new SphereBufferGeometry(0.05, 24, 24);
-				var material = new MeshPhysicalMaterial({
-					map: new TextureLoader().load('assets/texture/ball/color.jpg'),
-					roughness: 1.0,
-					metalness: 0.0,
-					roughnessMap: new TextureLoader().load('assets/texture/ball/roughness.jpg'),
-					normalMap: new TextureLoader().load('assets/texture/ball/normal.png'),
-				});
-
-				material = this.createAugmentedMaterial(material, this.depthDataTexture);
-
-				var shape = new Sphere(0.05);
-
-				var ball = new PhysicsObject(geometry, material, this.world);
-				ball.castShadow = true;
-				ball.receiveShadow = true;
-				ball.position.copy(position);
-				ball.body.velocity.set(direction.x, direction.y, direction.z);
-				ball.addShape(shape);
-				ball.initialize();
-				this.scene.add(ball);
-			}
-		}));
+		this.gui = new GUI(this);
+		this.gui.create();
 
 		this.resetDepthCanvas();
 
@@ -696,7 +579,7 @@ export class App
 			XRManager.start(this.renderer,
 			{
 				optionalFeatures: ["dom-overlay"],
-				domOverlay: {root: this.container},
+				domOverlay: {root: this.gui.container},
 				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"]
 			}, function(error)
 			{
