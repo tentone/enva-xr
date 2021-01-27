@@ -16,7 +16,7 @@
   "dependencies": {
     "cannon-es-debugger": "0.1.0",
     "cannon-es": "0.15.1",
-    "three": "0.123.0",
+    "three": "0.125.0",
     "three-to-cannon": "^3.1.0",
     "troika-three-text": "^0.35.0"
   },
