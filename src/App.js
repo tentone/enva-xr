@@ -1,21 +1,16 @@
 import {
-	Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
-	SphereBufferGeometry, DirectionalLight, TextureLoader, AmbientLightProbe,
+	Vector3, Vector2, Mesh, WebGLRenderer, Scene, PerspectiveCamera,
+	DirectionalLight, AmbientLightProbe,
 	MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
-	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap,
-	MeshPhysicalMaterial
-} from "three";
+	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3, Quaternion} from "cannon-es";
+import {World, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3} from "cannon-es";
 import {threeToCannon} from 'three-to-cannon';
 import cannonDebugger from 'cannon-es-debugger';
 import {XRManager} from "./utils/XRManager.js";
-import {GUIUtils} from "./gui/GUIUtils.js";
 import {ObjectUtils} from "./utils/ObjectUtils.js";
 import {Cursor} from "./object/Cursor.js";
-import {PhysicsObject} from "./object/PhysicsObject.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
-import {Measurement} from "./object/Measurement.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture.js";
 
 /**
@@ -213,24 +208,24 @@ export class App
 
 	nextShadowType()
 	{
-		if (!this.renderer.shadowMap.enabled) 
+		if (!this.renderer.shadowMap.enabled)
 		{
 			this.renderer.shadowMap.enabled = true;
 			this.renderer.shadowMap.type = BasicShadowMap;
 		}
-		else if (this.renderer.shadowMap.type === BasicShadowMap) 
+		else if (this.renderer.shadowMap.type === BasicShadowMap)
 		{
 			this.renderer.shadowMap.type = PCFShadowMap;
 		}
-		else if (this.renderer.shadowMap.type === PCFShadowMap) 
+		else if (this.renderer.shadowMap.type === PCFShadowMap)
 		{
 			this.renderer.shadowMap.type = PCFSoftShadowMap;
 		}
-		else if (this.renderer.shadowMap.type === PCFSoftShadowMap) 
+		else if (this.renderer.shadowMap.type === PCFSoftShadowMap)
 		{
 			this.renderer.shadowMap.type = VSMShadowMap;
 		}
-		else if (this.renderer.shadowMap.type === VSMShadowMap) 
+		else if (this.renderer.shadowMap.type === VSMShadowMap)
 		{
 			this.renderer.shadowMap.enabled = false;
 			this.renderer.shadowMap.type = BasicShadowMap;
@@ -257,7 +252,7 @@ export class App
 			this.mode = NORMAL;
 		}
 
-		if (this.mode === NORMAL) 
+		if (this.mode === NORMAL)
 		{
 			this.scene.overrideMaterial = null;
 			this.scene.traverse(function(child)
@@ -357,7 +352,7 @@ export class App
 			alert("Failed to destroy WebGL context.");
 		}
 
-		if (this.canvas !== null) 
+		if (this.canvas !== null)
 		{
 			document.body.removeChild(this.canvas);
 		}
@@ -410,7 +405,7 @@ export class App
 	 * @param {*} colorMap
 	 * @param {*} depthMap
 	 */
-	createAugmentedMaterial(material, depthMap) 
+	createAugmentedMaterial(material, depthMap)
 	{
 		material.userData = {
 			uDepthTexture: {value: depthMap},
@@ -494,7 +489,7 @@ export class App
 		return material;
 	}
 
-	loadGLTFMesh(url, rotation, scale) 
+	loadGLTFMesh(url, rotation, scale)
 	{
 		if (this.cursor.visible)
 		{
@@ -609,7 +604,7 @@ export class App
 		window.addEventListener("resize", () => {this.resize();}, false);
 
 		// Render loop
-		this.renderer.setAnimationLoop((time, frame) => 
+		this.renderer.setAnimationLoop((time, frame) =>
 		{
 			this.render(time, frame);
 		});
@@ -768,7 +763,7 @@ export class App
 					this.depthDataTexture.updateDepth(depthData);
 
 					// Draw canvas texture depth
-					if (this.debugDepth) 
+					if (this.debugDepth)
 					{
 						this.depthTexture.updateDepth(depthData, this.camera.near, this.camera.far);
 					}
@@ -782,12 +777,12 @@ export class App
 		this.renderer.render(this.scene, this.camera);
 
 		var end = performance.now();
-		if (this.performanceCounterEnabled) 
+		if (this.performanceCounterEnabled)
 		{
 			this.performanceCounterFull.push(delta);
 			this.performanceCounterRender.push(end - start);
 
-			if (this.performanceCounterFull.length >= this.performanceCounterSamples) 
+			if (this.performanceCounterFull.length >= this.performanceCounterSamples)
 			{
 
 				this.performanceCounterEnabled = false;
