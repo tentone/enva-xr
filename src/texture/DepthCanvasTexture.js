@@ -17,7 +17,7 @@ export class DepthCanvasTexture extends CanvasTexture
 	 */
 	updateDepth(depth, near, far)
 	{
-        var canvas = this.image;
+		var canvas = this.image;
 
 		canvas.width = depth.height;
 		canvas.height = depth.width;
@@ -25,9 +25,9 @@ export class DepthCanvasTexture extends CanvasTexture
 		var context = canvas.getContext("2d");
 		var image = context.getImageData(0, 0, canvas.width, canvas.height);
 
-		for(var x = 0; x < depth.width; x++)
+		for (var x = 0; x < depth.width; x++)
 		{
-			for(var y = 0; y < depth.height; y++)
+			for (var y = 0; y < depth.height; y++)
 			{
 				var distance = (depth.getDepth(x, y) - near) / (far - near);
 				var j = (x * canvas.width + (canvas.width - y)) * 4;

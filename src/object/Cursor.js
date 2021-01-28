@@ -8,7 +8,7 @@ export class Cursor extends Mesh
 		var ring = new RingBufferGeometry(0.045, 0.05, 32).rotateX(-Math.PI / 2);
 		var dot = new CircleBufferGeometry(0.005, 32).rotateX(-Math.PI / 2);
 
-		super(BufferGeometryUtils.mergeBufferGeometries([ring, dot]),new MeshBasicMaterial({opacity: 0.4, transparent: true}));
+		super(BufferGeometryUtils.mergeBufferGeometries([ring, dot]), new MeshBasicMaterial({opacity: 0.4, transparent: true}));
 
 		this.matrixAutoUpdate = false;
 		this.visible = false;

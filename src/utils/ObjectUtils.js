@@ -1,6 +1,7 @@
 import {Vector3} from "three";
 
-export class ObjectUtils {
+export class ObjectUtils 
+{
 	/**
 	 * Resize a object to fit a unitary box and center around the origin.
 	 *

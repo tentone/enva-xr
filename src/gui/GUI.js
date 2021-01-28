@@ -1,7 +1,8 @@
 /**
  * Application user interface.
  */
-export class GUI {
+export class GUI 
+{
 	constructor(app)
 	{
 		/**
@@ -40,16 +41,16 @@ export class GUI {
 					this.app.scene.add(this.app.measurement);
 				}
 			}
-        }));
+		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg",  () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg", () =>
 		{
 			this.app.performanceCounterFull = [];
 			this.app.performanceCounterRender = [];
 			this.app.performanceCounterEnabled = true;
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg",  () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", () =>
 		{
 			this.app.nextShadowType();
 		}));
@@ -90,14 +91,14 @@ export class GUI {
 			this.app.loadGLTFMesh("./assets/3d/gltf/BarramundiFish.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg",  () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg", () =>
 		{
 			this.app.loadGLTFMesh("./assets/3d/flower/this.app.scene.gltf", new Euler(0, 0, 0), 0.007);
 		}));
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/rocks.svg", () =>
 		{
-			if(pose !== null)
+			if (pose !== null)
 			{
 				var viewOrientation = pose.transform.orientation;
 				var viewPosition = pose.transform.position;
@@ -118,7 +119,7 @@ export class GUI {
 					roughness: 1.0,
 					metalness: 0.0,
 					roughnessMap: new TextureLoader().load('assets/texture/ball/roughness.jpg'),
-					normalMap: new TextureLoader().load('assets/texture/ball/normal.png'),
+					normalMap: new TextureLoader().load('assets/texture/ball/normal.png')
 				});
 
 				material = this.app.createAugmentedMaterial(material, this.app.depthDataTexture);

@@ -1,4 +1,4 @@
-import {ShaderMaterial} from "three"
+import {ShaderMaterial} from "three";
 import AugmentedCanvasMaterialFragment from "./AugmentedCanvasMaterialFragment.glsl";
 import AugmentedMaterialVertex from "./AugmentedMaterialVertex.glsl";
 

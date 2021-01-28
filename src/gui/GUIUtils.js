@@ -3,7 +3,8 @@ var h = 60;
 var x = 10;
 var y = 10;
 
-export class GUIUtils {
+export class GUIUtils 
+{
 	/**
 	 * Create a button with an icon.
 	 *

@@ -12,7 +12,7 @@ export class XRManager
 	 * @param {*} sessionInit
 	 * @param {*} onError
 	 */
-	static start(renderer, sessionInit = {}, onError = function(){})
+	static start(renderer, sessionInit = {}, onError = function() {})
 	{
 		if (currentSession === null)
 		{

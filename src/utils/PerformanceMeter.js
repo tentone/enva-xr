@@ -22,7 +22,8 @@ export class PerformanceMeter
 	{
 		var time = performance.now();
 		this.values.push(tim - this.last);
-		if (this.values.length >= this.samples) {
+		if (this.values.length >= this.samples) 
+		{
 			this.values.shift();
 		}
 	}
@@ -32,7 +33,7 @@ export class PerformanceMeter
 	 */
 	average()
 	{
-		return this.values.reduce(function(a, b){return a + b;}, 0) / this.values.length;
+		return this.values.reduce(function(a, b) {return a + b;}, 0) / this.values.length;
 	}
 
 	/**

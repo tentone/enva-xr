@@ -1,6 +1,7 @@
 import {Vector3} from "three";
 
-export class MathUtils {
+export class MathUtils 
+{
 	/**
 	 * Project a point in the world to the screen correct screen position.
 	 *
@@ -18,6 +19,6 @@ export class MathUtils {
 		vector.y = (-vector.y + 1) * resolution.y / 2;
 		vector.z = 0;
 
-		return vector
+		return vector;
 	};
 }

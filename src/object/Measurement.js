@@ -1,5 +1,5 @@
 import {BufferGeometry, Line, Line3, LineBasicMaterial, Vector3} from "three";
-import {Text} from "troika-three-text"
+import {Text} from "troika-three-text";
 
 /**
  * Represents a measurement from a point to another.
@@ -16,10 +16,10 @@ export class Measurement extends Line
 		var geometry = new BufferGeometry().setFromPoints([point, point]);
 
 		super(geometry, new LineBasicMaterial(
-		{
-			color: 0xffffff,
-			linewidth: 5
-		}));
+			{
+				color: 0xffffff,
+				linewidth: 5
+			}));
 
 		/**
 		 * List of points that compose the measurement.
@@ -30,7 +30,7 @@ export class Measurement extends Line
 		 * Text used to display the measurement value.
 		 */
 		this.text = new Text();
-		this.text.fontSize = 0.1
+		this.text.fontSize = 0.1;
 		this.text.color = 0xFFFFFF;
 		this.text.anchorX = "center";
 		this.text.anchorY = "middle";
@@ -59,7 +59,8 @@ export class Measurement extends Line
 	 *
 	 * Also recalculates the bouding sphere of the geometry to ensure proper camera culling.
 	 */
-	updateGeometry() {
+	updateGeometry() 
+	{
 		var positions = this.geometry.attributes.position.array;
 		positions[0] = this.points[0].x;
 		positions[1] = this.points[0].y;
@@ -76,7 +77,8 @@ export class Measurement extends Line
 	/**
 	 * Update the text of the measurement.
 	 */
-	updateText() {
+	updateText() 
+	{
 		var distance = Math.round(this.points[0].distanceTo(this.points[1]) * 100);
 		var line = new Line3(this.points[0], this.points[1]);
 

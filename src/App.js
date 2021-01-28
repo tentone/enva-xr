@@ -1,20 +1,22 @@
-import {Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
+import {
+	Vector3, Vector2, Mesh, Euler, WebGLRenderer, Scene, PerspectiveCamera,
 	SphereBufferGeometry, DirectionalLight, TextureLoader, AmbientLightProbe,
 	MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
 	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap,
-	MeshPhysicalMaterial} from "three";
+	MeshPhysicalMaterial
+} from "three";
+import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3, Quaternion} from "cannon-es";
+import {threeToCannon} from 'three-to-cannon';
+import cannonDebugger from 'cannon-es-debugger';
 import {XRManager} from "./utils/XRManager.js";
 import {GUIUtils} from "./gui/GUIUtils.js";
 import {ObjectUtils} from "./utils/ObjectUtils.js";
 import {Cursor} from "./object/Cursor.js";
-import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import {World, Sphere, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3, Quaternion} from "cannon-es";
 import {PhysicsObject} from "./object/PhysicsObject.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {Measurement} from "./object/Measurement.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture.js";
-import {threeToCannon} from 'three-to-cannon';
-import cannonDebugger from 'cannon-es-debugger'
 
 /**
  * Render everything.
@@ -183,7 +185,7 @@ export class App
 
 	createScene()
 	{
-        this.depthDataTexture = new DepthDataTexture();
+		this.depthDataTexture = new DepthDataTexture();
 
 		this.directionalLight = new DirectionalLight();
 		this.directionalLight.castShadow = true;
@@ -209,37 +211,42 @@ export class App
 		this.scene.add(this.floorMesh);
 	}
 
-    nextShadowType()
-    {
-		if (!this.renderer.shadowMap.enabled) {
+	nextShadowType()
+	{
+		if (!this.renderer.shadowMap.enabled) 
+		{
 			this.renderer.shadowMap.enabled = true;
 			this.renderer.shadowMap.type = BasicShadowMap;
 		}
-		else if(this.renderer.shadowMap.type === BasicShadowMap) {
+		else if (this.renderer.shadowMap.type === BasicShadowMap) 
+		{
 			this.renderer.shadowMap.type = PCFShadowMap;
 		}
-		else if(this.renderer.shadowMap.type === PCFShadowMap) {
+		else if (this.renderer.shadowMap.type === PCFShadowMap) 
+		{
 			this.renderer.shadowMap.type = PCFSoftShadowMap;
 		}
-		else if(this.renderer.shadowMap.type === PCFSoftShadowMap) {
+		else if (this.renderer.shadowMap.type === PCFSoftShadowMap) 
+		{
 			this.renderer.shadowMap.type = VSMShadowMap;
 		}
-		else if(this.renderer.shadowMap.type === VSMShadowMap) {
+		else if (this.renderer.shadowMap.type === VSMShadowMap) 
+		{
 			this.renderer.shadowMap.enabled = false;
 			this.renderer.shadowMap.type = BasicShadowMap;
 		}
 
 		this.renderer.shadowMap.needsUpdate = true;
-		this.scene.traverse(function (child)
+		this.scene.traverse(function(child)
 		{
 			if (child.material)
 			{
 				child.material.needsUpdate = true;
 			}
-		})
+		});
 
 		// console.log("Shadow type changed to " + this.renderer.shadowMap.type);
-    }
+	}
 
 	nextRenderMode()
 	{
@@ -250,11 +257,12 @@ export class App
 			this.mode = NORMAL;
 		}
 
-		if (this.mode === NORMAL) {
+		if (this.mode === NORMAL) 
+		{
 			this.scene.overrideMaterial = null;
 			this.scene.traverse(function(child)
 			{
-				if(child.isMesh && child.material && child.material.isAgumentedMaterial)
+				if (child.isMesh && child.material && child.material.isAgumentedMaterial)
 				{
 					child.material.userData.uOcclusionEnabled.value = true;
 					child.material.uniformsNeedUpdate = true;
@@ -281,7 +289,7 @@ export class App
 			this.scene.overrideMaterial = null;
 			this.scene.traverse(function(child)
 			{
-				if(child.isMesh && child.material && child.material.isAgumentedMaterial)
+				if (child.isMesh && child.material && child.material.isAgumentedMaterial)
 				{
 					child.material.userData.uOcclusionEnabled.value = false;
 					child.material.uniformsNeedUpdate = true;
@@ -301,58 +309,59 @@ export class App
 	 */
 	createRenderer()
 	{
-        this.canvas = document.createElement("canvas");
-        document.body.appendChild(this.canvas);
+		this.canvas = document.createElement("canvas");
+		document.body.appendChild(this.canvas);
 
 		this.glContext = this.canvas.getContext("webgl2", {xrCompatible: true});
 
 		this.renderer = new WebGLRenderer(
-		{
-			context: this.glContext,
-			antialias: true,
-			alpha: true,
-			canvas: this.canvas,
-			depth: true,
-			powerPreference: "high-performance",
-            precision: "highp",
-            preserveDrawingBuffer: false,
-            premultipliedAlpha: true,
-            logarithmicDepthBuffer: false,
-            stencil: true
-		});
+			{
+				context: this.glContext,
+				antialias: true,
+				alpha: true,
+				canvas: this.canvas,
+				depth: true,
+				powerPreference: "high-performance",
+				precision: "highp",
+				preserveDrawingBuffer: false,
+				premultipliedAlpha: true,
+				logarithmicDepthBuffer: false,
+				stencil: true
+			});
 
 		this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = PCFSoftShadowMap;
-        this.renderer.sortObjects = false;
-        this.renderer.physicallyCorrectLights = true;
+		this.renderer.shadowMap.type = PCFSoftShadowMap;
+		this.renderer.sortObjects = false;
+		this.renderer.physicallyCorrectLights = true;
 
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.xr.enabled = true;
 	}
 
-    forceContextLoss()
-    {
+	forceContextLoss()
+	{
 
-        try
-        {
-            if (this.renderer !== null)
-            {
-                this.renderer.dispose();
-                this.renderer.forceContextLoss();
-                this.renderer = null;
-            }
-        }
-        catch (e)
-        {
-            this.renderer = null;
-            alert("Failed to destroy WebGL context.");
-        }
+		try
+		{
+			if (this.renderer !== null)
+			{
+				this.renderer.dispose();
+				this.renderer.forceContextLoss();
+				this.renderer = null;
+			}
+		}
+		catch (e)
+		{
+			this.renderer = null;
+			alert("Failed to destroy WebGL context.");
+		}
 
-        if(this.canvas !== null) {
-            document.body.removeChild(this.canvas);
-        }
-    };
+		if (this.canvas !== null) 
+		{
+			document.body.removeChild(this.canvas);
+		}
+	};
 
 
 	/**
@@ -375,7 +384,7 @@ export class App
 		this.floor.type = Body.STATIC;
 		this.floor.position.set(0, 0, 0);
 		this.floor.velocity.set(0, 0, 0);
-		this.floor.quaternion.setFromAxisAngle(new Vec3(1, 0, 0), -Math.PI / 2)
+		this.floor.quaternion.setFromAxisAngle(new Vec3(1, 0, 0), -Math.PI / 2);
 		this.floor.addShape(new Plane());
 		this.world.addBody(this.floor);
 	}
@@ -401,7 +410,8 @@ export class App
 	 * @param {*} colorMap
 	 * @param {*} depthMap
 	 */
-	createAugmentedMaterial(material, depthMap) {
+	createAugmentedMaterial(material, depthMap) 
+	{
 		material.userData = {
 			uDepthTexture: {value: depthMap},
 			uWidth: {value: 1.0},
@@ -434,14 +444,14 @@ export class App
 
 
 			var fragmentEntryPoint = "#include <clipping_planes_fragment>";
-			if(material instanceof ShadowMaterial)
+			if (material instanceof ShadowMaterial)
 			{
 				fragmentEntryPoint = "#include <fog_fragment>";
 			}
 
 			// Fragment depth logic
-			shader.fragmentShader =  shader.fragmentShader.replace("void main",
-			`float getDepthInMillimeters(in sampler2D depthText, in vec2 uv)
+			shader.fragmentShader = shader.fragmentShader.replace("void main",
+				`float getDepthInMillimeters(in sampler2D depthText, in vec2 uv)
 			{
 				vec2 packedDepth = texture2D(depthText, uv).ra;
 				return dot(packedDepth, vec2(255.0, 65280.0));
@@ -450,7 +460,7 @@ export class App
 			void main`);
 
 
-			shader.fragmentShader =  shader.fragmentShader.replace(fragmentEntryPoint, `
+			shader.fragmentShader = shader.fragmentShader.replace(fragmentEntryPoint, `
 			${fragmentEntryPoint}
 
 			if(uOcclusionEnabled)
@@ -474,17 +484,18 @@ export class App
 			` + shader.vertexShader;
 
 			// Vertex depth logic
-			shader.vertexShader =  shader.vertexShader.replace("#include <fog_vertex>", `
+			shader.vertexShader = shader.vertexShader.replace("#include <fog_vertex>", `
 			#include <fog_vertex>
 
 			vDepth = gl_Position.z;
 			`);
-		}
+		};
 
 		return material;
 	}
 
-	loadGLTFMesh(url, rotation, scale) {
+	loadGLTFMesh(url, rotation, scale) 
+	{
 		if (this.cursor.visible)
 		{
 			var position = new Vector3();
@@ -502,7 +513,7 @@ export class App
 					{
 						child.castShadow = true;
 						child.receiveShadow = true;
-						child.material =  this.createAugmentedMaterial(child.material, this.depthDataTexture);
+						child.material = this.createAugmentedMaterial(child.material, this.depthDataTexture);
 					}
 				});
 
@@ -536,7 +547,7 @@ export class App
 
 	resetDepthCanvas()
 	{
-		if(!this.depthCanvas)
+		if (!this.depthCanvas)
 		{
 			this.depthCanvas = document.createElement("canvas");
 			this.gui.container.appendChild(this.depthCanvas);
@@ -577,14 +588,14 @@ export class App
 		button.onclick = () =>
 		{
 			XRManager.start(this.renderer,
-			{
-				optionalFeatures: ["dom-overlay"],
-				domOverlay: {root: this.gui.container},
-				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"]
-			}, function(error)
-			{
-				alert("Error starting the AR session. " + error);
-			});
+				{
+					optionalFeatures: ["dom-overlay"],
+					domOverlay: {root: this.gui.container},
+					requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"]
+				}, function(error)
+				{
+					alert("Error starting the AR session. " + error);
+				});
 		};
 		document.body.appendChild(button);
 
@@ -598,7 +609,8 @@ export class App
 		window.addEventListener("resize", () => {this.resize();}, false);
 
 		// Render loop
-		this.renderer.setAnimationLoop((time, frame) => {
+		this.renderer.setAnimationLoop((time, frame) => 
+		{
 			this.render(time, frame);
 		});
 	}
@@ -622,7 +634,7 @@ export class App
 	{
 		this.scene.traverse(function(child)
 		{
-			if(child.isMesh && child.material && child.material.isAgumentedMaterial)
+			if (child.isMesh && child.material && child.material.isAgumentedMaterial)
 			{
 				child.material.userData.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
 				child.material.userData.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
@@ -667,9 +679,7 @@ export class App
 			session.requestReferenceSpace("viewer").then((referenceSpace) =>
 			{
 				session.requestHitTestSource(
-				{
-					space: referenceSpace
-				}).then((source) =>
+					{space: referenceSpace}).then((source) =>
 				{
 					this.xrHitTestSource = source;
 				});
@@ -681,8 +691,8 @@ export class App
 
 				// Get cube map for reflections
 				// this.xrLightProbe.addEventListener("reflectionchange", () => {
-					// var glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
-					// console.log(glCubeMap);
+				// var glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
+				// console.log(glCubeMap);
 				// });
 			});
 
@@ -702,8 +712,8 @@ export class App
 			let lightEstimate = frame.getLightEstimate(this.xrLightProbe);
 			if (lightEstimate)
 			{
-                let directionalPosition = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
-                directionalPosition.multiplyScalar(5);
+				let directionalPosition = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
+				directionalPosition.multiplyScalar(5);
 
 				let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
 				this.directionalLight.position.copy(directionalPosition);
@@ -729,8 +739,8 @@ export class App
 				position.setFromMatrixPosition(this.cursor.matrix);
 				if (position.y < this.floor.position.y)
 				{
-                    this.floor.position.y = position.y;
-                    this.floorMesh.position.y = position.y;
+					this.floor.position.y = position.y;
+					this.floorMesh.position.y = position.y;
 				}
 			}
 			else
@@ -749,16 +759,17 @@ export class App
 		if (viewerPose)
 		{
 			pose = viewerPose;
-			for(var view of pose.views)
+			for (var view of pose.views)
 			{
 				var depthData = frame.getDepthInformation(view);
-				if(depthData)
+				if (depthData)
 				{
 					// Update textures
 					this.depthDataTexture.updateDepth(depthData);
 
 					// Draw canvas texture depth
-					if (this.debugDepth) {
+					if (this.debugDepth) 
+					{
 						this.depthTexture.updateDepth(depthData, this.camera.near, this.camera.far);
 					}
 
@@ -771,15 +782,17 @@ export class App
 		this.renderer.render(this.scene, this.camera);
 
 		var end = performance.now();
-		if(this.performanceCounterEnabled) {
+		if (this.performanceCounterEnabled) 
+		{
 			this.performanceCounterFull.push(delta);
 			this.performanceCounterRender.push(end - start);
 
-			if (this.performanceCounterFull.length >= this.performanceCounterSamples) {
+			if (this.performanceCounterFull.length >= this.performanceCounterSamples) 
+			{
 
 				this.performanceCounterEnabled = false;
-				var avgFull = this.performanceCounterFull.reduce(function(a, b){return a + b;}, 0) / this.performanceCounterFull.length;
-				var avgRender = this.performanceCounterRender.reduce(function(a, b){return a + b;}, 0) / this.performanceCounterRender.length;
+				var avgFull = this.performanceCounterFull.reduce(function(a, b) {return a + b;}, 0) / this.performanceCounterFull.length;
+				var avgRender = this.performanceCounterRender.reduce(function(a, b) {return a + b;}, 0) / this.performanceCounterRender.length;
 				console.log(avgFull + ", " + avgRender + ", " + this.renderer.info.render.calls + ", " + this.renderer.info.render.triangles + ", " + this.renderer.info.memory.geometries + ", " + this.renderer.info.memory.textures);
 			}
 		}
