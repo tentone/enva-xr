@@ -2,7 +2,8 @@ import {
 	Vector3, Vector2, Mesh, WebGLRenderer, Scene, PerspectiveCamera,
 	DirectionalLight, AmbientLightProbe,
 	MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
-	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap} from "three";
+	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap
+} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {World, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3} from "cannon-es";
 import {threeToCannon} from 'three-to-cannon';
