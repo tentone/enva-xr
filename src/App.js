@@ -13,6 +13,7 @@ import {ObjectUtils} from "./utils/ObjectUtils.js";
 import {Cursor} from "./object/Cursor.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture.js";
+import {GUI} from "./gui/GUI.js";
 
 /**
  * Render everything.
@@ -664,18 +665,17 @@ export class App
 		var session = this.renderer.xr.getSession();
 		var referenceSpace = this.renderer.xr.getReferenceSpace();
 
-		// if (!this.xrGlBinding)
-		// {
-		// 	this.xrGlBinding = new XRWebGLBinding(session, this.glContext);
-		// }
+		if (!this.xrGlBinding)
+		{
+			this.xrGlBinding = new XRWebGLBinding(session, this.glContext);
+		}
 
 		// Request hit test source
 		if (!this.hitTestSourceRequested)
 		{
 			session.requestReferenceSpace("viewer").then((referenceSpace) =>
 			{
-				session.requestHitTestSource(
-					{space: referenceSpace}).then((source) =>
+				session.requestHitTestSource({space: referenceSpace}).then((source) =>
 				{
 					this.xrHitTestSource = source;
 				});
@@ -754,8 +754,8 @@ export class App
 		var viewerPose = frame.getViewerPose(referenceSpace);
 		if (viewerPose)
 		{
-			pose = viewerPose;
-			for (var view of pose.views)
+			this.pose = viewerPose;
+			for (var view of this.pose.views)
 			{
 				var depthData = frame.getDepthInformation(view);
 				if (depthData)

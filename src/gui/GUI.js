@@ -1,3 +1,8 @@
+import {Vector3, SphereBufferGeometry, Euler, Quaternion, MeshPhysicalMaterial, TextureLoader, Sphere} from "three";
+import {Measurement} from "../object/Measurement.js";
+import {PhysicsObject} from "../object/PhysicsObject.js";
+import {GUIUtils} from "./GUIUtils.js";
+
 /**
  * Application user interface.
  */
