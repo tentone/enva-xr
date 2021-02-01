@@ -1,4 +1,4 @@
-import {Box3} from "three";
+import {Box3, Vector3} from "three";
 
 export class VoxelEnvironment
 {
@@ -11,16 +11,25 @@ export class VoxelEnvironment
 
 		/**
 		 * Voxel model bouding box.
+		 * 
+		 * Coordinates in meters.
 		 */
-		this.box = new Box3();
+		this.box = new Box3(new Vector3(-5, -5, -5), new Vector3(5, 5, 5));
 		
 		/**
-		 * Precision of the depth system in mm.
+		 * Precision of the depth system in meters.
 		 * 
 		 * The grid of voxels has the size defined here.
 		 */
-		this.precision = 50;
+		this.precision = 0.05;
+
+		/**
+		 * Grid of voxels organized into a array cube. 
+		 */
+		this.grid = [];
 	}
+
+
 
 	/**
 	 * Draw the voxel model using the camera properties and depth data received.

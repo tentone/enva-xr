@@ -686,10 +686,10 @@ export class App
 				this.xrLightProbe = probe;
 
 				// Get cube map for reflections
-				// this.xrLightProbe.addEventListener("reflectionchange", () => {
-				// var glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
-				// console.log(glCubeMap);
-				// });
+				/* this.xrLightProbe.addEventListener("reflectionchange", () => {
+					var glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
+					console.log(glCubeMap);
+				}); */
 			});
 
 			session.addEventListener("end", () =>
