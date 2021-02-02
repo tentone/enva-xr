@@ -24,12 +24,15 @@ export class VoxelEnvironment
 		this.precision = 0.05;
 
 		/**
+		 * Box shape shared across all voxels in the environment.
+		 */
+		this.shape = new Box(new Vec3(this.precision / 2, this.precision / 2, this.precision / 2));
+
+		/**
 		 * Grid of voxels organized into a array cube. 
 		 */
 		this.grid = [];
 	}
-
-
 
 	/**
 	 * Draw the voxel model using the camera properties and depth data received.

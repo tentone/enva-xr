@@ -1,4 +1,4 @@
-import {Body, Box} from "cannon-es";
+import {Body, Box, Vec3} from "cannon-es";
 
 export class VoxelBody extends Body
 {
@@ -11,6 +11,6 @@ export class VoxelBody extends Body
 		this.type = Body.STATIC;
 		this.position.set(x, y, z);
 		this.velocity.set(0, 0, 0);
-		this.addShape(new Box());
+		this.addShape(this.manager.shape);
 	}
 }
