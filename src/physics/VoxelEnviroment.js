@@ -24,6 +24,11 @@ export class VoxelEnvironment
 		this.precision = 0.05;
 
 		/**
+		 * Probability value theshold for a voxel to be activated of deactivated.
+		 */
+		this.threshold = 0.6;
+
+		/**
 		 * Box shape shared across all voxels in the environment.
 		 */
 		this.shape = new Box(new Vec3(this.precision / 2, this.precision / 2, this.precision / 2));
@@ -32,6 +37,29 @@ export class VoxelEnvironment
 		 * Grid of voxels organized into a array cube. 
 		 */
 		this.grid = [];
+	}
+
+	/**
+	 * Get all voxels that are inside of the camera frustum.
+	 * 
+	 * @param {Camera} camera Camera object
+	 */
+	getVoxelInFrustum(camera)
+	{
+		var voxels = [];
+
+		// TODO <ADD CODE HERE>
+
+		return voxels;
+	}
+
+
+	/**
+	 * Update a specific point in the voxel grid.
+	 */
+	updatePoint()
+	{
+		// TODO <ADD CODE HERE>
 	}
 
 	/**
