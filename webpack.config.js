@@ -17,7 +17,7 @@ module.exports = {
 		hot: true
 	},
 	plugins: [
-		/* new CopyPlugin({
+		new CopyPlugin({
 			patterns: [
 				{
 					from: Path.resolve(__dirname, source + "/assets"),
@@ -26,7 +26,7 @@ module.exports = {
 				}
 			],
 			options: {concurrency: 100}
-		}), */
+		}),
 		new HtmlWebpackPlugin({
 			filename: 'index.html',
 			template: 'index.html'
