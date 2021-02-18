@@ -6,7 +6,7 @@ import {GUIUtils} from "./GUIUtils.js";
 /**
  * Application user interface.
  */
-export class GUI 
+export class GUI
 {
 	constructor(app)
 	{
