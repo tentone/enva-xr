@@ -73,23 +73,28 @@ export class GUI
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
 		{
-			this.app.loadGLTFMesh("./assets/3d/car/this.app.scene.gltf", new Euler(0, 0, 0), 0.003);
+			this.app.loadGLTFMesh("./assets/3d/car/scene.gltf", new Euler(0, 0, 0), 0.003);
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
+		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
 		{
 			this.app.loadGLTFMesh("./assets/3d/gltf/WaterBottle.glb", new Euler(0, 0, 0), 1.0);
-		}));
+		})); */
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/tripod.svg", () =>
 		{
 			this.app.loadGLTFMesh("./assets/3d/gltf/AntiqueCamera.glb", new Euler(0, 0, 0), 0.1);
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/dots.svg", () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/shoe.svg", () =>
+		{
+			this.app.loadGLTFMesh("./assets/3d/gltf/Shoe.glb", new Euler(0, 0, 0), 1.0);
+		}));
+
+		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/dots.svg", () =>
 		{
 			this.app.loadGLTFMesh("./assets/3d/gltf/MetalRoughSpheresNoTextures.glb", new Euler(0, 0, 0), 100.0);
-		}));
+		})); */
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/fish.svg", () =>
 		{
@@ -98,7 +103,12 @@ export class GUI
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg", () =>
 		{
-			this.app.loadGLTFMesh("./assets/3d/flower/this.app.scene.gltf", new Euler(0, 0, 0), 0.007);
+			this.app.loadGLTFMesh("./assets/3d/flower/scene.gltf", new Euler(0, 0, 0), 0.007);
+		}));
+
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/toy-car.svg", () =>
+		{
+			this.app.loadGLTFMesh("./assets/3d/gltf/ToyCar.glb", new Euler(0, 0, 0), 10.0);
 		}));
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/rocks.svg", () =>

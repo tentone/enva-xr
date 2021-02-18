@@ -2,7 +2,7 @@ import {
 	Vector3, Vector2, Mesh, WebGLRenderer, Scene, PerspectiveCamera,
 	DirectionalLight, AmbientLightProbe,
 	MeshBasicMaterial, MeshDepthMaterial, Matrix4, PlaneBufferGeometry,
-	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap
+	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, AmbientLight
 } from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {World, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3} from "cannon-es";
@@ -115,6 +115,11 @@ export class App
 		this.shadowMaterial;
 
 		/**
+		 * Ambient light.
+		 */
+		this.ambientLight;
+
+		/**
 		 * Mesh used to cast shadows into the floor.
 		 */
 		this.floorMesh;
@@ -183,6 +188,9 @@ export class App
 	createScene()
 	{
 		this.depthDataTexture = new DepthDataTexture();
+
+		this.ambientLight = new AmbientLight(0x333333);
+		this.scene.add(this.ambientLight);
 
 		this.directionalLight = new DirectionalLight();
 		this.directionalLight.castShadow = true;
@@ -501,7 +509,7 @@ export class App
 			const loader = new GLTFLoader();
 			loader.loadAsync(url).then((gltf) =>
 			{
-				var object = gltf.this.scene;
+				var object = gltf.scene;
 				this.scene.add(object);
 
 				object.traverse((child) =>
