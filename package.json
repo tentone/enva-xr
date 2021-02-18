@@ -1,8 +1,8 @@
 {
   "name": "ar-tracking",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ar-tracking",
-  "main": "source/main.js",
+  "main": "src/main.js",
   "scripts": {
     "build": "webpack",
     "start": "webpack-dev-server --host 0.0.0.0 --https",
@@ -12,7 +12,8 @@
   "license": "MIT",
   "keywords": [
     "three",
-    "ar"
+    "ar",
+	"webxr"
   ],
   "dependencies": {
     "cannon-es-debugger": "~0.1.0",
