@@ -102,27 +102,27 @@ export class App
 		/**
 		 * Directional shadow casting light.
 		 */
-		this.directionalLight;
+		this.directionalLight = null;
 
 		/**
 		 * Light probe object using spherical harmonics.
 		 */
-		this.lightProbe;
+		this.lightProbe = null;
 
 		/**
 		 * Mesh used as floor.
 		 */
-		this.shadowMaterial;
+		this.shadowMaterial = null;
 
 		/**
 		 * Ambient light.
 		 */
-		this.ambientLight;
+		this.ambientLight = null;
 
 		/**
 		 * Mesh used to cast shadows into the floor.
 		 */
-		this.floorMesh;
+		this.floorMesh = null;
 
 		/**
 		 * Time of the last frame.
@@ -174,15 +174,18 @@ export class App
 		 */
 		this.canvas = null;
 
-		this.performanceCounterFull = [];
-		this.performanceCounterRender = [];
-		this.performanceCounterEnabled = false;
-		this.performanceCounterSamples = 100;
-
 		/**
 		 * Rendering mode in use.
 		 */
 		this.mode = NORMAL;
+
+		this.performanceCounterFull = [];
+
+		this.performanceCounterRender = [];
+
+		this.performanceCounterEnabled = false;
+
+		this.performanceCounterSamples = 100;
 	}
 
 	createScene()

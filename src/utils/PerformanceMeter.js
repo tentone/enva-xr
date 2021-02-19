@@ -1,3 +1,10 @@
+/**
+ * Auxiliary tools to measure performance of the application.
+ *
+ * Ticks measurements between frames and provides metrics from the times measured.
+ *
+ * Can also be used to measure specific time deltas.
+ */
 export class PerformanceMeter
 {
 	constructor()
@@ -21,8 +28,8 @@ export class PerformanceMeter
 	tick()
 	{
 		var time = performance.now();
-		this.values.push(tim - this.last);
-		if (this.values.length >= this.samples) 
+		this.values.push(time - this.last);
+		if (this.values.length >= this.samples)
 		{
 			this.values.shift();
 		}
