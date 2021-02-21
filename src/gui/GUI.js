@@ -5,6 +5,8 @@ import {GUIUtils} from "./GUIUtils.js";
 
 /**
  * Application user interface.
+ *
+ * The interface can be shown during AR presentation as a "dom-overlay" in the WebXR context.
  */
 export class GUI
 {
@@ -15,8 +17,14 @@ export class GUI
 		 */
 		this.app = app;
 
+		/**
+		 * The DOM element where the GUI should be created.
+		 */
 		this.parent = document.body;
 
+		/**
+		 * DOM container for the GUI.
+		 */
 		this.container = null;
 	}
 
@@ -29,6 +37,12 @@ export class GUI
 		this.container.style.width = "100%";
 		this.container.style.height = "100%";
 		this.parent.appendChild(this.container);
+
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", () =>
+		{
+			this.app.debugDepth = !this.app.debugDepth;
+			this.app.depthCanvas.style.display = this.app.debugDepth ? "block" : "none";
+		}));
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/ruler.svg", () =>
 		{
@@ -48,28 +62,22 @@ export class GUI
 			}
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg", () =>
+		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg", () =>
 		{
 			this.app.performanceCounterFull = [];
 			this.app.performanceCounterRender = [];
 			this.app.performanceCounterEnabled = true;
-		}));
+		})); */
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", () =>
+		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", () =>
 		{
 			this.app.nextShadowType();
-		}));
+		})); */
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/bug.svg", () =>
+		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/bug.svg", () =>
 		{
 			this.app.nextRenderMode();
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", () =>
-		{
-			this.app.debugDepth = !this.app.debugDepth;
-			this.app.depthCanvas.style.display = this.app.debugDepth ? "block" : "none";
-		}));
+		})); */
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
 		{

@@ -15,33 +15,33 @@ import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture.js";
 import {GUI} from "./gui/GUI.js";
 
-/**
- * Render everything.
- */
-var NORMAL = 0;
-
-/**
- * Render Z Depth only.
- */
-var DEBUG_ZBUFFER = 1;
-
-/**
- * Render AR depth only.
- */
-var DEBUG_AR_DEPTH = 2;
-
-/**
- * No occlusion estimation.
- */
-var DEBUG_NO_OCCLUSION = 3;
-
-/**
- * Draw nothign just the AR base image.
- */
-var DEBUG_CAMERA_IMAGE = 4;
-
 export class App
 {
+	/**
+	 * Render everything.
+	 */
+	static NORMAL = 0;
+
+	/**
+	 * Render Z Depth only.
+	 */
+	static DEBUG_ZBUFFER = 1;
+
+	/**
+	 * Render AR depth only.
+	 */
+	static DEBUG_AR_DEPTH = 2;
+
+	/**
+	 * No occlusion estimation.
+	 */
+	static DEBUG_NO_OCCLUSION = 3;
+
+	/**
+	 * Draw nothign just the AR base image.
+	 */
+	static DEBUG_CAMERA_IMAGE = 4;
+
 	constructor()
 	{
 		/**
@@ -177,7 +177,7 @@ export class App
 		/**
 		 * Rendering mode in use.
 		 */
-		this.mode = NORMAL;
+		this.mode = App.NORMAL;
 
 		this.performanceCounterFull = [];
 
@@ -260,12 +260,12 @@ export class App
 	{
 		this.mode++;
 
-		if (this.mode === DEBUG_CAMERA_IMAGE)
+		if (this.mode === App.DEBUG_CAMERA_IMAGE)
 		{
-			this.mode = NORMAL;
+			this.mode = App.NORMAL;
 		}
 
-		if (this.mode === NORMAL)
+		if (this.mode === App.NORMAL)
 		{
 			this.scene.overrideMaterial = null;
 			this.scene.traverse(function(child)
@@ -277,7 +277,7 @@ export class App
 				}
 			});
 		}
-		else if (this.mode === DEBUG_ZBUFFER)
+		else if (this.mode === App.DEBUG_ZBUFFER)
 		{
 			this.scene.overrideMaterial = new MeshDepthMaterial();
 		}
@@ -291,7 +291,7 @@ export class App
 			this.depthCanvas.style.bottom = "0px";
 			this.depthCanvas.style.borderRadius = "0px";
 		}
-		else if (this.mode === DEBUG_NO_OCCLUSION)
+		else if (this.mode === App.DEBUG_NO_OCCLUSION)
 		{
 			this.resetDepthCanvas();
 			this.scene.overrideMaterial = null;
@@ -304,7 +304,7 @@ export class App
 				}
 			});
 		}
-		else if (this.mode === DEBUG_CAMERA_IMAGE)
+		else if (this.mode === App.DEBUG_CAMERA_IMAGE)
 		{
 			this.scene.overrideMaterial = new MeshBasicMaterial({transparent: true, opacity: 0.0});
 		}
