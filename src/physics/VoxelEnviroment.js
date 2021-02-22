@@ -11,14 +11,14 @@ export class VoxelEnvironment
 
 		/**
 		 * Voxel model bouding box.
-		 * 
+		 *
 		 * Coordinates in meters.
 		 */
 		this.box = new Box3(new Vector3(-5, -5, -5), new Vector3(5, 5, 5));
-		
+
 		/**
 		 * Precision of the depth system in meters.
-		 * 
+		 *
 		 * The grid of voxels has the size defined here.
 		 */
 		this.precision = 0.05;
@@ -34,14 +34,14 @@ export class VoxelEnvironment
 		this.shape = new Box(new Vec3(this.precision / 2, this.precision / 2, this.precision / 2));
 
 		/**
-		 * Grid of voxels organized into a array cube. 
+		 * Grid of voxels organized into a array cube.
 		 */
 		this.grid = [];
 	}
 
 	/**
 	 * Get all voxels that are inside of the camera frustum.
-	 * 
+	 *
 	 * @param {Camera} camera Camera object
 	 */
 	getVoxelInFrustum(camera)
@@ -64,7 +64,7 @@ export class VoxelEnvironment
 
 	/**
 	 * Draw the voxel model using the camera properties and depth data received.
-	 * 
+	 *
 	 * Depth is checked agains all voxels in the volume, if the depth point gets outside the model is expanded to fit new data.
 	 */
 	updateDepth(camera, depth)
@@ -72,12 +72,15 @@ export class VoxelEnvironment
 		var width = depth.height;
 		var height = depth.width;
 
+		var origin = new Vector3();
+		camera.getWorldPosition(origin);
+
 		for (var x = 0; x < width; x++)
 		{
 			for (var y = 0; y < height; y++)
 			{
 				var distance = depth.getDepth(x, y);
-				
+
 				// TODO <Project distance and check collision>
 			}
 		}
