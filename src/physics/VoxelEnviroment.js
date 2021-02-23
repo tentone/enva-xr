@@ -81,6 +81,7 @@ export class VoxelEnvironment
 			{
 				var distance = depth.getDepth(x, y);
 
+				// Project with correct camera parameters
 				var position = new Vector3();
 				position.x = x - width / 2;
 				position.y = -y + height / 2;
