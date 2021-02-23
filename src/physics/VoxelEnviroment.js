@@ -81,6 +81,11 @@ export class VoxelEnvironment
 			{
 				var distance = depth.getDepth(x, y);
 
+				var position = new Vector3();
+				position.x = x - width / 2;
+				position.y = -y + height / 2;
+				position.z = distance;
+
 				// TODO <Project distance and check collision>
 			}
 		}
