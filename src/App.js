@@ -17,31 +17,6 @@ import {GUI} from "./gui/GUI.js";
 
 export class App
 {
-	/**
-	 * Render everything.
-	 */
-	static NORMAL = 0;
-
-	/**
-	 * Render Z Depth only.
-	 */
-	static DEBUG_ZBUFFER = 1;
-
-	/**
-	 * Render AR depth only.
-	 */
-	static DEBUG_AR_DEPTH = 2;
-
-	/**
-	 * No occlusion estimation.
-	 */
-	static DEBUG_NO_OCCLUSION = 3;
-
-	/**
-	 * Draw nothign just the AR base image.
-	 */
-	static DEBUG_CAMERA_IMAGE = 4;
-
 	constructor()
 	{
 		/**
@@ -806,3 +781,27 @@ export class App
 	}
 }
 
+/**
+ * Render everything.
+ */
+App.NORMAL = 0;
+
+/**
+ * Render Z Depth only.
+ */
+App.DEBUG_ZBUFFER = 1;
+
+/**
+ * Render AR depth only.
+ */
+App.DEBUG_AR_DEPTH = 2;
+
+/**
+ * No occlusion estimation.
+ */
+App.DEBUG_NO_OCCLUSION = 3;
+
+/**
+ * Draw nothign just the AR base image.
+ */
+App.DEBUG_CAMERA_IMAGE = 4;
