@@ -1,8 +1,8 @@
 import {Vector3, SphereBufferGeometry, Euler, Quaternion, MeshPhysicalMaterial, TextureLoader} from "three";
+import {Sphere} from "cannon-es";
 import {Measurement} from "../object/Measurement.js";
 import {PhysicsObject} from "../object/PhysicsObject.js";
 import {GUIUtils} from "./GUIUtils.js";
-import {Sphere} from "cannon-es";
 
 /**
  * Application user interface.
