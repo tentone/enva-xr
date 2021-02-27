@@ -771,7 +771,6 @@ export class App
 
 			if (this.performanceCounterFull.length >= this.performanceCounterSamples)
 			{
-
 				this.performanceCounterEnabled = false;
 				var avgFull = this.performanceCounterFull.reduce(function(a, b) {return a + b;}, 0) / this.performanceCounterFull.length;
 				var avgRender = this.performanceCounterRender.reduce(function(a, b) {return a + b;}, 0) / this.performanceCounterRender.length;

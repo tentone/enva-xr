@@ -13,7 +13,7 @@
   "keywords": [
     "three",
     "ar",
-	"webxr"
+    "webxr"
   ],
   "dependencies": {
     "cannon-es-debugger": "~0.1.0",
