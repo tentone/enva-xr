@@ -1,4 +1,4 @@
-import {Body, Box, Vec3} from "cannon-es";
+import {Body} from "cannon-es";
 
 export class VoxelBody extends Body
 {
@@ -24,9 +24,9 @@ export class VoxelBody extends Body
 
 	/**
 	 * Update the voxel internal probability.
-	 * 
-	 * If the probability of the voxels goes bellow the threshold the voxel is deactivated. 
-	 * 
+	 *
+	 * If the probability of the voxels goes bellow the threshold the voxel is deactivated.
+	 *
 	 * @param {number} hit If the 1 the voxel is occupied by depth, otherwise is not occupied. A value inbetween can be used for antialiasing like calculation.
 	 * @param {number} factor The update factor based on the the time elapsed between frames and the update probability
 	 */
