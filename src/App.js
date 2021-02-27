@@ -358,10 +358,14 @@ export class App
 		this.world.defaultContactMaterial.contactEquationRelaxation = 4;
 		this.world.quatNormalizeSkip = 0;
 		this.world.quatNormalizeFast = false;
+
 		this.world.broadphase = new NaiveBroadphase();
-		this.world.solver = new SplitSolver(new GSSolver());
-		this.world.solver.tolerance = 0.01;
-		this.world.solver.iterations = 7;
+		this.world.broadphase.useBoundingBoxes = true;
+
+		var solver = new GSSolver();
+		solver.tolerance = 0.1;
+		solver.iterations = 7;
+		this.world.solver = new SplitSolver(solver);
 
 		this.floor = new Body();
 		this.floor.type = Body.STATIC;
