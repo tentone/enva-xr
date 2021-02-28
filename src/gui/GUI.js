@@ -63,12 +63,12 @@ export class GUI
 			}
 		}));
 
-		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg", () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg", () =>
 		{
 			this.app.performanceCounterFull = [];
 			this.app.performanceCounterRender = [];
 			this.app.performanceCounterEnabled = true;
-		})); */
+		}));
 
 		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", () =>
 		{
@@ -85,19 +85,14 @@ export class GUI
 			this.app.loadGLTFMesh("./assets/3d/porsche_911/scene.gltf", new Euler(0, 0, 0), 0.003);
 		}));
 
-		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
+		this.container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
 		{
 			this.app.loadGLTFMesh("./assets/3d/WaterBottle.glb", new Euler(0, 0, 0), 1.0);
-		})); */
+		}));
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/tripod.svg", () =>
 		{
 			this.app.loadGLTFMesh("./assets/3d/AntiqueCamera.glb", new Euler(0, 0, 0), 0.1);
-		}));
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/christmas-tree.svg", () =>
-		{
-			this.app.loadGLTFMesh("./assets/3d/ruby_rose/scene.gltf", new Euler(0, 0, 0), 0.1);
 		}));
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/shoe.svg", () =>

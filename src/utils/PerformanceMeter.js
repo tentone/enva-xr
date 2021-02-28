@@ -11,7 +11,15 @@ export class PerformanceMeter
 	{
 		this.reset();
 
-		this.samples = samples ? samples : 400;
+		this.values = [];
+
+		this.last = null;
+
+		this.max = null;
+
+		this.min = null;
+
+		this.samples = samples ? samples : 1000;
 	}
 
 	/**
@@ -23,16 +31,28 @@ export class PerformanceMeter
 	}
 
 	/**
-	 * Finish measurement and add it to the list of measurements..
+	 * Finish measurement and add it to the list of measurements.
+	 *
+	 * Tock can be used by itselt to measure times by being called multiple times.
 	 */
 	tock()
 	{
 		var time = performance.now();
+		var delta = time - this.last;
 
-		this.values.push(time - this.last);
-		if (this.values.length >= this.samples)
+		if (this.values.length < this.samples)
 		{
-			this.values.shift();
+			if (this.max === null || delta > max)
+			{
+				this.max = delta;
+			}
+
+			if (this.min === null || delta < min)
+			{
+				this.min = delta;
+			}
+
+			this.values.push(delta);
 		}
 
 		this.last = time;
@@ -41,7 +61,7 @@ export class PerformanceMeter
 	/**
 	 * Get the average value from all samples in the performance meter.
 	 */
-	stats()
+	average()
 	{
 		return this.values.reduce(function(a, b) {return a + b;}, 0) / this.values.length;
 	}

@@ -14,6 +14,7 @@ import {Cursor} from "./object/Cursor.js";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture.js";
 import {GUI} from "./gui/GUI.js";
+import {PerformanceMeter} from "./utils/PerformanceMeter.js";
 
 export class App
 {
@@ -154,13 +155,15 @@ export class App
 		 */
 		this.mode = App.NORMAL;
 
-		this.performanceCounterFull = [];
+		/**
+		 * Performance meter to measure full frame times.
+		 */
+		this.meter = new PerformanceMeter();
 
-		this.performanceCounterRender = [];
-
-		this.performanceCounterEnabled = false;
-
-		this.performanceCounterSamples = 100;
+		/**
+		 * Performance meter to measure only the frame composition time.
+		 */
+		this.meterFrame = new PerformanceMeter();
 	}
 
 	createScene()
