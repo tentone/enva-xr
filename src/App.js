@@ -158,12 +158,12 @@ export class App
 		/**
 		 * Performance meter to measure full frame times.
 		 */
-		this.meter = new PerformanceMeter();
+		this.timeMeter = new PerformanceMeter();
 
 		/**
 		 * Performance meter to measure only the frame composition time.
 		 */
-		this.meterFrame = new PerformanceMeter();
+		this.timeMeterFrame = new PerformanceMeter();
 	}
 
 	createScene()
@@ -642,6 +642,9 @@ export class App
 	 */
 	render(time, frame)
 	{
+		this.timeMeter.tock();
+		this.timeMeterFrame.tick();
+
 		let delta = time - this.lastTime;
 		this.lastTime = time;
 
@@ -653,7 +656,6 @@ export class App
 		// Update physics this.world
 		this.world.step(delta / 1e3);
 
-		var start = performance.now();
 
 		var session = this.renderer.xr.getSession();
 		var referenceSpace = this.renderer.xr.getReferenceSpace();
@@ -769,23 +771,22 @@ export class App
 		}
 
 		this.renderer.render(this.scene, this.camera);
+		this.timeMeterFrame.tock();
 
-		var end = performance.now();
-		if (this.performanceCounterEnabled)
+		if (this.timeMeter.finished() && this.timeMeterFrame.finished())
 		{
-			this.performanceCounterFull.push(delta);
-			this.performanceCounterRender.push(end - start);
+			var a = this.timeMeter.stats();
+			this.timeMeter.reset(false);
 
-			if (this.performanceCounterFull.length >= this.performanceCounterSamples)
-			{
-				this.performanceCounterEnabled = false;
-				var avgFull = this.performanceCounterFull.reduce(function(a, b) {return a + b;}, 0) / this.performanceCounterFull.length;
-				var avgRender = this.performanceCounterRender.reduce(function(a, b) {return a + b;}, 0) / this.performanceCounterRender.length;
-				console.log(avgFull + ", " + avgRender + ", " + this.renderer.info.render.calls + ", " + this.renderer.info.render.triangles + ", " + this.renderer.info.memory.geometries + ", " + this.renderer.info.memory.textures);
-			}
+			var b = this.timeMeterFrame.stats();
+			this.timeMeterFrame.reset(false);
+
+			console.log(`${c++};${a.average};${a.max};${a.min};${b.average};${b.max};${b.min}`);
 		}
 	}
 }
+
+var c = 0;
 
 /**
  * Render everything.

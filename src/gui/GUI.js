@@ -65,9 +65,8 @@ export class GUI
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg", () =>
 		{
-			this.app.performanceCounterFull = [];
-			this.app.performanceCounterRender = [];
-			this.app.performanceCounterEnabled = true;
+			this.app.timeMeter.reset();
+			this.app.timeMeterFrame.reset();
 		}));
 
 		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", () =>
