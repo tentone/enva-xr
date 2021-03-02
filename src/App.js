@@ -174,27 +174,27 @@ export class App
 		this.scene.add(this.ambientLight);
 
 		this.directionalLight = new DirectionalLight();
-		this.directionalLight.castShadow = true;
-		this.directionalLight.shadow.mapSize.set(1024, 1024);
+		this.directionalLight.castShadow = false;
+		/* this.directionalLight.shadow.mapSize.set(1024, 1024);
 		this.directionalLight.shadow.camera.far = 20;
 		this.directionalLight.shadow.camera.near = 0.1;
 		this.directionalLight.shadow.camera.left = -5;
 		this.directionalLight.shadow.camera.right = 5;
 		this.directionalLight.shadow.camera.bottom = -5;
-		this.directionalLight.shadow.camera.top = 5;
+		this.directionalLight.shadow.camera.top = 5; */
 		this.scene.add(this.directionalLight);
 
 		this.lightProbe = new AmbientLightProbe();
 		this.scene.add(this.lightProbe);
 
-		this.shadowMaterial = new ShadowMaterial({opacity: 0.5});
+		/* this.shadowMaterial = new ShadowMaterial({opacity: 0.5});
 		this.shadowMaterial = this.createAugmentedMaterial(this.shadowMaterial, this.depthDataTexture);
 
 		this.floorMesh = new Mesh(new PlaneBufferGeometry(100, 100, 1, 1), this.shadowMaterial);
 		this.floorMesh.rotation.set(-Math.PI / 2, 0, 0);
 		this.floorMesh.castShadow = false;
 		this.floorMesh.receiveShadow = true;
-		this.scene.add(this.floorMesh);
+		this.scene.add(this.floorMesh); */
 	}
 
 	nextShadowType()
@@ -315,7 +315,7 @@ export class App
 				stencil: true
 			});
 
-		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.enabled = false;
 		this.renderer.shadowMap.type = PCFSoftShadowMap;
 		this.renderer.sortObjects = false;
 		this.renderer.physicallyCorrectLights = true;
@@ -501,8 +501,8 @@ export class App
 				{
 					if (child instanceof Mesh)
 					{
-						child.castShadow = true;
-						child.receiveShadow = true;
+						child.castShadow = false;
+						child.receiveShadow = false;
 						child.material = this.createAugmentedMaterial(child.material, this.depthDataTexture);
 					}
 				});
@@ -731,7 +731,7 @@ export class App
 				if (position.y < this.floor.position.y)
 				{
 					this.floor.position.y = position.y;
-					this.floorMesh.position.y = position.y;
+					// this.floorMesh.position.y = position.y;
 				}
 			}
 			else
