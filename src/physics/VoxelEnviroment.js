@@ -44,7 +44,7 @@ export class VoxelEnvironment
 	 *
 	 * @param {Camera} camera Camera object
 	 */
-	getVoxelInFrustum(camera)
+	getVoxelsInFrustum(camera)
 	{
 		var voxels = [];
 
@@ -67,8 +67,9 @@ export class VoxelEnvironment
 	 *
 	 * Depth is checked agains all voxels in the volume, if the depth point gets outside the model is expanded to fit new data.
 	 */
-	updateDepth(camera, depth)
+	update(camera, depth)
 	{
+		/*
 		var width = depth.height;
 		var height = depth.width;
 
@@ -90,5 +91,6 @@ export class VoxelEnvironment
 				// TODO <Project distance and check collision>
 			}
 		}
+		*/
 	}
 }

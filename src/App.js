@@ -36,6 +36,11 @@ export class App
 		this.world = null;
 
 		/**
+		 * Voxel environment use
+		 */
+		this.voxelEnvironment = new VoxelEnvironment();
+
+		/**
 		 * Phsyics floor plane should be set to the lowest plane intersection found.
 		 */
 		this.floor = null;
@@ -755,6 +760,9 @@ export class App
 				var depthData = frame.getDepthInformation(view);
 				if (depthData)
 				{
+					// Voxel environment
+					this.voxelEnvironment.update(camera, depthData);
+
 					// Update textures
 					this.depthDataTexture.updateDepth(depthData);
 
