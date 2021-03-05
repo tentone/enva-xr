@@ -69,12 +69,13 @@ export class VoxelEnvironment
 	 */
 	update(camera, depth)
 	{
-		/*
 		var width = depth.height;
 		var height = depth.width;
 
 		var origin = new Vector3();
 		camera.getWorldPosition(origin);
+
+		var projectionMatrix = camera.projectionMatrix;
 
 		for (var x = 0; x < width; x++)
 		{
@@ -82,7 +83,6 @@ export class VoxelEnvironment
 			{
 				var distance = depth.getDepth(x, y);
 
-				// Project with correct camera parameters
 				var position = new Vector3();
 				position.x = x - width / 2;
 				position.y = -y + height / 2;
@@ -91,6 +91,5 @@ export class VoxelEnvironment
 				// TODO <Project distance and check collision>
 			}
 		}
-		*/
 	}
 }
