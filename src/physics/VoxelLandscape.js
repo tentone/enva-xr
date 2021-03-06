@@ -264,9 +264,9 @@ export class VoxelLandscape
 		}
 
 		// Set box positions
-		var sx = this.sx,
-			sy = this.sy,
-			sz = this.sz;
+		var sx = this.sx;
+		var sy = this.sy;
+		var sz = this.sz;
 
 		for (var i=0; i<this.boxes.length; i++)
 		{
@@ -280,9 +280,8 @@ export class VoxelLandscape
 
 			// Replace box shapes
 			b.addShape(new Box(new Vec3(b.nx*sx*0.5, b.ny*sy*0.5, b.nz*sz*0.5)));
-			// b.aabbNeedsUpdate = true;
+			b.aabbNeedsUpdate = true;
 			world.addBody(b);
-			// this.boxes.push(box);
 		}
 	}
 }

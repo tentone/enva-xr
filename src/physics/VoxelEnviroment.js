@@ -2,7 +2,7 @@ import {Box3, Vector3} from "three";
 
 export class VoxelEnvironment
 {
-	constructor(world)
+	constructor(world, size)
 	{
 		/**
 		 * Cannon physics world.
@@ -31,7 +31,7 @@ export class VoxelEnvironment
 		/**
 		 * Box shape shared across all voxels in the environment.
 		 */
-		this.shape = new Box(new Vec3(this.precision / 2, this.precision / 2, this.precision / 2));
+		this.shape = new Box(new Vec3(-size, -size, -size), new Vec3(size, size, size));
 
 		/**
 		 * Grid of voxels organized into a array cube.
@@ -87,8 +87,6 @@ export class VoxelEnvironment
 				position.x = x - width / 2;
 				position.y = -y + height / 2;
 				position.z = distance;
-
-				// TODO <Project distance and check collision>
 			}
 		}
 	}
