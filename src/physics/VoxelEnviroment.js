@@ -40,29 +40,6 @@ export class VoxelEnvironment
 	}
 
 	/**
-	 * Get all voxels that are inside of the camera frustum.
-	 *
-	 * @param {Camera} camera Camera object
-	 */
-	getVoxelsInFrustum(camera)
-	{
-		var voxels = [];
-
-		// TODO <ADD CODE HERE>
-
-		return voxels;
-	}
-
-
-	/**
-	 * Update a specific point in the voxel grid.
-	 */
-	updatePoint()
-	{
-		// TODO <ADD CODE HERE>
-	}
-
-	/**
 	 * Draw the voxel model using the camera properties and depth data received.
 	 *
 	 * Depth is checked agains all voxels in the volume, if the depth point gets outside the model is expanded to fit new data.
@@ -90,4 +67,14 @@ export class VoxelEnvironment
 			}
 		}
 	}
+
+	/**
+	 * Update a specific point in the voxel grid.
+	 */
+	updatePoint()
+	{
+		// TODO <ADD CODE HERE>
+	}
+
+
 }
