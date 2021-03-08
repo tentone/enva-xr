@@ -2,7 +2,7 @@ import {BufferGeometry, Line, LineBasicMaterial, Vector3} from "three";
 import {Text} from "troika-three-text";
 
 /**
- * Represents a measurement from a point to another.
+ * Represents a angle measurement between three points.
  */
 export class Angle extends Line
 {
@@ -59,7 +59,7 @@ export class Angle extends Line
 	 *
 	 * Also recalculates the bouding sphere of the geometry to ensure proper camera culling.
 	 */
-	updateGeometry() 
+	updateGeometry()
 	{
 		var positions = this.geometry.attributes.position.array;
 		positions[0] = this.points[0].x;
@@ -83,7 +83,7 @@ export class Angle extends Line
 	/**
 	 * Update the label text and position.
 	 */
-	getAngle() 
+	getAngle()
 	{
 		if (this.points.length < 3)
 		{
@@ -114,7 +114,7 @@ export class Angle extends Line
 	/**
 	 * Update the text of the measurement.
 	 */
-	updateText() 
+	updateText()
 	{
 		if (this.points.length < 3)
 		{
@@ -123,7 +123,7 @@ export class Angle extends Line
 		}
 
 		var center = new Vector3();
-		for (var i = 0; i < this.points.length; i++) 
+		for (var i = 0; i < this.points.length; i++)
 		{
 			center.add(this.points[i]);
 		}
