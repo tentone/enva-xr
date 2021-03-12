@@ -7,6 +7,11 @@ export class VoxelBody extends Body
 		super();
 
 		/**
+		 * Indicates if the body is enabled of disabled.
+		 */
+		this.active = false;
+
+		/**
 		 * Voxel enviroment manager to wich this voxel body belongs.
 		 */
 		this.manager = manager;
@@ -43,13 +48,6 @@ export class VoxelBody extends Body
 			this.probability = 0.0;
 		}
 
-		if (this.probability > this.manager.threshold)
-		{
-			// TODO <ADD CODE HERE ACTIVATE VOXEL>
-		}
-		else
-		{
-			// TODO <ADD CODE HERE DEACTIVATE VOXEL>
-		}
+		this.active = this.probability > this.manager.threshold;
 	}
 }
