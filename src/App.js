@@ -762,7 +762,7 @@ export class App
 				if (depthData)
 				{
 					// Voxel environment
-					this.voxelEnvironment.update(camera, depthData);
+					this.voxelEnvironment.update(this.camera, depthData);
 
 					// Update textures
 					this.depthDataTexture.updateDepth(depthData);

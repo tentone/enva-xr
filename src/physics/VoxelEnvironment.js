@@ -30,12 +30,12 @@ export class VoxelEnvironment
 		/**
 		 * Box shape shared across all voxels in the environment.
 		 */
-		this.shape = new Box(new Vec3(-section, -section, -section), new Vec3(section, section, section));
+		this.shape = new Box(new Vec3(-precision, -precision, -precision), new Vec3(precision, precision, precision));
 
 		/**
 		 * Length of the voxel grid in each direction.
 		 */
-		this.length = new Vector3(section / size, section / size, section / size);
+		this.length = new Vector3(precision / size, precision / size, precision / size);
 
 		/**
 		 * Precision of the depth system in meters.
@@ -103,6 +103,7 @@ export class VoxelEnvironment
 				position.z = distance;
 				position.applyMatrix4(camera.matrixWorld);
 
+				// TODO <ADD CODE HERE>
 			}
 		}
 	}
