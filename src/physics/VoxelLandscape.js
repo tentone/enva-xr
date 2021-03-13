@@ -1,11 +1,15 @@
 import {Vec3, Box, Body} from "cannon-es";
 
+/**
+ * Voxel landscape can be used to represent voxel based enviroment.
+ */
 export class VoxelLandscape
 {
 	/**
-	 * Constructor for the boxel landscape.
+	 * Constructor for the voxel landscape.
 	 *
 	 * The user must manually update the map for the first time.
+	 *
 	 * @param {World} world Physics world where the voxel landscape will be used.
 	 * @param {number} nx Amount of voxels in X.
 	 * @param {number} ny Amount of voxels in Y.

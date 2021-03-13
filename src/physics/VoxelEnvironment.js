@@ -1,9 +1,20 @@
 import {Box3, Vector3} from "three";
+import {Vec3, Box} from "cannon-es";
 
 export class VoxelEnvironment
 {
-	constructor(world, size)
+	constructor(world, size, precision)
 	{
+		if (size === undefined)
+		{
+			size = 5.0;
+		}
+
+		if (precision === undefined)
+		{
+			precision = 0.05;
+		}
+
 		/**
 		 * Cannon physics world.
 		 */
@@ -14,14 +25,24 @@ export class VoxelEnvironment
 		 *
 		 * Coordinates in meters.
 		 */
-		this.box = new Box3(new Vector3(-5, -5, -5), new Vector3(5, 5, 5));
+		this.box = new Box3(new Vector3(-size, -size, -size), new Vector3(size, size, size));
+
+		/**
+		 * Box shape shared across all voxels in the environment.
+		 */
+		this.shape = new Box(new Vec3(-section, -section, -section), new Vec3(section, section, section));
+
+		/**
+		 * Length of the voxel grid in each direction.
+		 */
+		this.length = new Vector3(section / size, section / size, section / size);
 
 		/**
 		 * Precision of the depth system in meters.
 		 *
 		 * The grid of voxels has the size defined here.
 		 */
-		this.precision = 0.05;
+		this.precision = precision;
 
 		/**
 		 * Probability value theshold for a voxel to be activated of deactivated.
@@ -29,15 +50,33 @@ export class VoxelEnvironment
 		this.threshold = 0.6;
 
 		/**
-		 * Box shape shared across all voxels in the environment.
-		 */
-		this.shape = new Box(new Vec3(-size, -size, -size), new Vec3(size, size, size));
-
-		/**
 		 * Grid of voxels organized into a array cube.
 		 */
 		this.grid = [];
 	}
+
+	/**
+	 * Get the index of a voxel stored in the list from its coordinates.
+	 *
+	 * @param {number} x X coordinate.
+	 * @param {number} y Y coordinate.
+	 * @param {number} z Z coordinate.
+	 * @return {number} Return the index of the voxel from its coordinates.
+	 */
+	 getIndex(x, y, z)
+	 {
+		 var nx = this.nx;
+		 var ny = this.ny;
+		 var nz = this.nz;
+
+		 if (x >= 0 && x < nx && y >= 0 && y < ny && z >= 0 && z < nz)
+		 {
+			 return x + nx * y + nx * ny * z;
+		 }
+
+		 return -1;
+	 }
+
 
 	/**
 	 * Draw the voxel model using the camera properties and depth data received.
@@ -52,8 +91,6 @@ export class VoxelEnvironment
 		var origin = new Vector3();
 		camera.getWorldPosition(origin);
 
-		var projectionMatrix = camera.projectionMatrix;
-
 		for (var x = 0; x < width; x++)
 		{
 			for (var y = 0; y < height; y++)
@@ -64,17 +101,9 @@ export class VoxelEnvironment
 				position.x = x - width / 2;
 				position.y = -y + height / 2;
 				position.z = distance;
+				position.applyMatrix4(camera.matrixWorld);
+
 			}
 		}
 	}
-
-	/**
-	 * Update a specific point in the voxel grid.
-	 */
-	updatePoint()
-	{
-		// TODO <ADD CODE HERE>
-	}
-
-
 }
