@@ -53,6 +53,17 @@ export class VoxelEnvironment
 		 * Grid of voxels organized into a array cube.
 		 */
 		this.grid = [];
+
+		for (var x = 0; x < this.length.x; x++)
+		{
+			for (var y = 0; y < this.length.y; y++)
+			{
+				for (var z = 0; z < this.length.x; x++)
+				{
+					this.grid.push(new VoxelBody(this, x, y, z));
+				}
+			}
+		}
 	}
 
 	/**
@@ -65,9 +76,9 @@ export class VoxelEnvironment
 	 */
 	 getIndex(x, y, z)
 	 {
-		 var nx = this.nx;
-		 var ny = this.ny;
-		 var nz = this.nz;
+		 var nx = this.length.x;
+		 var ny = this.length.y;
+		 var nz = this.length.z;
 
 		 if (x >= 0 && x < nx && y >= 0 && y < ny && z >= 0 && z < nz)
 		 {
@@ -102,8 +113,6 @@ export class VoxelEnvironment
 				position.y = -y + height / 2;
 				position.z = distance;
 				position.applyMatrix4(camera.matrixWorld);
-
-				// TODO <ADD CODE HERE>
 			}
 		}
 	}
