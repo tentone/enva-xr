@@ -3,7 +3,7 @@ var h = 60;
 var x = 10;
 var y = 10;
 
-export class GUIUtils 
+export class GUIUtils
 {
 	/**
 	 * Create a button with an icon.
@@ -21,7 +21,7 @@ export class GUIUtils
 		button.style.bottom = y + "px";
 		button.style.backgroundColor = "#FFFFFF33";
 		button.style.borderRadius = "20px";
-		button.style.opacity = "0.3";
+		button.style.opacity = "0.2";
 		button.style.zIndex = "1000";
 		button.onclick = onclick;
 

@@ -507,8 +507,8 @@ export class App
 				{
 					if (child instanceof Mesh)
 					{
-						child.castShadow = false;
-						child.receiveShadow = false;
+						child.castShadow = true;
+						child.receiveShadow = true;
 						child.material = this.createAugmentedMaterial(child.material, this.depthDataTexture);
 					}
 				});
@@ -738,6 +738,8 @@ export class App
 				if (position.y < this.floor.position.y)
 				{
 					this.floor.position.y = position.y;
+
+
 				}
 
 				// Shadow plane
