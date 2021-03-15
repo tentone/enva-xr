@@ -1,5 +1,6 @@
 import {Box3, Vector3} from "three";
 import {Vec3, Box} from "cannon-es";
+import {VoxelBody} from "./VoxelBody";
 
 export class VoxelEnvironment
 {

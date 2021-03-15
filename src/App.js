@@ -39,7 +39,7 @@ export class App
 		/**
 		 * Voxel environment use
 		 */
-		this.voxelEnvironment = new VoxelEnvironment();
+		this.voxelEnvironment = null; // new VoxelEnvironment();
 
 		/**
 		 * Phsyics floor plane should be set to the lowest plane intersection found.
@@ -728,6 +728,7 @@ export class App
 			if (hitTestResults.length)
 			{
 				var hit = hitTestResults[0];
+
 				this.cursor.visible = true;
 				this.cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 
@@ -737,8 +738,10 @@ export class App
 				if (position.y < this.floor.position.y)
 				{
 					this.floor.position.y = position.y;
-					this.floorMesh.position.y = position.y;
 				}
+
+				// Shadow plane
+				this.floorMesh.position.y = position.y;
 			}
 			else
 			{
@@ -762,7 +765,7 @@ export class App
 				if (depthData)
 				{
 					// Voxel environment
-					this.voxelEnvironment.update(this.camera, depthData);
+					// this.voxelEnvironment.update(this.camera, depthData);
 
 					// Update textures
 					this.depthDataTexture.updateDepth(depthData);
