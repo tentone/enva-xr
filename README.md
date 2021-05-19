@@ -4,7 +4,7 @@
 - The framework implements realistic rendering of 3D objects, handles with geometry occlusions, matches the lighting of the environment, casts shadows, and provides physics interaction with real-world objects.
 - Target the web environment and have designed our solution to work on a vast range of devices as, monocular camera setups or devices with dedicated higher quality depth sensors.
 - Single application while being capable of obtaining over 20 frames per second even on middle-range devices.
-- [Demonstration video](https://www.youtube.com/watch?v=H6-eCIkYRuA) of the features in the framework.
+- [Demonstration video](https://www.youtube.com/watch?v=uFTV4o01338) of the features in the framework.
 - Based on the experimental [WebXR AR](https://immersive-web.github.io/webxr-ar-module/) draft  API available in Chrome 88+
   - [Lighting Estimation](https://immersive-web.github.io/lighting-estimation/)
   - [Depth Sensing Module](https://immersive-web.github.io/depth-sensing/)
