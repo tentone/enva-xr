@@ -738,8 +738,6 @@ export class App
 				if (position.y < this.floor.position.y)
 				{
 					this.floor.position.y = position.y;
-
-
 				}
 
 				// Shadow plane
@@ -794,7 +792,8 @@ export class App
 
 			var b = this.timeMeterFrame.stats();
 			this.timeMeterFrame.reset(false);
-
+			
+			// Log performance metrics
 			console.log(`${c++};${a.average};${a.max};${a.min};${b.average};${b.max};${b.min}`);
 		}
 	}
