@@ -3,6 +3,9 @@
  */
 let currentSession = null;
 
+/**
+ * XR manager is used to manage wich XR session is currently running and prevent multiple sessions from running concorrently.
+ */
 export class XRManager
 {
 	/**
