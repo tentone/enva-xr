@@ -12,5 +12,14 @@ export class Cursor extends Mesh
 
 		this.matrixAutoUpdate = false;
 		this.visible = false;
+
+		/**
+		 * Callback method to execute when the cursor is pressed.
+		 * 
+		 * Receives the pose of the cursor in world coordinates.
+		 * 
+		 * 
+		 */
+		this.onaction = null;
 	}
 }

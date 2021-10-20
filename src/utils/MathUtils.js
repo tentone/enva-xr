@@ -1,12 +1,15 @@
-import {Vector3} from "three";
+import {Camera, Vector3} from "three";
 
+/**
+ * Class contain math utils to simplify common math operations.
+ */
 export class MathUtils 
 {
 	/**
 	 * Project a point in the world to the screen correct screen position.
 	 *
-	 * @param {*} point
-	 * @param {*} camera
+	 * @param {Vector3} point - Point to project from world coordinates to screen coordinates.
+	 * @param {Camera} camera - Camera object to extract the projection matrix used to project the point.
 	 */
 	static projectPoint(point, camera)
 	{

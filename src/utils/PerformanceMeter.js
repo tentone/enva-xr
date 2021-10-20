@@ -7,6 +7,9 @@
  */
 export class PerformanceMeter
 {
+	/**
+	 * @param {number} samples - Number of samples to read performance metrics. 
+	 */
 	constructor(samples)
 	{
 		this.reset(false);
@@ -51,6 +54,8 @@ export class PerformanceMeter
 
 	/**
 	 * Check if the meter is filled with values.
+	 * 
+	 * @returns {boolean} - True if the performance metris where acquired. 
 	 */
 	finished()
 	{

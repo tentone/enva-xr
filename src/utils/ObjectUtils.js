@@ -1,11 +1,11 @@
-import {Vector3} from "three";
+import {Object3D, Vector3} from "three";
 
 export class ObjectUtils 
 {
 	/**
 	 * Resize a object to fit a unitary box and center around the origin.
 	 *
-	 * @param {*} object
+	 * @param {Object3D} object - Object to center and scale into a unitary box.
 	 */
 	static centerUnitary(object)
 	{

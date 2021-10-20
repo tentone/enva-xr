@@ -15,7 +15,6 @@ import {DepthCanvasTexture} from "./texture/DepthCanvasTexture.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture.js";
 import {GUI} from "./gui/GUI.js";
 import {PerformanceMeter} from "./utils/PerformanceMeter.js";
-import {VoxelEnvironment} from "./physics/VoxelEnvironment.js";
 
 export class App
 {
