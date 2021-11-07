@@ -1,5 +1,5 @@
-import {Body, Shape} from "cannon-es";
-import {Vector3, Mesh, Quaternion, Matrix4} from "three";
+import {Body, Shape, World} from "cannon-es";
+import {Vector3, Mesh, Quaternion, Matrix4, BufferGeometry, Material} from "three";
 
 /**
  * Wrapper for cannon.js physics objects.
@@ -10,6 +10,11 @@ import {Vector3, Mesh, Quaternion, Matrix4} from "three";
  */
 export class PhysicsObject extends Mesh
 {
+	/**
+	 * @param {BufferGeometry} geometry - Geometry of the object. 
+	 * @param {Material} material - Material used to render the object. 
+	 * @param {World} world - Physics world where the object will be placed at.
+	 */
 	constructor(geometry, material, world)
 	{
 		super(geometry, material);

@@ -1,17 +1,12 @@
-var w = 60;
-var h = 60;
-var x = 10;
-var y = 10;
-
 export class GUIUtils
 {
 	/**
 	 * Create a button with an icon.
 	 *
-	 * @param {*} imageSrc
-	 * @param {*} onclick
+	 * @param {string} imageSrc - Source of the image used as icon.
+	 * @param {Function} onclick - Method to be executed when the button is pressed.
 	 */
-	static createButton(imageSrc, onclick)
+	static createButton(x, y, w, h, imageSrc, onclick)
 	{
 		var button = document.createElement("div");
 		button.style.width = w + "px";
@@ -33,8 +28,6 @@ export class GUIUtils
 		icon.style.left = "10%";
 		icon.style.position = "absolute";
 		button.appendChild(icon);
-
-		y += w + 5;
 
 		return button;
 	}

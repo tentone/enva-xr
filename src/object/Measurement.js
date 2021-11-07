@@ -1,4 +1,4 @@
-import {BufferGeometry, Line, Line3, LineBasicMaterial, Vector3} from "three";
+import {BufferGeometry, Line, Line3, LineBasicMaterial, Matrix4, Vector3} from "three";
 import {Text} from "troika-three-text";
 
 /**
@@ -6,6 +6,9 @@ import {Text} from "troika-three-text";
  */
 export class Measurement extends Line
 {
+	/**
+	 * @param {Vector3} point - First point of the measurement.
+	 */
 	constructor(point)
 	{
 		if (!point)
@@ -43,7 +46,7 @@ export class Measurement extends Line
 	 *
 	 * Useful for preview in real time the measurement.
 	 *
-	 * @param {*} matrix
+	 * @param {Matrix4} matrix - Matrix to extract the position from.
 	 */
 	setPointFromMatrix(matrix)
 	{

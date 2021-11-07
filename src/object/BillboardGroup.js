@@ -1,5 +1,10 @@
 import {Mesh, BufferGeometry, MeshBasicMaterial, Quaternion} from "three";
 
+/**
+ * Billboard group is a group of objetcts that is automatically rotated to always face the camera.
+ * 
+ * @extends {Mesh}
+ */
 export class BillboardGroup extends Mesh
 {
 	constructor()

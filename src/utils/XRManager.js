@@ -1,3 +1,5 @@
+import { WebGLRenderer } from "three";
+
 /**
  * XR session running.
  */
@@ -10,10 +12,12 @@ export class XRManager
 {
 	/**
 	 * Start webxr session for immersive-ar with the provided session configuration.
+	 * 
+	 * If there is a session already running the method will throw an error.
 	 *
-	 * @param {*} renderer
-	 * @param {*} sessionInit
-	 * @param {*} onError
+	 * @param {WebGLRenderer} renderer - WebGL renderer object.
+	 * @param {any} sessionInit - Session initialization data.
+	 * @param {Function} onError - Callback method called if an error occurs.
 	 */
 	static start(renderer, sessionInit = {}, onError = function() {})
 	{
@@ -37,6 +41,9 @@ export class XRManager
 		}
 	}
 
+	/**
+	 * End the session.
+	 */
 	static end()
 	{
 		if (!currentSession === null)

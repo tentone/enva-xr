@@ -17,20 +17,20 @@ module.exports = {
 		hot: true
 	},
 	plugins: [
-		new CopyPlugin({
-			patterns: [
-				{
-					from: Path.resolve(__dirname, "./assets"),
-					to: Path.resolve(__dirname, output + "/assets"),
-					force: true
-				}
-			],
-			options: {concurrency: 100}
-		}),
-		new HtmlWebpackPlugin({
-			filename: 'index.html',
-			template: 'index.html'
-		}),
+		// new CopyPlugin({
+		// 	patterns: [
+		// 		{
+		// 			from: Path.resolve(__dirname, "./assets"),
+		// 			to: Path.resolve(__dirname, output + "/assets"),
+		// 			force: true
+		// 		}
+		// 	],
+		// 	options: {concurrency: 100}
+		// }),
+		// new HtmlWebpackPlugin({
+		// 	filename: 'index.html',
+		// 	template: 'index.html'
+		// }),
 		new Webpack.NamedModulesPlugin(),
 		new Webpack.HotModuleReplacementPlugin()
 	],
