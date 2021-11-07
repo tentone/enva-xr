@@ -1,8 +1,8 @@
 import {Vector3, SphereBufferGeometry, Euler, Quaternion, MeshPhysicalMaterial, TextureLoader} from "three";
 import {Sphere} from "cannon-es";
-import {Measurement} from "../object/Measurement.js";
-import {PhysicsObject} from "../object/PhysicsObject.js";
-import {GUIUtils} from "./GUIUtils.js";
+import {Measurement} from "../object/Measurement";
+import {PhysicsObject} from "../object/PhysicsObject";
+import {GUIUtils} from "./GUIUtils";
 
 /**
  * Application user interface.
@@ -81,42 +81,50 @@ export class GUI
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
 		{
-			this.app.loadGLTFMesh("./assets/3d/porsche_911/scene.gltf", new Euler(0, 0, 0), 0.003);
+			if(!this.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/porsche_911/scene.gltf", new Euler(0, 0, 0), 0.003);
 		}));
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
 		{
-			this.app.loadGLTFMesh("./assets/3d/WaterBottle.glb", new Euler(0, 0, 0), 1.0);
+			if(!this.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/WaterBottle.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/tripod.svg", () =>
 		{
-			this.app.loadGLTFMesh("./assets/3d/AntiqueCamera.glb", new Euler(0, 0, 0), 0.1);
+			if(!this.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/AntiqueCamera.glb", new Euler(0, 0, 0), 0.1);
 		}));
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/shoe.svg", () =>
 		{
-			this.app.loadGLTFMesh("./assets/3d/Shoe.glb", new Euler(0, 0, 0), 1.0);
+			if(!this.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/Shoe.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
 		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/dots.svg", () =>
 		{
-			this.app.loadGLTFMesh("./assets/3d/MetalRoughSpheresNoTextures.glb", new Euler(0, 0, 0), 100.0);
+			if(!this.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/MetalRoughSpheresNoTextures.glb", new Euler(0, 0, 0), 100.0);
 		})); */
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/fish.svg", () =>
 		{
-			this.app.loadGLTFMesh("./assets/3d/BarramundiFish.glb", new Euler(0, 0, 0), 1.0);
+			if(!this.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/BarramundiFish.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg", () =>
 		{
-			this.app.loadGLTFMesh("./assets/3d/flower/scene.gltf", new Euler(0, 0, 0), 0.007);
+			if(!this.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/flower/scene.gltf", new Euler(0, 0, 0), 0.007);
 		}));
 
 		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/toy-car.svg", () =>
 		{
-			this.app.loadGLTFMesh("./assets/3d/ToyCar.glb", new Euler(0, 0, 0), 10.0);
+			if(!this.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/ToyCar.glb", new Euler(0, 0, 0), 10.0);
 		})); */
 
 		this.container.appendChild(GUIUtils.createButton("./assets/icon/rocks.svg", () =>

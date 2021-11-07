@@ -1,5 +1,5 @@
 import {Mesh, RingBufferGeometry, CircleBufferGeometry, MeshBasicMaterial} from "three";
-import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils";
 
 export class Cursor extends Mesh
 {
