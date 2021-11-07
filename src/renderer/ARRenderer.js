@@ -6,15 +6,14 @@ import {
 } from "three";
 import {World, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3} from "cannon-es";
 import cannonDebugger from 'cannon-es-debugger';
-import {XRManager} from "./utils/XRManager";
-import {Cursor} from "./object/Cursor";
-import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
-import {DepthDataTexture} from "./texture/DepthDataTexture";
-import {GUI} from "./gui/GUI";
-import {PerformanceMeter} from "./utils/PerformanceMeter";
-import {AugmentedMaterial} from "./material/AugmentedMaterial";
+import {XRManager} from "../utils/XRManager";
+import {Cursor} from "../object/Cursor";
+import {DepthCanvasTexture} from "../texture/DepthCanvasTexture";
+import {DepthDataTexture} from "../texture/DepthDataTexture";
+import {PerformanceMeter} from "../utils/PerformanceMeter";
+import {AugmentedMaterial} from "../material/AugmentedMaterial";
 
-export class App
+export class ARRenderer
 {
 	constructor()
 	{
@@ -156,7 +155,7 @@ export class App
 		/**
 		 * Rendering mode in use.
 		 */
-		this.mode = App.NORMAL;
+		this.mode = ARRenderer.NORMAL;
 
 		/**
 		 * Performance meter to measure full frame times.
@@ -241,12 +240,12 @@ export class App
 	{
 		this.mode++;
 
-		if (this.mode === App.DEBUG_CAMERA_IMAGE)
+		if (this.mode === ARRenderer.DEBUG_CAMERA_IMAGE)
 		{
-			this.mode = App.NORMAL;
+			this.mode = ARRenderer.NORMAL;
 		}
 
-		if (this.mode === App.NORMAL)
+		if (this.mode === ARRenderer.NORMAL)
 		{
 			this.scene.overrideMaterial = null;
 			this.scene.traverse(function(child)
@@ -258,7 +257,7 @@ export class App
 				}
 			});
 		}
-		else if (this.mode === App.DEBUG_ZBUFFER)
+		else if (this.mode === ARRenderer.DEBUG_ZBUFFER)
 		{
 			this.scene.overrideMaterial = new MeshDepthMaterial();
 		}
@@ -272,7 +271,7 @@ export class App
 			this.depthCanvas.style.bottom = "0px";
 			this.depthCanvas.style.borderRadius = "0px";
 		}
-		else if (this.mode === App.DEBUG_NO_OCCLUSION)
+		else if (this.mode === ARRenderer.DEBUG_NO_OCCLUSION)
 		{
 			this.resetDepthCanvas();
 			this.scene.overrideMaterial = null;
@@ -285,7 +284,7 @@ export class App
 				}
 			});
 		}
-		else if (this.mode === App.DEBUG_CAMERA_IMAGE)
+		else if (this.mode === ARRenderer.DEBUG_CAMERA_IMAGE)
 		{
 			this.scene.overrideMaterial = new MeshBasicMaterial({transparent: true, opacity: 0.0});
 		}
@@ -330,7 +329,6 @@ export class App
 
 	forceContextLoss()
 	{
-
 		try
 		{
 			if (this.renderer !== null)
@@ -343,7 +341,7 @@ export class App
 		catch (e)
 		{
 			this.renderer = null;
-			alert("Failed to destroy WebGL context.");
+			throw new Error("Failed to destroy WebGL context.");
 		}
 
 		if (this.canvas !== null)
@@ -645,24 +643,24 @@ var c = 0;
 /**
  * Render everything.
  */
-App.NORMAL = 0;
+ARRenderer.NORMAL = 0;
 
 /**
  * Render Z Depth only.
  */
-App.DEBUG_ZBUFFER = 1;
+ARRenderer.DEBUG_ZBUFFER = 1;
 
 /**
  * Render AR depth only.
  */
-App.DEBUG_AR_DEPTH = 2;
+ARRenderer.DEBUG_AR_DEPTH = 2;
 
 /**
  * No occlusion estimation.
  */
-App.DEBUG_NO_OCCLUSION = 3;
+ARRenderer.DEBUG_NO_OCCLUSION = 3;
 
 /**
  * Draw nothign just the AR base image.
  */
-App.DEBUG_CAMERA_IMAGE = 4;
+ARRenderer.DEBUG_CAMERA_IMAGE = 4;

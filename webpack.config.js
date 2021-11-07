@@ -7,7 +7,7 @@ const source = Path.resolve(__dirname, "./src");
 const output = Path.resolve(__dirname, "./build");
 
 module.exports = {
-	entry: ['./src/main.js'],
+	entry: ['./src/Apate.js'],
 	output: {
 		filename: '[name].bundle.js',
 		path: output

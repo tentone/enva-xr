@@ -17,6 +17,6 @@ export {DepthDataTexture} from "./texture/DepthDataTexture";
 export {MathUtils} from "./utils/MathUtils";
 export {ObjectUtils} from "./utils/ObjectUtils";
 export {XRManager} from "./utils/XRManager";
+export {LoaderUtils} from "./utils/LoaderUtils";
 
-
-
+export {ARRenderer} from "./renderer/ARRenderer";

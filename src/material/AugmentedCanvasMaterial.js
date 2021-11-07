@@ -1,6 +1,6 @@
 import {ShaderMaterial} from "three";
 import AugmentedCanvasMaterialFragment from "./AugmentedCanvasMaterialFragment.glsl";
-import AugmentedMaterialVertex from "./AugmentedMaterialVertex.glsl";
+import AugmentedMaterialVertex from "./AugmentedBasicMaterialVertex.glsl";
 
 /**
  * Shader material used to combine virtual and real scene with depth blending.

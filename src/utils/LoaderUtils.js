@@ -2,8 +2,8 @@ import {Vector3, Mesh, Scene} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {Body} from "cannon-es";
 import {threeToCannon} from 'three-to-cannon';
-import {ObjectUtils} from "./utils/ObjectUtils";
-import {AugmentedMaterial} from "./material/AugmentedMaterial";
+import {ObjectUtils} from "./ObjectUtils";
+import {AugmentedMaterial} from "../material/AugmentedMaterial";
 
 /**
  * Loader utils contain auxiliary methods to load objects from file.
