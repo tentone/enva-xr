@@ -2,7 +2,7 @@
   "name": "ar-occlusion",
   "version": "0.0.2",
   "description": "ar-occlusion",
-  "main": "src/main.js",
+  "main": "src/Main.js",
   "scripts": {
     "build": "webpack",
     "start": "webpack-dev-server --host 0.0.0.0 --https",
