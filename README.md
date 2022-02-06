@@ -30,7 +30,7 @@
 
 - Physically correct attributes are associated with each 3D object that, combined with lighting information captured by the device, enables the rendering of AR content that matches the real-world illumination.
 
-- Depth data provided by WebXR to dynamically place 3D objects around the environment, calculate geometry occlusion and build a model of the environment  to enable physics interaction.
+- Depth data provided by WebXR to dynamically place 3D objects around the environment, calculate geometry occlusion and build a model of the environment to enable physics interaction.
 
 - Calculate geometry occlusion on a pixel basis directly from the projected vertices coordinates to prevent loss in data precision 
 
