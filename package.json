@@ -16,11 +16,11 @@
     "webxr"
   ],
   "dependencies": {
-    "cannon-es-debugger": "~0.1.0",
-    "cannon-es": "~0.15.1",
-    "three": "~0.124.0",
-    "three-to-cannon": "~3.1.0",
-    "troika-three-text": "~0.35.0"
+    "cannon-es-debugger": "~1.0.0",
+    "cannon-es": "~0.19.0",
+    "three": "~0.138.0",
+    "three-to-cannon": "~4.0.2",
+    "troika-three-text": "~0.45.0"
   },
   "devDependencies": {
     "copy-webpack-plugin": "~6.0.2",
