@@ -28,8 +28,8 @@ module.exports = {
 			options: {concurrency: 100}
 		}),
 		new HtmlWebpackPlugin({
-			filename: 'index.html',
-			template: 'index.html'
+			filename: 'src/example/index.html',
+			template: 'src/example/index.html'
 		}),
 		new Webpack.NamedModulesPlugin(),
 		new Webpack.HotModuleReplacementPlugin()

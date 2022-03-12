@@ -1,5 +1,5 @@
 import {Mesh, RingBufferGeometry, CircleBufferGeometry, MeshBasicMaterial} from "three";
-import {BufferGeometryUtils} from "three/examples/jsm/utils/BufferGeometryUtils";
+import {mergeBufferGeometries} from "three/examples/jsm/utils/BufferGeometryUtils";
 
 /**
  * Cursor is used to interfact with the environment.
@@ -16,7 +16,7 @@ export class Cursor extends Mesh
 		{
 			var ring = new RingBufferGeometry(0.045, 0.05, 32).rotateX(-Math.PI / 2);
 			var dot = new CircleBufferGeometry(0.005, 32).rotateX(-Math.PI / 2);
-			geometry = BufferGeometryUtils.mergeBufferGeometries([ring, dot]);
+			geometry = mergeBufferGeometries([ring, dot]);
 		}
 		
 		if (!material)

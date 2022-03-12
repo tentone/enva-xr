@@ -1,6 +1,6 @@
-import {App} from "./App";
+import {ARRenderer} from "../src/rendererARRenderer";
 
-const app = new App();
+const app = new ARRenderer();
 app.initialize();
 
 
