@@ -1,4 +1,4 @@
-import { WebGLRenderer } from "three";
+import {WebGLRenderer} from "three";
 
 /**
  * XR session running.
