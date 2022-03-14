@@ -1,6 +1,6 @@
-import {ARRenderer} from "../src/ARRenderer";
+import {ARApp} from "../src/ARApp";
 
-const app = new ARRenderer();
+const app = new ARApp();
 app.initialize();
 
 const gui = new GUI(app);

@@ -13,7 +13,7 @@ import {DepthDataTexture} from "./texture/DepthDataTexture";
 import {PerformanceMeter} from "./utils/PerformanceMeter";
 import {AugmentedMaterial} from "./material/AugmentedMaterial";
 
-export class ARRenderer
+export class ARApp
 {
 	constructor()
 	{
@@ -148,6 +148,11 @@ export class ARRenderer
 		this.xrGlBinding = null;
 
 		/**
+		 * Callback to update logic of the app before rendering.
+		 */
+		this.onFrame = null;
+
+		/**
 		 * Rendering canvas.
 		 */
 		this.canvas = null;
@@ -155,7 +160,7 @@ export class ARRenderer
 		/**
 		 * Rendering mode in use.
 		 */
-		this.mode = ARRenderer.NORMAL;
+		this.mode = ARApp.NORMAL;
 
 		/**
 		 * Performance meter to measure full frame times.
@@ -240,12 +245,12 @@ export class ARRenderer
 	{
 		this.mode++;
 
-		if (this.mode === ARRenderer.DEBUG_CAMERA_IMAGE)
+		if (this.mode === ARApp.DEBUG_CAMERA_IMAGE)
 		{
-			this.mode = ARRenderer.NORMAL;
+			this.mode = ARApp.NORMAL;
 		}
 
-		if (this.mode === ARRenderer.NORMAL)
+		if (this.mode === ARApp.NORMAL)
 		{
 			this.scene.overrideMaterial = null;
 			this.scene.traverse(function(child)
@@ -257,7 +262,7 @@ export class ARRenderer
 				}
 			});
 		}
-		else if (this.mode === ARRenderer.DEBUG_ZBUFFER)
+		else if (this.mode === ARApp.DEBUG_ZBUFFER)
 		{
 			this.scene.overrideMaterial = new MeshDepthMaterial();
 		}
@@ -271,7 +276,7 @@ export class ARRenderer
 			this.depthCanvas.style.bottom = "0px";
 			this.depthCanvas.style.borderRadius = "0px";
 		}
-		else if (this.mode === ARRenderer.DEBUG_NO_OCCLUSION)
+		else if (this.mode === ARApp.DEBUG_NO_OCCLUSION)
 		{
 			this.resetDepthCanvas();
 			this.scene.overrideMaterial = null;
@@ -284,7 +289,7 @@ export class ARRenderer
 				}
 			});
 		}
-		else if (this.mode === ARRenderer.DEBUG_CAMERA_IMAGE)
+		else if (this.mode === ARApp.DEBUG_CAMERA_IMAGE)
 		{
 			this.scene.overrideMaterial = new MeshBasicMaterial({transparent: true, opacity: 0.0});
 		}
@@ -460,6 +465,10 @@ export class ARRenderer
 		// Render loop
 		this.renderer.setAnimationLoop((time, frame) =>
 		{
+			if(this.onFrame) {
+				this.onFrame(time, this);
+			}
+			
 			this.render(time, frame);
 		});
 	}
@@ -643,24 +652,24 @@ var c = 0;
 /**
  * Render everything.
  */
-ARRenderer.NORMAL = 0;
+ARApp.NORMAL = 0;
 
 /**
  * Render Z Depth only.
  */
-ARRenderer.DEBUG_ZBUFFER = 1;
+ARApp.DEBUG_ZBUFFER = 1;
 
 /**
  * Render AR depth only.
  */
-ARRenderer.DEBUG_AR_DEPTH = 2;
+ARApp.DEBUG_AR_DEPTH = 2;
 
 /**
  * No occlusion estimation.
  */
-ARRenderer.DEBUG_NO_OCCLUSION = 3;
+ARApp.DEBUG_NO_OCCLUSION = 3;
 
 /**
  * Draw nothign just the AR base image.
  */
-ARRenderer.DEBUG_CAMERA_IMAGE = 4;
+ARApp.DEBUG_CAMERA_IMAGE = 4;

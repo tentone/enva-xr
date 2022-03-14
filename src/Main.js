@@ -19,4 +19,4 @@ export {ObjectUtils} from "./utils/ObjectUtils";
 export {XRManager} from "./utils/XRManager";
 export {LoaderUtils} from "./utils/LoaderUtils";
 
-export {ARRenderer} from "./ARRenderer";
+export {ARApp} from "./ARApp";
