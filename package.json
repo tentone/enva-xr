@@ -4,8 +4,8 @@
   "description": "ar-occlusion",
   "main": "src/Main.js",
   "scripts": {
-    "build": "webpack",
-    "start": "webpack-dev-server --host 0.0.0.0 --https",
+    "build": "webpack --config ./webpack.example.js ",
+    "start": "webpack-dev-server --config ./webpack.example.js --host 0.0.0.0 --https",
     "lint-fix": "eslint --ext .js --fix src"
   },
   "author": "Tentone",

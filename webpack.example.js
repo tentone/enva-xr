@@ -7,7 +7,8 @@ const source = Path.resolve(__dirname, "./example");
 const output = Path.resolve(__dirname, "./build");
 
 module.exports = {
-	entry: ['./example/main.js'],
+	mode: 'development',
+	entry: ['./src/example/main.js'],
 	output: {
 		filename: '[name].bundle.js',
 		path: output
@@ -28,10 +29,9 @@ module.exports = {
 			options: {concurrency: 100}
 		}),
 		new HtmlWebpackPlugin({
-			filename: './example/index.html',
-			template: './example/index.html'
+			filename: './src/example/index.html',
+			template: './src/example/index.html'
 		}),
-		new Webpack.NamedModulesPlugin(),
 		new Webpack.HotModuleReplacementPlugin()
 	],
 	module: {
