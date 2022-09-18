@@ -12,6 +12,7 @@ import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
 import {DepthDataTexture} from "./texture/DepthDataTexture";
 import {PerformanceMeter} from "./utils/PerformanceMeter";
 import {AugmentedMaterial} from "./material/AugmentedMaterial";
+import { GUI } from "./gui/GUI";
 
 export class ARApp
 {
@@ -445,7 +446,11 @@ export class ARApp
 				{
 					optionalFeatures: ["dom-overlay"],
 					domOverlay: {root: this.gui.container},
-					requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"]
+					requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
+					depthSensing: {
+						usagePreference: ["cpu-optimized", "gpu-optimized"],
+						dataFormatPreference: ["luminance-alpha", "float32"],
+					},
 				}, function(error)
 				{
 					alert("Error starting the AR session. " + error);

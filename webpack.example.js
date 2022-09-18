@@ -1,28 +1,34 @@
-const Path = require('path');
+const path = require('path');
 const Webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
 
-const source = Path.resolve(__dirname, "./example");
-const output = Path.resolve(__dirname, "./build");
+const source = path.resolve(__dirname, "./example");
+const output = path.resolve(__dirname, "./build");
 
 module.exports = {
 	mode: 'development',
 	entry: ['./src/example/main.js'],
+	
 	output: {
 		filename: '[name].bundle.js',
 		path: output
 	},
+
 	devServer: {
-		contentBase: source,
-		hot: true
+		static: {
+			directory: path.join(__dirname, 'public'),
+		},
+		compress: true,
+		hot: true,
+		port: 9000,
 	},
 	plugins: [
 		new CopyPlugin({
 			patterns: [
 				{
-					from: Path.resolve(__dirname, "./assets"),
-					to: Path.resolve(__dirname, output + "/assets"),
+					from: path.resolve(__dirname, "./assets"),
+					to: path.resolve(__dirname, output + "/assets"),
 					force: true
 				}
 			],

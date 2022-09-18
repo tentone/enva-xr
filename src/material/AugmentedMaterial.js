@@ -1,4 +1,4 @@
-import {Material, Scene, Texture} from "three";
+import {Material, Scene, Texture, Matrix4} from "three";
 
 /**
  * Augmented Material has static tools to transform regular three.js materials into AR materials.
