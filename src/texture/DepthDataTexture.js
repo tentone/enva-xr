@@ -1,4 +1,4 @@
-import {DataTexture, LuminanceAlphaFormat, UnsignedByteType, LinearFilter} from "three";
+import {DataTexture, RGFormat, UnsignedByteType, LinearFilter} from "three";
 
 /**
  * Stores the raw depth values in a 16 bit value packed texture.
@@ -15,7 +15,7 @@ export class DepthDataTexture extends DataTexture
 		var height = 90;
 		var data = new Uint8Array(width * height);
 
-		super(data, width, height, LuminanceAlphaFormat, UnsignedByteType);
+		super(data, width, height, RGFormat, UnsignedByteType);
 
 		this.magFilter = LinearFilter;
 		this.minFilter = LinearFilter;
@@ -26,11 +26,11 @@ export class DepthDataTexture extends DataTexture
 	 *
 	 * Depth data is retrieved from the WebXR API.
 	 *
-	 * @param {*} depthData
+	 * @param {*} depthInfo
 	 */
-	updateDepth(depthData)
+	updateDepth(depthInfo)
 	{
-		var dataBuffer = depthData.data;
+		var dataBuffer = depthInfo.data;
 		this.image.data = new Uint8Array(dataBuffer.buffer, dataBuffer.byteOffset, dataBuffer.byteLength);
 		this.needsUpdate = true;
 	}

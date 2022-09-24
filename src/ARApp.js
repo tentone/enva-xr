@@ -614,23 +614,23 @@ export class ARApp
 			this.pose = viewerPose;
 			for (var view of this.pose.views)
 			{
-				var depthData = frame.getDepthInformation(view);
-				if (depthData)
+				var depthInfo = frame.getDepthInformation(view);
+				if (depthInfo)
 				{
 					// Voxel environment
 					// this.voxelEnvironment.update(this.camera, depthData);
 
 					// Update textures
-					this.depthDataTexture.updateDepth(depthData);
+					this.depthDataTexture.updateDepth(depthInfo);
 
 					// Draw canvas texture depth
 					if (this.debugDepth)
 					{
-						this.depthTexture.updateDepth(depthData, this.camera.near, this.camera.far);
+						this.depthTexture.updateDepth(depthInfo, this.camera.near, this.camera.far);
 					}
 
 					// Update normal matrix
-					AugmentedMaterial.updateUniforms(this.scene, depthData.normTextureFromNormView.matrix);
+					AugmentedMaterial.updateUniforms(this.scene, depthInfo);
 				}
 			}
 		}

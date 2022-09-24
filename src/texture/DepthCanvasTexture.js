@@ -15,21 +15,21 @@ export class DepthCanvasTexture extends CanvasTexture
 	 *
 	 * Uses the camera planes to correctly adjust the values.
 	 */
-	updateDepth(depth, near, far)
+	updateDepth(depthInfo, near, far)
 	{
 		var canvas = this.image;
 
-		canvas.width = depth.height;
-		canvas.height = depth.width;
+		canvas.width = depthInfo.height;
+		canvas.height = depthInfo.width;
 
 		var context = canvas.getContext("2d");
 		var image = context.getImageData(0, 0, canvas.width, canvas.height);
 
-		for (var x = 0; x < depth.width; x++)
+		for (var x = 0; x < depthInfo.width; x++)
 		{
-			for (var y = 0; y < depth.height; y++)
+			for (var y = 0; y < depthInfo.height; y++)
 			{
-				var distance = (depth.getDepth(x, y) - near) / (far - near);
+				var distance = (depthInfo.getDepth(x, y) - near) / (far - near);
 				var j = (x * canvas.width + (canvas.width - y)) * 4;
 
 				if (distance > 1.0) {distance = 1.0;}

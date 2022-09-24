@@ -22,7 +22,8 @@ export class AugmentedMaterial
 			uWidth: {value: 1.0},
 			uHeight: {value: 1.0},
 			uUvTransform: {value: new Matrix4()},
-			uOcclusionEnabled: {value: true}
+			uOcclusionEnabled: {value: true},
+			uRawValueToMeters: {value: 0.0}
 		};
 
 		material.isAgumentedMaterial = true;
@@ -43,6 +44,7 @@ export class AugmentedMaterial
 			uniform mat4 uUvTransform;
 
 			uniform bool uOcclusionEnabled;
+			uniform float uRawValueToMeters;
 
 			varying float vDepth;
 			` + shader.fragmentShader;
@@ -55,32 +57,31 @@ export class AugmentedMaterial
 			}
 
 			// Fragment depth logic
+
 			shader.fragmentShader = shader.fragmentShader.replace("void main",
-				`float getDepthInMillimeters(in sampler2D depthText, in vec2 uv)
-			{
-				vec2 packedDepth = texture2D(depthText, uv).ra;
-				return dot(packedDepth, vec2(255.0, 65280.0));
-			}
+                `float getDepthInMeters(in sampler2D depthText, in vec2 uv)
+            {
+                vec2 packedDepth = texture2D(depthText, uv).rg;
+                return dot(packedDepth, vec2(255.0, 256.0 * 255.0)) * uRawValueToMeters;
+            }
+            void main`);
 
-			void main`);
-
-
-			shader.fragmentShader = shader.fragmentShader.replace(fragmentEntryPoint, `
-			${fragmentEntryPoint}
-
-			if(uOcclusionEnabled)
-			{
-				// Normalize x, y to range [0, 1]
-				float x = gl_FragCoord.x / uWidth;
-				float y = gl_FragCoord.y / uHeight;
-				vec2 depthUV = (uUvTransform * vec4(vec2(x, y), 0, 1)).xy;
-
-				float depth = getDepthInMillimeters(uDepthTexture, depthUV) / 1000.0;
-				if (depth < vDepth)
-				{
-					discard;
-				}
-			}
+            shader.fragmentShader = shader.fragmentShader.replace(fragmentEntryPoint, `
+            ${fragmentEntryPoint}
+            if(uOcclusionEnabled)
+            {
+                // Normalize x, y to range [0, 1]
+                float x = gl_FragCoord.x / uWidth;
+                float y = gl_FragCoord.y / uHeight;
+                vec2 uv = gl_FragCoord.xy / uResolution.xy;
+                
+                vec2 depthUV = (uUvTransform * vec4(uv, 0, 1)).xy;
+                float depth = getDepthInMeters(uDepthTexture, depthUV);
+                if (depth < vDepth)
+                {
+                    discard;
+                }
+            }
 			`);
 
 			// Vertex variables
@@ -107,8 +108,11 @@ export class AugmentedMaterial
 	 * @param {Scene} scene - Scene to be updated, tarverses all objects and updates materials found.
 	 * @param {XRRigidTransform} normTextureFromNormViewMatrix - Matrix obtained from AR depth from frame.getDepthInformation(view).
 	 */
-	static updateUniforms(scene, normTextureFromNormViewMatrix)
+	static updateUniforms(scene, depthInfo)
 	{
+		const normTextureFromNormViewMatrix = depthInfo.normTextureFromNormView.matrix;
+		const rawValueToMeters = depthInfo.rawValueToMeters;
+		
 		scene.traverse(function(child)
 		{
 			if (child.isMesh && child.material && child.material.isAgumentedMaterial)
@@ -116,6 +120,7 @@ export class AugmentedMaterial
 				child.material.userData.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
 				child.material.userData.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
 				child.material.userData.uUvTransform.value.fromArray(normTextureFromNormViewMatrix);
+				child.material.userData.uRawValueToMeters.value = rawValueToMeters;
 				child.material.uniformsNeedUpdate = true;
 			}
 		});
