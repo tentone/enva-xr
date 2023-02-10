@@ -8,13 +8,11 @@ const output = path.resolve(__dirname, "./build");
 
 module.exports = {
 	mode: 'development',
-	entry: ['./src/example/main.js'],
-	
+	entry: ['./example/main.js'],
 	output: {
 		filename: '[name].bundle.js',
 		path: output
 	},
-
 	devServer: {
 		static: {
 			directory: path.join(__dirname, 'public'),
@@ -36,7 +34,7 @@ module.exports = {
 		}),
 		new HtmlWebpackPlugin({
 			filename: 'index.html',
-			template: './src/example/index.html'
+			template: './example/index.html'
 		}),
 		new Webpack.HotModuleReplacementPlugin()
 	],
