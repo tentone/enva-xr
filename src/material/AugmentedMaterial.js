@@ -1,4 +1,4 @@
-import {Material, Scene, Texture, Matrix4} from "three";
+import {Material, Scene, Texture, Matrix4, ShadowMaterial} from "three";
 
 /**
  * Augmented Material has static tools to transform regular three.js materials into AR materials.
@@ -106,11 +106,11 @@ export class AugmentedMaterial
 	 * https://immersive-web.github.io/depth-sensing/
 	 * 
 	 * @param {Scene} scene - Scene to be updated, tarverses all objects and updates materials found.
-	 * @param {XRRigidTransform} normTextureFromNormViewMatrix - Matrix obtained from AR depth from frame.getDepthInformation(view).
+	 * @param {XRCPUDepthInformation} depthInfo - Matrix obtained from AR depth from frame.getDepthInformation(view).
 	 */
 	static updateUniforms(scene, depthInfo)
 	{
-		const normTextureFromNormViewMatrix = depthInfo.normTextureFromNormView.matrix;
+		const normTextureFromNormViewMatrix = depthInfo.normDepthBufferFromNormView.matrix;
 		const rawValueToMeters = depthInfo.rawValueToMeters;
 		
 		scene.traverse(function(child)
