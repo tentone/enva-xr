@@ -174,6 +174,62 @@ export class ARApp
 		this.timeMeterFrame = new PerformanceMeter();
 	}
 
+
+	/**
+	 * Initalize the AR app.
+	 */
+	initialize()
+	{
+		this.createScene();
+		this.createWorld();
+
+		this.resolution.set(window.innerWidth, window.innerHeight);
+
+		this.gui = new GUI(this);
+		this.gui.create();
+
+		this.resetDepthCanvas();
+		this.createRenderer();
+
+		// Cursor to select objects
+		this.cursor = new Cursor();
+		this.scene.add(this.cursor);
+
+		// Resize this.renderer
+		window.addEventListener("resize", () => {this.resize();}, false);
+	}
+
+	/**
+	 * Start the XR mode.
+	 */
+	start() {
+		this.initialize();
+
+		XRManager.start(this.renderer,
+			{
+				optionalFeatures: ["dom-overlay"],
+				domOverlay: {root: this.gui.container},
+				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
+				depthSensing: {
+					usagePreference: ["cpu-optimized", "gpu-optimized"],
+					dataFormatPreference: ["luminance-alpha", "float32"],
+				},
+			}, function(error)
+			{
+				alert("Error starting the AR session. " + error);
+			});
+
+		// Render loop
+		this.renderer.setAnimationLoop((time, frame) =>
+		{
+			if(this.onFrame) {
+				this.onFrame(time, this);
+			}
+			
+			this.render(time, frame);
+		});
+	}
+
 	createScene()
 	{
 		this.depthDataTexture = new DepthDataTexture();
@@ -205,7 +261,10 @@ export class ARApp
 		this.scene.add(this.floorMesh);
 	}
 
-	nextShadowType()
+	/**
+	 * Chnage the random rendering method.
+	 */
+	setShadowType()
 	{
 		if (!this.renderer.shadowMap.enabled)
 		{
@@ -239,12 +298,21 @@ export class ARApp
 			}
 		});
 
-		// console.log("Shadow type changed to " + this.renderer.shadowMap.type);
+		console.log("enva-xr: Shadow type changed to " + this.renderer.shadowMap.type);
 	}
 
-	nextRenderMode()
+	/**
+	 * Switch the render mode being used by the framework
+	 * 
+	 * @param mode - Render mode to be used (optional, is missing sets next render mode)
+	 */
+	setRenderMode(mode = null)
 	{
 		this.mode++;
+
+		if (mode !== null) {
+			this.mode = mode;
+		}
 
 		if (this.mode === ARApp.DEBUG_CAMERA_IMAGE)
 		{
@@ -305,7 +373,6 @@ export class ARApp
 	{
 		this.canvas = document.createElement("canvas");
 		document.body.appendChild(this.canvas);
-
 		this.glContext = this.canvas.getContext("webgl2", {xrCompatible: true});
 
 		this.renderer = new WebGLRenderer(
@@ -399,7 +466,9 @@ export class ARApp
 		});
 	}
 
-
+	/**
+	 * Reset the depth debug canvas.
+	 */
 	resetDepthCanvas()
 	{
 		if (!this.depthCanvas)
@@ -415,67 +484,6 @@ export class ARApp
 		this.depthCanvas.style.borderRadius = "20px";
 		this.depthCanvas.style.width = "180px";
 		this.depthCanvas.style.height = "320px";
-	}
-
-	initialize()
-	{
-		this.createScene();
-		this.createWorld();
-
-		this.resolution.set(window.innerWidth, window.innerHeight);
-
-		this.gui = new GUI(this);
-		this.gui.create();
-
-		this.resetDepthCanvas();
-
-		var button = document.createElement("div");
-		button.style.position = "absolute";
-		button.style.backgroundColor = "#FF6666";
-		button.style.width = "100%";
-		button.style.height = "100%";
-		button.style.top = "0px";
-		button.style.left = "0px";
-		button.style.textAlign = "center";
-		button.style.fontFamily = "Arial";
-		button.style.fontSize = "10vh";
-		button.innerText = "Enter AR";
-		button.onclick = () =>
-		{
-			XRManager.start(this.renderer,
-				{
-					optionalFeatures: ["dom-overlay"],
-					domOverlay: {root: this.gui.container},
-					requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
-					depthSensing: {
-						usagePreference: ["cpu-optimized", "gpu-optimized"],
-						dataFormatPreference: ["luminance-alpha", "float32"],
-					},
-				}, function(error)
-				{
-					alert("Error starting the AR session. " + error);
-				});
-		};
-		document.body.appendChild(button);
-
-		this.createRenderer();
-
-		// Cursor to select objects
-		this.cursor = new Cursor();
-		this.scene.add(this.cursor);
-
-		// Resize this.renderer
-		window.addEventListener("resize", () => {this.resize();}, false);
-
-		// Render loop
-		this.renderer.setAnimationLoop((time, frame) =>
-		{
-			if(this.onFrame) {
-				this.onFrame(time, this);
-			}
-			
-			this.render(time, frame);
-		});
 	}
 
 	/**
