@@ -115,7 +115,7 @@ export class AugmentedMaterial
 		
 		scene.traverse(function(child)
 		{
-			if (child.isMesh && child.material && child.material.isAgumentedMaterial)
+			if ( child.material && child.material.isAgumentedMaterial)
 			{
 				child.material.userData.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
 				child.material.userData.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);

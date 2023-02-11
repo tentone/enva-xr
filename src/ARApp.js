@@ -12,7 +12,6 @@ import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
 import {DepthDataTexture} from "./texture/DepthDataTexture";
 import {PerformanceMeter} from "./utils/PerformanceMeter";
 import {AugmentedMaterial} from "./material/AugmentedMaterial";
-import { GUI } from "./gui/GUI";
 
 export class ARApp
 {
@@ -126,7 +125,7 @@ export class ARApp
 		/**
 		 * Cursor to hit test the this.scene.
 		 */
-		this.cursor = null;
+		this.cursor = new Cursor();
 
 		/**
 		 * Measurement being created currently.
@@ -164,6 +163,16 @@ export class ARApp
 		this.mode = ARApp.NORMAL;
 
 		/**
+		 * DOM container for GUI elements visible in AR mode.
+		 */
+		this.domContainer = document.createElement("div");
+		this.domContainer.style.position = "absolute";
+		this.domContainer.style.top = "0px";
+		this.domContainer.style.left = "0px";
+		this.domContainer.style.width = "100%";
+		this.domContainer.style.height = "100%";
+
+		/**
 		 * Performance meter to measure full frame times.
 		 */
 		this.timeMeter = new PerformanceMeter();
@@ -185,30 +194,29 @@ export class ARApp
 
 		this.resolution.set(window.innerWidth, window.innerHeight);
 
-		this.gui = new GUI(this);
-		this.gui.create();
+
+		document.body.appendChild(this.domContainer);
 
 		this.resetDepthCanvas();
 		this.createRenderer();
 
 		// Cursor to select objects
-		this.cursor = new Cursor();
 		this.scene.add(this.cursor);
 
 		// Resize this.renderer
 		window.addEventListener("resize", () => {this.resize();}, false);
+
+		this.start();
 	}
 
 	/**
 	 * Start the XR mode.
 	 */
 	start() {
-		this.initialize();
-
 		XRManager.start(this.renderer,
 			{
 				optionalFeatures: ["dom-overlay"],
-				domOverlay: {root: this.gui.container},
+				domOverlay: {root: this.domContainer},
 				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
 				depthSensing: {
 					usagePreference: ["cpu-optimized", "gpu-optimized"],
@@ -474,7 +482,7 @@ export class ARApp
 		if (!this.depthCanvas)
 		{
 			this.depthCanvas = document.createElement("canvas");
-			this.gui.container.appendChild(this.depthCanvas);
+			this.domContainer.appendChild(this.depthCanvas);
 			this.depthTexture = new DepthCanvasTexture(this.depthCanvas);
 		}
 

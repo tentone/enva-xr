@@ -1,8 +1,13 @@
 import {Vector3, SphereBufferGeometry, Euler, Quaternion, MeshPhysicalMaterial, TextureLoader} from "three";
 import {Sphere} from "cannon-es";
-import {Measurement} from "../object/Measurement";
-import {PhysicsObject} from "../object/PhysicsObject";
-import {GUIUtils} from "./GUIUtils";
+import {Measurement} from "../src/object/Measurement";
+import {PhysicsObject} from "../src/object/PhysicsObject";
+
+let x = 20;
+let y = 20;
+const w = 50;
+const h = 50;
+
 
 /**
  * Application user interface.
@@ -11,7 +16,7 @@ import {GUIUtils} from "./GUIUtils";
  */
 export class GUI
 {
-	constructor(app)
+	constructor(app, container)
 	{
 		/**
 		 * App that this GUI is controlling.
@@ -19,33 +24,54 @@ export class GUI
 		this.app = app;
 
 		/**
-		 * The DOM element where the GUI should be created.
-		 */
-		this.parent = document.body;
-
-		/**
 		 * DOM container for the GUI.
 		 */
-		this.container = null;
+		this.container = container;
+	}
+
+	/**
+	 * Create a button with an icon.
+	 *
+	 * @param {string} imageSrc - Source of the image used as icon.
+	 * @param {Function} onclick - Method to be executed when the button is pressed.
+	 */
+	createButton(imageSrc, onclick)
+	{
+		var button = document.createElement("div");
+		button.style.width = w + "px";
+		button.style.height = h + "px";
+		button.style.position = "absolute";
+		button.style.left = x + "px";
+		button.style.bottom = y + "px";
+		button.style.backgroundColor = "#FFFFFF33";
+		button.style.borderRadius = "20px";
+		button.style.opacity = "0.2";
+		button.style.zIndex = "1000";
+		button.onclick = onclick;
+
+		var icon = document.createElement("img");
+		icon.src = imageSrc;
+		icon.style.width = "80%";
+		icon.style.height = "80%";
+		icon.style.top = "10%";
+		icon.style.left = "10%";
+		icon.style.position = "absolute";
+		button.appendChild(icon);
+
+		y += h + 10;
+
+		return button;
 	}
 
 	create()
 	{
-		this.container = document.createElement("div");
-		this.container.style.position = "absolute";
-		this.container.style.top = "0px";
-		this.container.style.left = "0px";
-		this.container.style.width = "100%";
-		this.container.style.height = "100%";
-		this.parent.appendChild(this.container);
-
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/3d.svg", () =>
+		this.container.appendChild(this.createButton("./assets/icon/3d.svg", () =>
 		{
 			this.app.debugDepth = !this.app.debugDepth;
 			this.app.depthCanvas.style.display = this.app.debugDepth ? "block" : "none";
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/ruler.svg", () =>
+		this.container.appendChild(this.createButton("./assets/icon/ruler.svg", () =>
 		{
 			if (this.app.cursor.visible)
 			{
@@ -63,71 +89,71 @@ export class GUI
 			}
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/stopwatch.svg", () =>
+		this.container.appendChild(this.createButton("./assets/icon/stopwatch.svg", () =>
 		{
 			this.app.timeMeter.reset();
 			this.app.timeMeterFrame.reset();
 		}));
 
-		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/shadow.svg", () =>
+		/* this.container.appendChild(this.createButton("./assets/icon/shadow.svg", () =>
 		{
 			this.app.nextShadowType();
 		})); */
 
-		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/bug.svg", () =>
+		/* this.container.appendChild(this.createButton("./assets/icon/bug.svg", () =>
 		{
 			this.app.nextRenderMode();
 		})); */
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/911.svg", () =>
+		this.container.appendChild(this.createButton("./assets/icon/911.svg", () =>
 		{
 			if(!this.cursor.visible) {return;}
 			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/porsche_911/scene.gltf", new Euler(0, 0, 0), 0.003);
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/bottle.svg", () =>
+		this.container.appendChild(this.createButton("./assets/icon/bottle.svg", () =>
 		{
 			if(!this.cursor.visible) {return;}
 			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/WaterBottle.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/tripod.svg", () =>
+		this.container.appendChild(this.createButton("./assets/icon/tripod.svg", () =>
 		{
 			if(!this.cursor.visible) {return;}
 			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/AntiqueCamera.glb", new Euler(0, 0, 0), 0.1);
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/shoe.svg", () =>
+		this.container.appendChild(this.createButton("./assets/icon/shoe.svg", () =>
 		{
 			if(!this.cursor.visible) {return;}
 			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/Shoe.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
-		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/dots.svg", () =>
+		/* this.container.appendChild(this.createButton("./assets/icon/dots.svg", () =>
 		{
 			if(!this.cursor.visible) {return;}
 			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/MetalRoughSpheresNoTextures.glb", new Euler(0, 0, 0), 100.0);
 		})); */
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/fish.svg", () =>
+		this.container.appendChild(this.createButton("./assets/icon/fish.svg", () =>
 		{
 			if(!this.cursor.visible) {return;}
 			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/BarramundiFish.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/flower.svg", () =>
+		this.container.appendChild(this.createButton("./assets/icon/flower.svg", () =>
 		{
 			if(!this.cursor.visible) {return;}
 			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/flower/scene.gltf", new Euler(0, 0, 0), 0.007);
 		}));
 
-		/* this.container.appendChild(GUIUtils.createButton("./assets/icon/toy-car.svg", () =>
+		/* this.container.appendChild(this.createButton("./assets/icon/toy-car.svg", () =>
 		{
 			if(!this.cursor.visible) {return;}
 			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/ToyCar.glb", new Euler(0, 0, 0), 10.0);
 		})); */
 
-		this.container.appendChild(GUIUtils.createButton("./assets/icon/rocks.svg", () =>
+		this.container.appendChild(this.createButton("./assets/icon/rocks.svg", () =>
 		{
 			if (this.app.pose !== null)
 			{
