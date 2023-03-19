@@ -107,50 +107,50 @@ export class GUI
 
 		this.container.appendChild(this.createButton("./assets/icon/911.svg", () =>
 		{
-			if(!this.cursor.visible) {return;}
-			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/porsche_911/scene.gltf", new Euler(0, 0, 0), 0.003);
+			if(!this.app.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.app.cursor.matrix, "./assets/3d/porsche_911/scene.gltf", new Euler(0, 0, 0), 0.003);
 		}));
 
 		this.container.appendChild(this.createButton("./assets/icon/bottle.svg", () =>
 		{
-			if(!this.cursor.visible) {return;}
-			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/WaterBottle.glb", new Euler(0, 0, 0), 1.0);
+			if(!this.app.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.app.cursor.matrix, "./assets/3d/WaterBottle.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
 		this.container.appendChild(this.createButton("./assets/icon/tripod.svg", () =>
 		{
-			if(!this.cursor.visible) {return;}
-			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/AntiqueCamera.glb", new Euler(0, 0, 0), 0.1);
+			if(!this.app.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.app.cursor.matrix, "./assets/3d/AntiqueCamera.glb", new Euler(0, 0, 0), 0.1);
 		}));
 
 		this.container.appendChild(this.createButton("./assets/icon/shoe.svg", () =>
 		{
-			if(!this.cursor.visible) {return;}
-			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/Shoe.glb", new Euler(0, 0, 0), 1.0);
+			if(!this.app.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.app.cursor.matrix, "./assets/3d/Shoe.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
 		/* this.container.appendChild(this.createButton("./assets/icon/dots.svg", () =>
 		{
-			if(!this.cursor.visible) {return;}
-			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/MetalRoughSpheresNoTextures.glb", new Euler(0, 0, 0), 100.0);
+			if(!this.app.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.app.cursor.matrix, "./assets/3d/MetalRoughSpheresNoTextures.glb", new Euler(0, 0, 0), 100.0);
 		})); */
 
 		this.container.appendChild(this.createButton("./assets/icon/fish.svg", () =>
 		{
-			if(!this.cursor.visible) {return;}
-			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/BarramundiFish.glb", new Euler(0, 0, 0), 1.0);
+			if(!this.app.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.app.cursor.matrix, "./assets/3d/BarramundiFish.glb", new Euler(0, 0, 0), 1.0);
 		}));
 
 		this.container.appendChild(this.createButton("./assets/icon/flower.svg", () =>
 		{
-			if(!this.cursor.visible) {return;}
-			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/flower/scene.gltf", new Euler(0, 0, 0), 0.007);
+			if(!this.app.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.app.cursor.matrix, "./assets/3d/flower/scene.gltf", new Euler(0, 0, 0), 0.007);
 		}));
 
 		/* this.container.appendChild(this.createButton("./assets/icon/toy-car.svg", () =>
 		{
-			if(!this.cursor.visible) {return;}
-			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.cursor.matrix, "./assets/3d/ToyCar.glb", new Euler(0, 0, 0), 10.0);
+			if(!this.app.cursor.visible) {return;}
+			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.app.cursor.matrix, "./assets/3d/ToyCar.glb", new Euler(0, 0, 0), 10.0);
 		})); */
 
 		this.container.appendChild(this.createButton("./assets/icon/rocks.svg", () =>

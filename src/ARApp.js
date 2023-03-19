@@ -573,22 +573,22 @@ export class ARApp
 
 
 		// Process lighting condition from probe
-		if (this.xrLightProbe)
-		{
-			let lightEstimate = frame.getLightEstimate(this.xrLightProbe);
-			if (lightEstimate)
-			{
-				let directionalPosition = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
-				directionalPosition.multiplyScalar(5);
+		// if (this.xrLightProbe)
+		// {
+		// 	let lightEstimate = frame.getLightEstimate(this.xrLightProbe);
+		// 	if (lightEstimate)
+		// 	{
+		// 		let directionalPosition = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
+		// 		directionalPosition.multiplyScalar(5);
 
-				let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
-				this.directionalLight.position.copy(directionalPosition);
-				this.directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
-				this.directionalLight.intensity = intensity;
+		// 		let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
+		// 		this.directionalLight.position.copy(directionalPosition);
+		// 		this.directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
+		// 		this.directionalLight.intensity = intensity;
 
-				this.lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
-			}
-		}
+		// 		this.lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
+		// 	}
+		// }
 
 		// Process Hit test
 		if (this.xrHitTestSource)
