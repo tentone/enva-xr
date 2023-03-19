@@ -16,7 +16,7 @@
 
 ### Getting Started
 
-- Download the repository from git `gh repo clone tentone/ar-occlusion`
+- Download the repository from git `gh repo clone tentone/enva-xr`
 - Install [Node](https://nodejs.org/en/) and [NPM](https://www.npmjs.com/).
 - Prepare a browser compatible with WebXR in a depth with support for `depth-estimation`, `hit-test` and `lighting`.
 - Install dependencies from NPM by running `npm install` and start the code running `npm run start`
