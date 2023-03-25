@@ -1,65 +1,64 @@
-import {Box3, Vector3} from "three";
-import {Vec3, Box} from "cannon-es";
+import {Box3, Camera, Vector3} from "three";
+import {Vec3, Box, World} from "cannon-es";
 import {VoxelBody} from "./VoxelBody";
 
 export class VoxelEnvironment
 {
-	constructor(world, size, precision)
+	/**
+	 * Cannon physics world.
+	 */
+	public world: World = null;
+
+	/**
+	 * Voxel model bouding box.
+	 *
+	 * Coordinates in meters.
+	 */
+	public box: Box3 = null;
+
+	/**
+	 * Box shape shared across all voxels in the environment.
+	 */
+	public shape: Box = null;
+
+	/**
+	 * Length of the voxel grid in each direction.
+	 */
+	public length: Vector3 = null;
+
+	/**
+	 * Precision of the depth system in meters.
+	 *
+	 * The grid of voxels has the size defined here.
+	 */
+	public precision = 0.0;
+
+	/**
+	 * Probability value theshold for a voxel to be activated of deactivated.
+	 */
+	public threshold = 0.6;
+
+	/**
+	 * Grid of voxels organized into a array cube.
+	 */
+	public grid = [];
+
+	constructor(world: World, size: number = 5.0, precision: number = 0.05)
 	{
-		if (size === undefined)
-		{
-			size = 5.0;
-		}
-
-		if (precision === undefined)
-		{
-			precision = 0.05;
-		}
-
-		/**
-		 * Cannon physics world.
-		 */
 		this.world = world;
 
-		/**
-		 * Voxel model bouding box.
-		 *
-		 * Coordinates in meters.
-		 */
 		this.box = new Box3(new Vector3(-size, -size, -size), new Vector3(size, size, size));
-
-		/**
-		 * Box shape shared across all voxels in the environment.
-		 */
-		this.shape = new Box(new Vec3(-precision, -precision, -precision), new Vec3(precision, precision, precision));
-
-		/**
-		 * Length of the voxel grid in each direction.
-		 */
+		this.shape = new Box( new Vec3(precision / 2.0, precision / 2.0, precision / 2.0));
 		this.length = new Vector3(precision / size, precision / size, precision / size);
+	
 
-		/**
-		 * Precision of the depth system in meters.
-		 *
-		 * The grid of voxels has the size defined here.
-		 */
 		this.precision = precision;
 
-		/**
-		 * Probability value theshold for a voxel to be activated of deactivated.
-		 */
-		this.threshold = 0.6;
-
-		/**
-		 * Grid of voxels organized into a array cube.
-		 */
-		this.grid = [];
-
-		for (var x = 0; x < this.length.x; x++)
+		for (let x = 0; x < this.length.x; x++)
 		{
-			for (var y = 0; y < this.length.y; y++)
+			for (let y = 0; y < this.length.y; y++)
 			{
-				for (var z = 0; z < this.length.x; x++)
+				for (let z = 0; z < this.length.x; x++)
 				{
 					this.grid.push(new VoxelBody(this, x, y, z));
 				}
@@ -75,11 +74,11 @@ export class VoxelEnvironment
 	 * @param {number} z Z coordinate.
 	 * @return {number} Return the index of the voxel from its coordinates.
 	 */
-	 getIndex(x, y, z)
+	 public getIndex(x: number, y: number, z: number)
 	 {
-		 var nx = this.length.x;
-		 var ny = this.length.y;
-		 var nz = this.length.z;
+		 let nx = this.length.x;
+		 let ny = this.length.y;
+		 let nz = this.length.z;
 
 		 if (x >= 0 && x < nx && y >= 0 && y < ny && z >= 0 && z < nz)
 		 {
@@ -95,21 +94,21 @@ export class VoxelEnvironment
 	 *
 	 * Depth is checked agains all voxels in the volume, if the depth point gets outside the model is expanded to fit new data.
 	 */
-	update(camera, depth)
+	public update(camera: Camera, depth: any-)
 	{
-		var width = depth.height;
-		var height = depth.width;
+		let width = depth.height;
+		let height = depth.width;
 
-		var origin = new Vector3();
+		let origin = new Vector3();
 		camera.getWorldPosition(origin);
 
-		for (var x = 0; x < width; x++)
+		for (let x = 0; x < width; x++)
 		{
-			for (var y = 0; y < height; y++)
+			for (let y = 0; y < height; y++)
 			{
-				var distance = depth.getDepth(x, y);
+				let distance = depth.getDepth(x, y);
 
-				var position = new Vector3();
+				let position = new Vector3();
 				position.x = x - width / 2;
 				position.y = -y + height / 2;
 				position.z = distance;

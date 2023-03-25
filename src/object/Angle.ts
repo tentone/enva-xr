@@ -6,29 +6,27 @@ import {Text} from "troika-three-text";
  */
 export class Angle extends Line
 {
-	constructor(point)
+	/**
+	 * List of points that compose the measurement.
+	 */
+	public points: Vector3[];
+
+	/**
+	 * Text used to display the measurement value.
+	 */
+	public text: Text;
+
+	constructor(point: Vector3 = new Vector3(0, 0, 0))
 	{
-		if (!point)
-		{
-			point = new Vector3(0, 0, 0);
-		}
-
-		var geometry = new BufferGeometry().setFromPoints([point, point, point]);
-
-		super(geometry, new LineBasicMaterial(
+		super(new BufferGeometry().setFromPoints([point, point, point]), new LineBasicMaterial(
 			{
 				color: 0xffffff,
 				linewidth: 5
 			}));
 
-		/**
-		 * List of points that compose the measurement.
-		 */
+
 		this.points = [point.clone()];
 
-		/**
-		 * Text used to display the measurement value.
-		 */
 		this.text = new Text();
 		this.text.fontSize = 0.1;
 		this.text.color = 0xFFFFFF;
@@ -47,7 +45,7 @@ export class Angle extends Line
 	 */
 	setPointFromMatrix(matrix)
 	{
-		var position = new Vector3(matrix.elements[12], matrix.elements[13], matrix.elements[14]);
+		let position = new Vector3(matrix.elements[12], matrix.elements[13], matrix.elements[14]);
 		this.points[this.points.length - 1].copy(position);
 
 		this.updateGeometry();
@@ -61,17 +59,18 @@ export class Angle extends Line
 	 */
 	updateGeometry()
 	{
-		var positions = this.geometry.attributes.position.array;
+		// @ts-ignore
+		let positions = this.geometry.attributes.position.array;
 		positions[0] = this.points[0].x;
 		positions[1] = this.points[0].y;
 		positions[2] = this.points[0].z;
 
-		var a = this.points.length > 1 ? 1 : 0;
+		let a = this.points.length > 1 ? 1 : 0;
 		positions[3] = this.points[a].x;
 		positions[4] = this.points[a].y;
 		positions[5] = this.points[a].z;
 
-		var b = this.points.length > 2 ? 2 : a;
+		let b = this.points.length > 2 ? 2 : a;
 		positions[6] = this.points[b].x;
 		positions[7] = this.points[b].y;
 		positions[8] = this.points[b].z;
@@ -90,9 +89,9 @@ export class Angle extends Line
 			return 0;
 		}
 
-		var a = this.points[0];
-		var b = this.points[1];
-		var c = this.points[2];
+		let a = this.points[0];
+		let b = this.points[1];
+		let c = this.points[2];
 
 		const v1 = new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
 		const v2 = new Vector3(c.x - b.x, c.y - b.y, c.z - b.z);
@@ -122,8 +121,8 @@ export class Angle extends Line
 			return;
 		}
 
-		var center = new Vector3();
-		for (var i = 0; i < this.points.length; i++)
+		let center = new Vector3();
+		for (let i = 0; i < this.points.length; i++)
 		{
 			center.add(this.points[i]);
 		}

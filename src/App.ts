@@ -329,7 +329,7 @@ export class App
 		this.world.broadphase = new NaiveBroadphase();
 		this.world.broadphase.useBoundingBoxes = true;
 
-		var solver = new GSSolver();
+		let solver = new GSSolver();
 		solver.tolerance = 0.1;
 		solver.iterations = 7;
 		this.world.solver = new SplitSolver(solver);
@@ -409,8 +409,8 @@ export class App
 		// this.lastTime = time;
 		// this.world.step(delta / 1e3);
 
-		var session = this.renderer.xr.getSession();
-		var referenceSpace = this.renderer.xr.getReferenceSpace();
+		let session = this.renderer.xr.getSession();
+		let referenceSpace = this.renderer.xr.getReferenceSpace();
 
 		if (!this.xrGlBinding)
 		{
@@ -434,7 +434,7 @@ export class App
 
 			// 	// Get cube map for reflections
 			// 	/* this.xrLightProbe.addEventListener("reflectionchange", () => {
-			// 		var glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
+			// 		let glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
 			// 		console.log(glCubeMap);
 			// 	}); */
 			// });
@@ -470,16 +470,16 @@ export class App
 		// Process Hit test
 		if (this.xrHitTestSource)
 		{
-			var hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
+			let hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
 			if (hitTestResults.length)
 			{
-				var hit = hitTestResults[0];
+				let hit = hitTestResults[0];
 				
 				this.cursor.visible = true;
 				this.cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 
 				// // Update physics floor plane
-				// var position = new Vector3();
+				// let position = new Vector3();
 				// position.setFromMatrixPosition(this.cursor.matrix);
 				// if (position.y < this.floor.position.y)
 				// {
@@ -501,13 +501,13 @@ export class App
 		}
 
 		// Handle depth
-		// var viewerPose = frame.getViewerPose(referenceSpace);
+		// let viewerPose = frame.getViewerPose(referenceSpace);
 		// if (viewerPose)
 		// {
 		// 	this.pose = viewerPose;
-		// 	for (var view of this.pose.views)
+		// 	for (let view of this.pose.views)
 		// 	{
-		// 		var depthInfo = frame.getDepthInformation(view);
+		// 		let depthInfo = frame.getDepthInformation(view);
 		// 		if (depthInfo)
 		// 		{
 		// 			// Voxel environment
@@ -533,10 +533,10 @@ export class App
 
 		// if (this.timeMeter.finished() && this.timeMeterFrame.finished())
 		// {
-		// 	var a = this.timeMeter.stats();
+		// 	let a = this.timeMeter.stats();
 		// 	this.timeMeter.reset(false);
 
-		// 	var b = this.timeMeterFrame.stats();
+		// 	let b = this.timeMeterFrame.stats();
 		// 	this.timeMeterFrame.reset(false);
 			
 		// 	// Log performance metrics

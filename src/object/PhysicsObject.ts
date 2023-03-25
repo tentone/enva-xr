@@ -1,5 +1,5 @@
 import {Body, Shape, World} from "cannon-es";
-import {Vector3, Mesh, Quaternion, Matrix4, BufferGeometry, Material} from "three";
+import {Vector3, Mesh, Quaternion, Matrix4} from "three";
 
 /**
  * Wrapper for cannon.js physics objects.
@@ -11,6 +11,37 @@ import {Vector3, Mesh, Quaternion, Matrix4, BufferGeometry, Material} from "thre
 export class PhysicsObject extends Mesh
 {
 	/**
+	 * The position of the object is copied directly from the body.
+	 *
+	 * Ignores the world tranforms inherited from parent objects.
+	 *
+	 * Faster but the physics object should not carry any world transformations.
+	 */
+	public static LOCAL: number = 100;
+
+	/**
+	 * The position of the object is adjusted to follow the parent object transformation.
+	 *
+	 * This mode should be used for objects placed inside others.
+	 */
+	public static WORLD: number = 101;
+
+	/**
+	 * Physics body contains the following attributes:
+	 */
+	public body: Body;
+
+	/**
+	 * Physics object position mode, indicates how coordinates from the physics engine are transformed into object coordinates.
+	 */
+	public mode: number;
+
+	/**
+	 * Refenrece to the physics world.
+	 */
+	public world: World = null;
+
+	/**
 	 * @param {BufferGeometry} geometry - Geometry of the object. 
 	 * @param {Material} material - Material used to render the object. 
 	 * @param {World} world - Physics world where the object will be placed at.
@@ -21,21 +52,14 @@ export class PhysicsObject extends Mesh
 
 		this.frustumCulled = false;
 
-		/**
-		 * Physics body contains the following attributes:
-		 */
+
 		this.body = new Body();
 		this.body.type = Body.DYNAMIC;
 		this.body.mass = 1.0;
 
-		/**
-		 * Physics object position mode, indicates how coordinates from the physics engine are transformed into object coordinates.
-		 */
 		this.mode = PhysicsObject.LOCAL;
 
-		/**
-		 * Refenrece to the physics world.
-		 */
+		
 		this.world = world;
 		this.world.addBody(this.body);
 	}
@@ -43,21 +67,25 @@ export class PhysicsObject extends Mesh
 	/**
 	 * Intialize physics object and add it to the scene physics world.
 	 */
-	initialize()
+	public initialize(): void
 	{
 		if (this.mode === PhysicsObject.LOCAL)
 		{
+			// @ts-ignore
 			this.body.position.copy(this.position);
+			// @ts-ignore
 			this.body.quaternion.copy(this.quaternion);
 		}
 		else if (this.mode === PhysicsObject.WORLD)
 		{
-			var position = new Vector3();
+			let position = new Vector3();
 			this.getWorldPosition(position);
+			// @ts-ignore
 			this.body.position.copy(position);
 
-			var quaternion = new Quaternion();
+			let quaternion = new Quaternion();
 			this.getWorldQuaternion(quaternion);
+			// @ts-ignore
 			this.body.quaternion.copy(quaternion);
 		}
 	};
@@ -65,13 +93,16 @@ export class PhysicsObject extends Mesh
 	/**
 	 * Update object position and rotation based on cannon.js body.
 	 */
-	onBeforeRender(renderer, scene, camera, geometry, material, group)
+	// @ts-ignore
+	public onBeforeRender(renderer, scene, camera, geometry, material, group): void
 	{
 		if (this.mode === PhysicsObject.LOCAL)
 		{
+			// @ts-ignore
 			this.position.copy(this.body.position);
 			if (!this.body.fixedRotation)
 			{
+				// @ts-ignore
 				this.quaternion.copy(this.body.quaternion);
 			}
 		}
@@ -79,14 +110,16 @@ export class PhysicsObject extends Mesh
 		{
 
 			// Physics transform matrix
-			var transform = new Matrix4();
+			let transform = new Matrix4();
 			if (this.body.fixedRotation)
 			{
 				transform.setPosition(this.body.position.x, this.body.position.y, this.body.position.z);
 			}
 			else
 			{
-				var quaternion = new Quaternion();
+				let quaternion = new Quaternion();
+
+				// @ts-ignore
 				quaternion.copy(this.body.quaternion);
 				transform.makeRotationFromQuaternion(quaternion);
 				transform.setPosition(this.body.position.x, this.body.position.y, this.body.position.z);
@@ -94,11 +127,11 @@ export class PhysicsObject extends Mesh
 
 
 			// Get inverse of the world matrix
-			var inverse = new Matrix4();
+			let inverse = new Matrix4();
 			inverse.getInverse(this.parent.matrixWorld);
 
 			// Get position, scale and quaternion
-			var scale = new Vector3();
+			let scale = new Vector3();
 			inverse.multiply(transform);
 			inverse.decompose(this.position, this.quaternion, scale);
 		}
@@ -107,7 +140,7 @@ export class PhysicsObject extends Mesh
 	/**
 	 * Add shape to physics object body.
 	 */
-	addShape(shape)
+	public addShape(shape: Shape): void
 	{
 		if (!(shape instanceof Shape))
 		{
@@ -118,18 +151,4 @@ export class PhysicsObject extends Mesh
 	};
 }
 
-/**
- * The position of the object is copied directly from the body.
- *
- * Ignores the world tranforms inherited from parent objects.
- *
- * Faster but the physics object should not carry any world transformations.
- */
-PhysicsObject.LOCAL = 100;
 
-/**
- * The position of the object is adjusted to follow the parent object transformation.
- *
- * This mode should be used for objects placed inside others.
- */
-PhysicsObject.WORLD = 101;

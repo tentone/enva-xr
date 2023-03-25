@@ -1,4 +1,4 @@
-import {Mesh, RingBufferGeometry, CircleBufferGeometry, MeshBasicMaterial} from "three";
+import {Mesh, MeshBasicMaterial, RingGeometry, CircleGeometry, BufferGeometry, Material} from "three";
 import {mergeBufferGeometries} from "three/examples/jsm/utils/BufferGeometryUtils";
 
 /**
@@ -10,12 +10,19 @@ import {mergeBufferGeometries} from "three/examples/jsm/utils/BufferGeometryUtil
  */
 export class Cursor extends Mesh
 {
-	constructor(geometry, material)
+	/**
+	 * Callback method to execute when the cursor is pressed.
+	 * 
+	 * Receives the pose of the cursor in world coordinates.
+	 */
+	public onaction: Function = null; 
+
+	constructor(geometry: BufferGeometry, material: Material)
 	{
 		if (!geometry)
 		{
-			var ring = new RingBufferGeometry(0.045, 0.05, 32).rotateX(-Math.PI / 2);
-			var dot = new CircleBufferGeometry(0.005, 32).rotateX(-Math.PI / 2);
+			let ring = new RingGeometry(0.045, 0.05, 32).rotateX(-Math.PI / 2);
+			let dot = new CircleGeometry(0.005, 32).rotateX(-Math.PI / 2);
 			geometry = mergeBufferGeometries([ring, dot]);
 		}
 		
@@ -28,12 +35,5 @@ export class Cursor extends Mesh
 
 		this.matrixAutoUpdate = false;
 		this.visible = false;
-
-		/**
-		 * Callback method to execute when the cursor is pressed.
-		 * 
-		 * Receives the pose of the cursor in world coordinates.
-		 */
-		this.onaction = null;
 	}
 }

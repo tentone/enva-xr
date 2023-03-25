@@ -1,4 +1,4 @@
-import {BufferGeometry, Line, Line3, LineBasicMaterial, Matrix4, Vector3} from "three";
+import {BufferGeometry, Line, Line3, LineBasicMaterial, Vector3} from "three";
 import {Text} from "troika-three-text";
 
 /**
@@ -7,31 +7,29 @@ import {Text} from "troika-three-text";
 export class Measurement extends Line
 {
 	/**
+	 * List of points that compose the measurement.
+	 */
+	public points: any[] ;
+
+	/**
+	 * Text used to display the measurement value.
+	 */
+	public text: Text = new Text();
+
+	/**
 	 * @param {Vector3} point - First point of the measurement.
 	 */
-	constructor(point)
+	constructor(point: Vector3 = new Vector3(0, 0, 0))
 	{
-		if (!point)
-		{
-			point = new Vector3(0, 0, 0);
-		}
-
-		var geometry = new BufferGeometry().setFromPoints([point, point]);
-
-		super(geometry, new LineBasicMaterial(
+		super(new BufferGeometry().setFromPoints([point, point]), new LineBasicMaterial(
 			{
 				color: 0xffffff,
 				linewidth: 5
 			}));
 
-		/**
-		 * List of points that compose the measurement.
-		 */
 		this.points = [point.clone(), point.clone()];
 
-		/**
-		 * Text used to display the measurement value.
-		 */
+	
 		this.text = new Text();
 		this.text.fontSize = 0.1;
 		this.text.color = 0xFFFFFF;
@@ -50,7 +48,7 @@ export class Measurement extends Line
 	 */
 	setPointFromMatrix(matrix)
 	{
-		var position = new Vector3(matrix.elements[12], matrix.elements[13], matrix.elements[14]);
+		let position = new Vector3(matrix.elements[12], matrix.elements[13], matrix.elements[14]);
 		this.points[this.points.length - 1].copy(position);
 
 		this.updateGeometry();
@@ -64,7 +62,8 @@ export class Measurement extends Line
 	 */
 	updateGeometry() 
 	{
-		var positions = this.geometry.attributes.position.array;
+		// @ts-ignore
+		let positions = this.geometry.attributes.position.array;
 		positions[0] = this.points[0].x;
 		positions[1] = this.points[0].y;
 		positions[2] = this.points[0].z;
@@ -82,8 +81,8 @@ export class Measurement extends Line
 	 */
 	updateText() 
 	{
-		var distance = Math.round(this.points[0].distanceTo(this.points[1]) * 100);
-		var line = new Line3(this.points[0], this.points[1]);
+		let distance = Math.round(this.points[0].distanceTo(this.points[1]) * 100);
+		let line = new Line3(this.points[0], this.points[1]);
 
 		line.getCenter(this.text.position);
 		this.text.position.y += 0.1;

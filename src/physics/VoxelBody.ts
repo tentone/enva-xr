@@ -2,24 +2,26 @@ import {Body} from "cannon-es";
 
 export class VoxelBody extends Body
 {
-	constructor(manager, x, y, z)
+	/**
+	 * Indicates if the body is enabled of disabled.
+	 */
+	public active: boolean = false;
+
+	/**
+	 * Voxel enviroment manager to wich this voxel body belongs.
+	 */
+	public manager = null;
+
+	/**
+	 * Current probability of this voxel belonging to the enviroment.
+	 */
+	public probability: number = 0.0;
+
+	constructor(manager: any, x: number, y: number, z: number)
 	{
 		super();
 
-		/**
-		 * Indicates if the body is enabled of disabled.
-		 */
-		this.active = false;
-
-		/**
-		 * Voxel enviroment manager to wich this voxel body belongs.
-		 */
 		this.manager = manager;
-
-		/**
-		 * Current probability of this voxel belonging to the enviroment.
-		 */
-		this.probability = 0.0;
 
 		this.type = Body.STATIC;
 		this.position.set(x, y, z);
@@ -35,7 +37,7 @@ export class VoxelBody extends Body
 	 * @param {number} hit If the 1 the voxel is occupied by depth, otherwise is not occupied. A value inbetween can be used for antialiasing like calculation.
 	 * @param {number} factor The update factor based on the the time elapsed between frames and the update probability
 	 */
-	update(hit, factor)
+	public update(hit: number, factor: number): void
 	{
 		this.probability = this.probability * (1 - factor) + factor * hit;
 

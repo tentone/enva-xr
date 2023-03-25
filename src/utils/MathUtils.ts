@@ -1,4 +1,4 @@
-import {Camera, Vector3} from "three";
+import {Camera, Vector2, Vector3} from "three";
 
 /**
  * Class contain math utils to simplify common math operations.
@@ -11,9 +11,9 @@ export class MathUtils
 	 * @param {Vector3} point - Point to project from world coordinates to screen coordinates.
 	 * @param {Camera} camera - Camera object to extract the projection matrix used to project the point.
 	 */
-	static projectPoint(point, camera)
+	static projectPoint(point: Vector3, resolution: Vector2, camera: Camera): Vector3
 	{
-		var vector = new Vector3();
+		let vector = new Vector3();
 
 		vector.copy(point);
 		vector.project(camera);

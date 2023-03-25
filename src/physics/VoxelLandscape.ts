@@ -1,10 +1,24 @@
-import {Vec3, Box, Body} from "cannon-es";
+import {Vec3, Box, Body, World} from "cannon-es";
 
 /**
  * Voxel landscape can be used to represent voxel based enviroment.
  */
 export class VoxelLandscape
 {
+	public nx: number = 0;
+	public ny: number = 0;
+	public nz: number = 0;
+
+	public sx: number = 0;
+	public sy: number = 0;
+	public sz: number = 0;
+
+	public world: World = null;
+	public map: any[] = [];
+	public boxified: any[] = [];
+	public boxes: any[] = [];
+	public boxShape: Box = null;
+
 	/**
 	 * Constructor for the voxel landscape.
 	 *
@@ -29,20 +43,17 @@ export class VoxelLandscape
 		this.sz = sz;
 
 		this.world = world;
-		this.map = [];
-		this.boxified = [];
-		this.boxes = [];
 		this.boxShape = new Box(new Vec3(sx*0.5, sy*0.5, sz*0.5));
 
-		var map = this.map;
-		var boxified = this.boxified;
+		let map = this.map;
+		let boxified = this.boxified;
 
 		// Prepare map
-		for (var i=0; i!==nx; i++)
+		for (let i=0; i!==nx; i++)
 		{
-			for (var j=0; j!==ny; j++)
+			for (let j=0; j!==ny; j++)
 			{
-				for (var k=0; k!==nz; k++)
+				for (let k=0; k!==nz; k++)
 				{
 					map.push(true);
 					boxified.push(false);
@@ -61,9 +72,9 @@ export class VoxelLandscape
 	 */
 	getBoxIndex(xi, yi, zi)
 	{
-		var nx = this.nx;
-		var ny = this.ny;
-		var nz = this.nz;
+		let nx = this.nx;
+		let ny = this.ny;
+		let nz = this.nz;
 
 		if (xi >= 0 && xi < nx && yi >= 0 && yi < ny && zi >= 0 && zi < nz)
 		{
@@ -83,7 +94,7 @@ export class VoxelLandscape
 	 */
 	setFilled(xi, yi, zi, filled)
 	{
-		var i = this.getBoxIndex(xi, yi, zi);
+		let i = this.getBoxIndex(xi, yi, zi);
 		if (i!==-1)
 		{
 			this.map[i] = Boolean(filled);
@@ -100,7 +111,7 @@ export class VoxelLandscape
 	 */
 	isFilled(xi, yi, zi)
 	{
-		var i = this.getBoxIndex(xi, yi, zi);
+		let i = this.getBoxIndex(xi, yi, zi);
 		return i !== -1 ? this.map[i] : false;
 	}
 
@@ -113,7 +124,7 @@ export class VoxelLandscape
 	 */
 	isBoxified(xi, yi, zi)
 	{
-		var i = this.getBoxIndex(xi, yi, zi);
+		let i = this.getBoxIndex(xi, yi, zi);
 		return i!==-1 ? this.boxified[i] : false;
 	}
 
@@ -138,16 +149,15 @@ export class VoxelLandscape
 	 */
 	update()
 	{
-		var map = this.map;
-		var boxes = this.boxes;
-		var world = this.world;
-		var boxified = this.boxified;
-		var nx = this.nx;
-		var ny = this.ny;
-		var nz = this.nz;
+		let boxes = this.boxes;
+		let world = this.world;
+		let boxified = this.boxified;
+		let nx = this.nx;
+		let ny = this.ny;
+		let nz = this.nz;
 
 		// Remove all old boxes
-		for (var i = 0; i!== boxes.length; i++)
+		for (let i = 0; i!== boxes.length; i++)
 		{
 			world.remove(boxes[i]);
 		}
@@ -155,21 +165,21 @@ export class VoxelLandscape
 		boxes.length = 0;
 
 		// Set whole map to unboxified
-		for (var i = 0; i !== boxified.length; i++)
+		for (let i = 0; i !== boxified.length; i++)
 		{
 			boxified[i] = false;
 		}
 
 		while (true)
 		{
-			var box;
+			let box;
 
 			// 1. Get a filled box that we haven't boxified yet
-			for (var i=0; !box && i<nx; i++)
+			for (let i=0; !box && i<nx; i++)
 			{
-				for (var j=0; !box && j<ny; j++)
+				for (let j=0; !box && j<ny; j++)
 				{
-					for (var k=0; !box && k<nz; k++)
+					for (let k=0; !box && k<nz; k++)
 					{
 						if (this.isFilled(i, j, k) && !this.isBoxified(i, j, k))
 						{
@@ -190,16 +200,16 @@ export class VoxelLandscape
 			if (box)
 			{
 				// Check what can be merged
-				var xi = box.xi;
-				var yi = box.yi;
-				var zi = box.zi;
+				let xi = box.xi;
+				let yi = box.yi;
+				let zi = box.zi;
 
 				box.nx = nx; // merge=1 means merge just with the self box
 				box.ny = ny;
 				box.nz = nz;
 
 				// Merge in x
-				for (var i=xi; i<nx+1; i++)
+				for (let i=xi; i<nx+1; i++)
 				{
 					if (!this.isFilled(i, yi, zi) || this.isBoxified(i, yi, zi) && this.getBoxIndex(i, yi, zi)!==-1)
 					{
@@ -210,10 +220,10 @@ export class VoxelLandscape
 				}
 
 				// Merge in y
-				var found = false;
-				for (var i=xi; !found && i<xi+box.nx; i++)
+				let found = false;
+				for (let i=xi; !found && i<xi+box.nx; i++)
 				{
-					for (var j=yi; !found && j<ny+1; j++)
+					for (let j=yi; !found && j<ny+1; j++)
 					{
 						if (!this.isFilled(i, j, zi) || this.isBoxified(i, j, zi) && this.getBoxIndex(i, j, zi)!==-1)
 						{
@@ -225,11 +235,11 @@ export class VoxelLandscape
 
 				// Merge in z
 				found = false;
-				for (var i=xi; !found && i<xi+box.nx; i++)
+				for (let i=xi; !found && i<xi+box.nx; i++)
 				{
-					for (var j=yi; !found && j<yi+box.ny; j++)
+					for (let j=yi; !found && j<yi+box.ny; j++)
 					{
-						for (var k=zi; k<nz+1; k++)
+						for (let k=zi; k<nz+1; k++)
 						{
 							if (!this.isFilled(i, j, k) || this.isBoxified(i, j, k) && this.getBoxIndex(i, j, k)!==-1)
 							{
@@ -245,11 +255,11 @@ export class VoxelLandscape
 				if (box.nz === 0) {box.nz = 1;}
 
 				// Set the merged boxes as boxified
-				for (var i=xi; i<xi+box.nx; i++)
+				for (let i=xi; i<xi+box.nx; i++)
 				{
-					for (var j=yi; j<yi+box.ny; j++)
+					for (let j=yi; j<yi+box.ny; j++)
 					{
-						for (var k=zi; k<zi+box.nz; k++)
+						for (let k=zi; k<zi+box.nz; k++)
 						{
 							if ( i >= xi && i <= xi+box.nx && j >= yi && j <= yi + box.ny && k >= zi && k <= zi + box.nz)
 							{
@@ -268,13 +278,13 @@ export class VoxelLandscape
 		}
 
 		// Set box positions
-		var sx = this.sx;
-		var sy = this.sy;
-		var sz = this.sz;
+		let sx = this.sx;
+		let sy = this.sy;
+		let sz = this.sz;
 
-		for (var i=0; i<this.boxes.length; i++)
+		for (let i=0; i<this.boxes.length; i++)
 		{
-			var b = this.boxes[i];
+			let b = this.boxes[i];
 
 			b.position.set(
 				b.xi * sx + b.nx*sx*0.5,

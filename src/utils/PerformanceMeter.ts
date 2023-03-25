@@ -8,48 +8,50 @@
 export class PerformanceMeter
 {
 	/**
+	 * Indicates if the meter is active or not.
+	 *
+	 * It is set active on reset.
+	 */
+	public active = false;
+
+	/**
+	 * List of values registered.
+	 */
+	public values = [];
+
+	/**
+	 * Last value registered for comparison.
+	 */
+	public last = null;
+
+	/**
+	 * Maximum value registered
+	 */
+	public max = null;
+
+	/**
+	 * Minimum value registered
+	 */
+	public min = null;
+
+	/**
+	 * Number of samples to take from the meter.
+	 */
+	public samples = 0;
+
+	/**
+	 * Function used to read measurement, by default performance.now is used.
+	 */
+	public read = function() {return performance.now();};
+
+	/**
 	 * @param {number} samples - Number of samples to read performance metrics. 
 	 */
-	constructor(samples)
+	constructor(samples: number = 100)
 	{
 		this.reset(false);
 
-		/**
-		 * Indicates if the meter is active or not.
-		 *
-		 * It is set active on reset.
-		 */
-		this.active = false;
-
-		/**
-		 * List of values registered.
-		 */
-		this.values = [];
-
-		/**
-		 * Last value registered for comparison.
-		 */
-		this.last = null;
-
-		/**
-		 * Maximum value registered
-		 */
-		this.max = null;
-
-		/**
-		 * Minimum value registered
-		 */
-		this.min = null;
-
-		/**
-		 * Number of samples to take from the meter.
-		 */
-		this.samples = samples ? samples : 100;
-
-		/**
-		 * Function used to read measurement, by default performance.now is used.
-		 */
-		this.read = function() {return performance.now();};
+		this.samples = samples;
 	}
 
 	/**
@@ -79,11 +81,11 @@ export class PerformanceMeter
 	{
 		if (this.active)
 		{
-			var time = this.read();
+			let time = this.read();
 
 			if (this.last !== null)
 			{
-				var delta = time - this.last;
+				let delta = time - this.last;
 
 				if (this.values.length < this.samples)
 				{

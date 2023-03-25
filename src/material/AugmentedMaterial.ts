@@ -50,7 +50,7 @@ export class AugmentedMaterial
 			` + shader.fragmentShader;
 
 
-			var fragmentEntryPoint = "#include <clipping_planes_fragment>";
+			let fragmentEntryPoint = "#include <clipping_planes_fragment>";
 			if (material instanceof ShadowMaterial)
 			{
 				fragmentEntryPoint = "#include <fog_fragment>";

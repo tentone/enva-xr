@@ -5,7 +5,7 @@ import {CanvasTexture} from "three";
  */
 export class DepthCanvasTexture extends CanvasTexture
 {
-	constructor(canvas)
+	public constructor(canvas: any)
 	{
 		super(canvas);
 	}
@@ -15,22 +15,22 @@ export class DepthCanvasTexture extends CanvasTexture
 	 *
 	 * Uses the camera planes to correctly adjust the values.
 	 */
-	updateDepth(depthInfo, near, far)
+	public updateDepth(depthInfo: any, near: number, far: number): void
 	{
-		var canvas = this.image;
+		let canvas = this.image;
 
 		canvas.width = depthInfo.height;
 		canvas.height = depthInfo.width;
 
-		var context = canvas.getContext("2d");
-		var image = context.getImageData(0, 0, canvas.width, canvas.height);
+		let context = canvas.getContext("2d");
+		let image = context.getImageData(0, 0, canvas.width, canvas.height);
 
-		for (var x = 0; x < depthInfo.width; x++)
+		for (let x = 0; x < depthInfo.width; x++)
 		{
-			for (var y = 0; y < depthInfo.height; y++)
+			for (let y = 0; y < depthInfo.height; y++)
 			{
-				var distance = (depthInfo.getDepth(x, y) - near) / (far - near);
-				var j = (x * canvas.width + (canvas.width - y)) * 4;
+				let distance = (depthInfo.getDepth(x, y) - near) / (far - near);
+				let j = (x * canvas.width + (canvas.width - y)) * 4;
 
 				if (distance > 1.0) {distance = 1.0;}
 				else if (distance < 0.0) {distance = 0.0;}

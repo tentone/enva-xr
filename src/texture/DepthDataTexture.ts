@@ -11,9 +11,9 @@ export class DepthDataTexture extends DataTexture
 {
 	constructor()
 	{
-		var width = 160;
-		var height = 90;
-		var data = new Uint8Array(width * height);
+		let width = 160;
+		let height = 90;
+		let data = new Uint8Array(width * height);
 
 		super(data, width, height, RGFormat, UnsignedByteType);
 
@@ -30,7 +30,7 @@ export class DepthDataTexture extends DataTexture
 	 */
 	updateDepth(depthInfo)
 	{
-		var dataBuffer = depthInfo.data;
+		let dataBuffer = depthInfo.data;
 		this.image.data = new Uint8Array(dataBuffer.buffer, dataBuffer.byteOffset, dataBuffer.byteLength);
 		this.needsUpdate = true;
 	}

@@ -1,4 +1,4 @@
-import {Object3D, Vector3} from "three";
+import {Box3, Object3D, Vector3} from "three";
 
 export class ObjectUtils 
 {
@@ -7,18 +7,18 @@ export class ObjectUtils
 	 *
 	 * @param {Object3D} object - Object to center and scale into a unitary box.
 	 */
-	static centerUnitary(object)
+	public static centerUnitary(object: Object3D)
 	{
-		var box = ObjectUtils.calculateBoundingBox(object);
+		let box = ObjectUtils.calculateBoundingBox(object);
 
 		if (box !== null)
 		{
-			var size = new Vector3();
+			let size = new Vector3();
 			box.getSize(size);
 
-			var scale = 1 / (size.x > size.y ? size.x > size.z ? size.x : size.z : size.y > size.z ? size.y : size.z);
+			let scale = 1 / (size.x > size.y ? size.x > size.z ? size.x : size.z : size.y > size.z ? size.y : size.z);
 
-			var center = new Vector3();
+			let center = new Vector3();
 			box.getCenter(center);
 			center.multiplyScalar(scale);
 
@@ -35,18 +35,21 @@ export class ObjectUtils
 	 * @param {Object3D} object Root object to be traversed.
 	 * @return {Box3} Bounding box of the object considering all of its children.
 	 */
-	static calculateBoundingBox(object)
+	public static calculateBoundingBox(object: Object3D): Box3
 	{
-		var box = null;
+		let box: Box3 = null;
 
-		object.traverse(function(children)
+		object.traverse(function(children: Object3D)
 		{
-			var bounding = null;
+			let bounding = null;
 
 			// Mesh, Points, Lines
+			// @ts-ignore
 			if (children.geometry !== undefined)
 			{
+				// @ts-ignore
 				children.geometry.computeBoundingBox();
+				// @ts-ignore
 				bounding = children.geometry.boundingBox.clone();
 				bounding.applyMatrix4(children.matrixWorld);
 			}

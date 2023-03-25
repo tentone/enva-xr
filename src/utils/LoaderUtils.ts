@@ -1,6 +1,6 @@
-import {Vector3, Mesh, Scene} from "three";
+import {Vector3, Mesh, Scene, Matrix4, Euler} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
-import {Body} from "cannon-es";
+import {Body, World} from "cannon-es";
 import {threeToCannon} from 'three-to-cannon';
 import {AugmentedMaterial} from "../material/AugmentedMaterial";
 import {ObjectUtils} from "./ObjectUtils";
@@ -19,15 +19,15 @@ export class LoaderUtils
      * @param {*} rotation 
      * @param {*} scale 
      */
-	static loadGLTF(scene, world, matrix, url, rotation, scale)
+	static loadGLTF(scene: Scene, world: World, matrix: Matrix4, url: string, rotation: Euler, scale: number, depthDataTexture: any)
 	{
-		var position = new Vector3();
+		let position = new Vector3();
 		position.setFromMatrixPosition(matrix);
 
 		const loader = new GLTFLoader();
 		loader.loadAsync(url).then((gltf) =>
 		{
-			var object = gltf.scene;
+			let object = gltf.scene;
 			scene.add(object);
 
 			object.traverse((child) =>
@@ -36,7 +36,7 @@ export class LoaderUtils
 				{
 					child.castShadow = true;
 					child.receiveShadow = true;
-					child.material = AugmentedMaterial.transform(child.material, this.depthDataTexture);
+					child.material = AugmentedMaterial.transform(child.material, depthDataTexture);
 				}
 			});
 
@@ -45,11 +45,11 @@ export class LoaderUtils
 			object.updateMatrix();
 			object.updateMatrixWorld(true);
 
-			var box = ObjectUtils.calculateBoundingBox(object);
-			var center = new Vector3();
+			let box = ObjectUtils.calculateBoundingBox(object);
+			let center = new Vector3();
 			box.getCenter(center);
 
-			var size = new Vector3();
+			let size = new Vector3();
 			box.getSize(size);
 
 			object.position.set(-center.x, -center.y / 2, -center.z);
@@ -57,11 +57,13 @@ export class LoaderUtils
 			object.updateMatrix();
 			object.updateMatrixWorld(true);
 
+			// @ts-ignore
 			const shape = threeToCannon(object, {type: threeToCannon.Type.BOX});
 			const body = new Body();
 			body.type = Body.STATIC;
 			body.position.set(object.position.x, object.position.y + size.y / 2, object.position.z);
 			body.velocity.set(0, 0, 0);
+			// @ts-ignore
 			body.addShape(shape);
 			world.addBody(body);
 		});

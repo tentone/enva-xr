@@ -1,15 +1,14 @@
-import {WebGLRenderer} from "three";
-
-/**
- * XR session running.
- */
-let currentSession = null;
 
 /**
  * XR manager is used to manage wich XR session is currently running and prevent multiple sessions from running concorrently.
  */
 export class XRManager
 {
+	/**
+	 * XR session running.
+	 */
+	public static session = null;
+
 	/**
 	 * Start webxr session for immersive-ar with the provided session configuration.
 	 * 
@@ -21,20 +20,20 @@ export class XRManager
 	 */
 	static start(renderer, sessionInit = {}, onError = function() {})
 	{
-		if (currentSession === null)
+		if (XRManager.session === null)
 		{
 			function onSessionStarted(session)
 			{
 				session.addEventListener("end", onSessionEnded);
 				renderer.xr.setReferenceSpaceType("local");
 				renderer.xr.setSession(session);
-				currentSession = session;
+				XRManager.session = session;
 			}
 
 			function onSessionEnded(event)
 			{
-				currentSession.removeEventListener("end", onSessionEnded);
-				currentSession = null;
+				XRManager.session.removeEventListener("end", onSessionEnded);
+				XRManager.session = null;
 			}
 
 			navigator.xr.requestSession("immersive-ar", sessionInit).then(onSessionStarted).catch(onError);
@@ -46,10 +45,10 @@ export class XRManager
 	 */
 	static end()
 	{
-		if (!currentSession === null)
+		if (!XRManager.session === null)
 		{
-			currentSession.end();
-			currentSession = null;
+			XRManager.session.end();
+			XRManager.session = null;
 		}
 	}
 }

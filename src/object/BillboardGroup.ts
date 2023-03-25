@@ -1,4 +1,4 @@
-import {Mesh, BufferGeometry, MeshBasicMaterial, Quaternion} from "three";
+import {Mesh, BufferGeometry, MeshBasicMaterial, Quaternion, WebGLRenderer, Scene, Camera, Group, Material} from "three";
 
 /**
  * Billboard group is a group of objetcts that is automatically rotated to always face the camera.
@@ -14,11 +14,12 @@ export class BillboardGroup extends Mesh
 		this.frustumCulled = false;
 	}
 
-	onBeforeRender(renderer, scene, camera, geometry, material, group)
+	// @ts-ignore
+	public onBeforeRender(renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: Group)
 	{
 		super.onBeforeRender(renderer, scene, camera, geometry, material, group);
 
-		var quaternion = new Quaternion();
+		let quaternion = new Quaternion();
 		camera.getWorldQuaternion(quaternion);
 		this.quaternion.copy(quaternion);
 	}

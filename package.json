@@ -31,6 +31,7 @@
     "html-webpack-plugin": "5.5.0",
     "raw-loader": "4.0.2",
     "ts-node": "10.9.1",
+    "ts-loader": "9.4.2",
     "typescript": "5.0.2",
     "webpack": "5.76.3",
     "webpack-cli": "5.0.1",
