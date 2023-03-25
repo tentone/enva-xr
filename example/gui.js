@@ -153,45 +153,45 @@ export class GUI
 			LoaderUtils.loadGLTF(this.app.scene, this.app.world, this.app.cursor.matrix, "./assets/3d/ToyCar.glb", new Euler(0, 0, 0), 10.0);
 		})); */
 
-		this.container.appendChild(this.createButton("./assets/icon/rocks.svg", () =>
-		{
-			if (this.app.pose !== null)
-			{
-				var viewOrientation = this.app.pose.transform.orientation;
-				var viewPosition = this.app.pose.transform.position;
+		// this.container.appendChild(this.createButton("./assets/icon/rocks.svg", () =>
+		// {
+		// 	if (this.app.pose !== null)
+		// 	{
+		// 		var viewOrientation = this.app.pose.transform.orientation;
+		// 		var viewPosition = this.app.pose.transform.position;
 
-				var orientation = new Quaternion(viewOrientation.x, viewOrientation.y, viewOrientation.z, viewOrientation.w);
+		// 		var orientation = new Quaternion(viewOrientation.x, viewOrientation.y, viewOrientation.z, viewOrientation.w);
 
-				var speed = 0.0;
+		// 		var speed = 0.0;
 
-				var direction = new Vector3(0.0, 0.0, -1.0);
-				direction.applyQuaternion(orientation);
-				direction.multiplyScalar(speed);
+		// 		var direction = new Vector3(0.0, 0.0, -1.0);
+		// 		direction.applyQuaternion(orientation);
+		// 		direction.multiplyScalar(speed);
 
-				var position = new Vector3(viewPosition.x, viewPosition.y, viewPosition.z);
+		// 		var position = new Vector3(viewPosition.x, viewPosition.y, viewPosition.z);
 
-				var geometry = new SphereBufferGeometry(0.05, 24, 24);
-				var material = new MeshPhysicalMaterial({
-					map: new TextureLoader().load('assets/texture/ball/color.jpg'),
-					roughness: 1.0,
-					metalness: 0.0,
-					roughnessMap: new TextureLoader().load('assets/texture/ball/roughness.jpg'),
-					normalMap: new TextureLoader().load('assets/texture/ball/normal.png')
-				});
+		// 		var geometry = new SphereBufferGeometry(0.05, 24, 24);
+		// 		var material = new MeshPhysicalMaterial({
+		// 			map: new TextureLoader().load('assets/texture/ball/color.jpg'),
+		// 			roughness: 1.0,
+		// 			metalness: 0.0,
+		// 			roughnessMap: new TextureLoader().load('assets/texture/ball/roughness.jpg'),
+		// 			normalMap: new TextureLoader().load('assets/texture/ball/normal.png')
+		// 		});
 
-				material = this.app.createAugmentedMaterial(material, this.app.depthDataTexture);
+		// 		material = this.app.createAugmentedMaterial(material, this.app.depthDataTexture);
 
-				var shape = new Sphere(0.05);
+		// 		var shape = new Sphere(0.05);
 
-				var ball = new PhysicsObject(geometry, material, this.app.world);
-				ball.castShadow = true;
-				ball.receiveShadow = true;
-				ball.position.copy(position);
-				ball.body.velocity.set(direction.x, direction.y, direction.z);
-				ball.addShape(shape);
-				ball.initialize();
-				this.app.scene.add(ball);
-			}
-		}));
+		// 		var ball = new PhysicsObject(geometry, material, this.app.world);
+		// 		ball.castShadow = true;
+		// 		ball.receiveShadow = true;
+		// 		ball.position.copy(position);
+		// 		ball.body.velocity.set(direction.x, direction.y, direction.z);
+		// 		ball.addShape(shape);
+		// 		ball.initialize();
+		// 		this.app.scene.add(ball);
+		// 	}
+		// }));
 	}
 }

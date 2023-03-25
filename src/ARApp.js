@@ -171,16 +171,6 @@ export class ARApp
 		this.domContainer.style.left = "0px";
 		this.domContainer.style.width = "100%";
 		this.domContainer.style.height = "100%";
-
-		/**
-		 * Performance meter to measure full frame times.
-		 */
-		this.timeMeter = new PerformanceMeter();
-
-		/**
-		 * Performance meter to measure only the frame composition time.
-		 */
-		this.timeMeterFrame = new PerformanceMeter();
 	}
 
 
@@ -190,15 +180,15 @@ export class ARApp
 	initialize()
 	{
 		this.createScene();
-		this.createWorld();
+		// this.createWorld();
 
 		this.resolution.set(window.innerWidth, window.innerHeight);
-
 
 		document.body.appendChild(this.domContainer);
 
 		this.resetDepthCanvas();
 		this.createRenderer();
+		this.setRenderMode(ARApp.NORMAL);
 
 		// Cursor to select objects
 		this.scene.add(this.cursor);
@@ -256,17 +246,17 @@ export class ARApp
 		this.directionalLight.shadow.camera.top = 5;
 		this.scene.add(this.directionalLight);
 
-		this.lightProbe = new AmbientLightProbe();
-		this.scene.add(this.lightProbe);
+		// this.lightProbe = new AmbientLightProbe();
+		// this.scene.add(this.lightProbe);
 
-		this.shadowMaterial = new ShadowMaterial({opacity: 0.5});
-		this.shadowMaterial = AugmentedMaterial.transform(this.shadowMaterial, this.depthDataTexture);
+		// this.shadowMaterial = new ShadowMaterial({opacity: 0.5});
+		// this.shadowMaterial = AugmentedMaterial.transform(this.shadowMaterial, this.depthDataTexture);
 
-		this.floorMesh = new Mesh(new PlaneBufferGeometry(100, 100, 1, 1), this.shadowMaterial);
-		this.floorMesh.rotation.set(-Math.PI / 2, 0, 0);
-		this.floorMesh.castShadow = false;
-		this.floorMesh.receiveShadow = true;
-		this.scene.add(this.floorMesh);
+		// this.floorMesh = new Mesh(new PlaneBufferGeometry(100, 100, 1, 1), this.shadowMaterial);
+		// this.floorMesh.rotation.set(-Math.PI / 2, 0, 0);
+		// this.floorMesh.castShadow = false;
+		// this.floorMesh.receiveShadow = true;
+		// this.scene.add(this.floorMesh);
 	}
 
 	/**
@@ -343,7 +333,7 @@ export class ARApp
 		{
 			this.scene.overrideMaterial = new MeshDepthMaterial();
 		}
-		else if (this.mode === DEBUG_AR_DEPTH)
+		else if (this.mode === ARApp.DEBUG_AR_DEPTH)
 		{
 			this.scene.overrideMaterial = null;
 			this.debugDepth = true;
@@ -381,6 +371,7 @@ export class ARApp
 	{
 		this.canvas = document.createElement("canvas");
 		document.body.appendChild(this.canvas);
+
 		this.glContext = this.canvas.getContext("webgl2", {xrCompatible: true});
 
 		this.renderer = new WebGLRenderer(
@@ -517,11 +508,7 @@ export class ARApp
 	 */
 	render(time, frame)
 	{
-		this.timeMeter.tock();
-		this.timeMeterFrame.tick();
 
-		let delta = time - this.lastTime;
-		this.lastTime = time;
 
 		if (!frame)
 		{
@@ -529,8 +516,9 @@ export class ARApp
 		}
 
 		// Update physics this.world
-		this.world.step(delta / 1e3);
-
+		// let delta = time - this.lastTime;
+		// this.lastTime = time;
+		// this.world.step(delta / 1e3);
 
 		var session = this.renderer.xr.getSession();
 		var referenceSpace = this.renderer.xr.getReferenceSpace();
@@ -551,16 +539,16 @@ export class ARApp
 				});
 			});
 
-			session.requestLightProbe().then((probe) =>
-			{
-				this.xrLightProbe = probe;
+			// session.requestLightProbe().then((probe) =>
+			// {
+			// 	this.xrLightProbe = probe;
 
-				// Get cube map for reflections
-				/* this.xrLightProbe.addEventListener("reflectionchange", () => {
-					var glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
-					console.log(glCubeMap);
-				}); */
-			});
+			// 	// Get cube map for reflections
+			// 	/* this.xrLightProbe.addEventListener("reflectionchange", () => {
+			// 		var glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
+			// 		console.log(glCubeMap);
+			// 	}); */
+			// });
 
 			session.addEventListener("end", () =>
 			{
@@ -573,22 +561,22 @@ export class ARApp
 
 
 		// Process lighting condition from probe
-		if (this.xrLightProbe)
-		{
-			let lightEstimate = frame.getLightEstimate(this.xrLightProbe);
-			if (lightEstimate)
-			{
-				let directionalPosition = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
-				directionalPosition.multiplyScalar(5);
+		// if (this.xrLightProbe)
+		// {
+		// 	let lightEstimate = frame.getLightEstimate(this.xrLightProbe);
+		// 	if (lightEstimate)
+		// 	{
+		// 		let directionalPosition = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
+		// 		directionalPosition.multiplyScalar(5);
 
-				let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
-				this.directionalLight.position.copy(directionalPosition);
-				this.directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
-				this.directionalLight.intensity = intensity;
+		// 		let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
+		// 		this.directionalLight.position.copy(directionalPosition);
+		// 		this.directionalLight.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
+		// 		this.directionalLight.intensity = intensity;
 
-				this.lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
-			}
-		}
+		// 		this.lightProbe.sh.fromArray(lightEstimate.sphericalHarmonicsCoefficients);
+		// 	}
+		// }
 
 		// Process Hit test
 		if (this.xrHitTestSource)
@@ -597,20 +585,20 @@ export class ARApp
 			if (hitTestResults.length)
 			{
 				var hit = hitTestResults[0];
-
+				
 				this.cursor.visible = true;
 				this.cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 
-				// Update physics floor plane
-				var position = new Vector3();
-				position.setFromMatrixPosition(this.cursor.matrix);
-				if (position.y < this.floor.position.y)
-				{
-					this.floor.position.y = position.y;
-				}
+				// // Update physics floor plane
+				// var position = new Vector3();
+				// position.setFromMatrixPosition(this.cursor.matrix);
+				// if (position.y < this.floor.position.y)
+				// {
+				// 	this.floor.position.y = position.y;
+				// }
 
-				// Shadow plane
-				this.floorMesh.position.y = position.y;
+				// // Shadow plane
+				// this.floorMesh.position.y = position.y;
 			}
 			else
 			{
@@ -624,51 +612,50 @@ export class ARApp
 		}
 
 		// Handle depth
-		var viewerPose = frame.getViewerPose(referenceSpace);
-		if (viewerPose)
-		{
-			this.pose = viewerPose;
-			for (var view of this.pose.views)
-			{
-				var depthInfo = frame.getDepthInformation(view);
-				if (depthInfo)
-				{
-					// Voxel environment
-					// this.voxelEnvironment.update(this.camera, depthData);
+		// var viewerPose = frame.getViewerPose(referenceSpace);
+		// if (viewerPose)
+		// {
+		// 	this.pose = viewerPose;
+		// 	for (var view of this.pose.views)
+		// 	{
+		// 		var depthInfo = frame.getDepthInformation(view);
+		// 		if (depthInfo)
+		// 		{
+		// 			// Voxel environment
+		// 			// this.voxelEnvironment.update(this.camera, depthData);
 
-					// Update textures
-					this.depthDataTexture.updateDepth(depthInfo);
+		// 			// Update textures
+		// 			this.depthDataTexture.updateDepth(depthInfo);
 
-					// Draw canvas texture depth
-					if (this.debugDepth)
-					{
-						this.depthTexture.updateDepth(depthInfo, this.camera.near, this.camera.far);
-					}
+		// 			// Draw canvas texture depth
+		// 			if (this.debugDepth)
+		// 			{
+		// 				this.depthTexture.updateDepth(depthInfo, this.camera.near, this.camera.far);
+		// 			}
 
-					// Update normal matrix
-					AugmentedMaterial.updateUniforms(this.scene, depthInfo);
-				}
-			}
-		}
+		// 			// Update normal matrix
+		// 			AugmentedMaterial.updateUniforms(this.scene, depthInfo);
+		// 		}
+		// 	}
+		// }
 
 		this.renderer.render(this.scene, this.camera);
-		this.timeMeterFrame.tock();
+		// this.timeMeterFrame.tock();
 
-		if (this.timeMeter.finished() && this.timeMeterFrame.finished())
-		{
-			var a = this.timeMeter.stats();
-			this.timeMeter.reset(false);
+		// if (this.timeMeter.finished() && this.timeMeterFrame.finished())
+		// {
+		// 	var a = this.timeMeter.stats();
+		// 	this.timeMeter.reset(false);
 
-			var b = this.timeMeterFrame.stats();
-			this.timeMeterFrame.reset(false);
+		// 	var b = this.timeMeterFrame.stats();
+		// 	this.timeMeterFrame.reset(false);
 			
-			// Log performance metrics
-			console.log(`${c++};${a.average};${a.max};${a.min};${b.average};${b.max};${b.min}`);
-		}
+		// 	// Log performance metrics
+		// 	console.log(`${c++};${a.average};${a.max};${a.min};${b.average};${b.max};${b.min}`);
+		// }
 	}
 }
 
-var c = 0;
 
 /**
  * Render everything.
