@@ -10,58 +10,11 @@ import {XRManager} from "./utils/XRManager";
 import {Cursor} from "./object/Cursor";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
 import {DepthDataTexture} from "./texture/DepthDataTexture";
-import {PerformanceMeter} from "./utils/PerformanceMeter";
-import {AugmentedMaterial} from "./material/AugmentedMaterial";
 
-export class ARApp
+export class App
 {
 	constructor()
 	{
-		/**
-		 * Light probe used to acess the lighting estimation for the this.scene.
-		 */
-		this.xrLightProbe = null;
-
-		/**
-		 * Physics this.world used for interaction.
-		 */
-		this.world = null;
-
-		/**
-		 * Voxel environment use
-		 */
-		this.voxelEnvironment = null; // new VoxelEnvironment();
-
-		/**
-		 * Phsyics floor plane should be set to the lowest plane intersection found.
-		 */
-		this.floor = null;
-
-		/**
-		 * If true the depth data is shown.
-		 */
-		this.debugDepth = false;
-
-		/**
-		 * XR Viewer pose object.
-		 */
-		this.pose = null;
-
-		/**
-		 * Canvas to draw depth information for debug.
-		 */
-		this.depthCanvas = null;
-
-		/**
-		 * Depth canvas texture with the calculated depth used to debug.
-		 */
-		this.depthTexture = null;
-
-		/**
-		 * Depth data texture.
-		 */
-		this.depthDataTexture = null;
-
 		/**
 		 * Camera used to view the this.scene.
 		 */
@@ -73,59 +26,9 @@ export class ARApp
 		this.scene = new Scene();
 
 		/**
-		 * Directional shadow casting light.
-		 */
-		this.directionalLight = null;
-
-		/**
-		 * Light probe object using spherical harmonics.
-		 */
-		this.lightProbe = null;
-
-		/**
-		 * Mesh used as floor.
-		 */
-		this.shadowMaterial = null;
-
-		/**
-		 * Ambient light.
-		 */
-		this.ambientLight = null;
-
-		/**
-		 * Mesh used to cast shadows into the floor.
-		 */
-		this.floorMesh = null;
-
-		/**
-		 * Time of the last frame.
-		 */
-		this.lastTime = 0;
-
-		/**
 		 * WebGL this.renderer used to draw the this.scene.
 		 */
 		this.renderer = null;
-
-		/**
-		 * WebXR hit test source, (null until requested).
-		 */
-		this.xrHitTestSource = null;
-
-		/**
-		 * Indicates if a hit test source was requested.
-		 */
-		this.hitTestSourceRequested = false;
-
-		/**
-		 * Cursor to hit test the this.scene.
-		 */
-		this.cursor = new Cursor();
-
-		/**
-		 * Measurement being created currently.
-		 */
-		this.measurement = null;
 
 		/**
 		 * Size of the this.rendererer.
@@ -138,24 +41,14 @@ export class ARApp
 		this.glContext = null;
 
 		/**
-		 * XRWebGLBinding object used get additional gl data.
-		 */
-		this.xrGlBinding = null;
-
-		/**
 		 * Callback to update logic of the app before rendering.
 		 */
-		this.onFrame = null;
+		this.beforeframe = null;
 
 		/**
 		 * Rendering canvas.
 		 */
 		this.canvas = null;
-
-		/**
-		 * Rendering mode in use.
-		 */
-		this.mode = ARApp.NORMAL;
 
 		/**
 		 * DOM container for GUI elements visible in AR mode.
@@ -168,7 +61,36 @@ export class ARApp
 		this.domContainer.style.height = "100%";
 	}
 
+	/**
+	 * Start the XR mode.
+	 */
+	start() {
+		XRManager.start(this.renderer,
+			{
+				optionalFeatures: ["dom-overlay"],
+				domOverlay: {root: this.domContainer},
+				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
+				depthSensing: {
+					usagePreference: ["cpu-optimized", "gpu-optimized"],
+					dataFormatPreference: ["luminance-alpha", "float32"],
+				},
+			}, function(error)
+			{
+				alert("Error starting the AR session. " + error);
+			});
 
+		// Render loop
+		this.renderer.setAnimationLoop((time, frame) =>
+		{
+			if(this.beforeframe) {
+				this.beforeframe(time, this);
+			}
+			
+			this.render(time, frame);
+		});
+	}
+
+	
 	/**
 	 * Initalize the AR app.
 	 */
@@ -194,34 +116,7 @@ export class ARApp
 		this.start();
 	}
 
-	/**
-	 * Start the XR mode.
-	 */
-	start() {
-		XRManager.start(this.renderer,
-			{
-				optionalFeatures: ["dom-overlay"],
-				domOverlay: {root: this.domContainer},
-				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
-				depthSensing: {
-					usagePreference: ["cpu-optimized", "gpu-optimized"],
-					dataFormatPreference: ["luminance-alpha", "float32"],
-				},
-			}, function(error)
-			{
-				alert("Error starting the AR session. " + error);
-			});
 
-		// Render loop
-		this.renderer.setAnimationLoop((time, frame) =>
-		{
-			if(this.onFrame) {
-				this.onFrame(time, this);
-			}
-			
-			this.render(time, frame);
-		});
-	}
 
 	createScene()
 	{
