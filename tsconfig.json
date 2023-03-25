@@ -1,0 +1,37 @@
+{
+	"exclude": [
+		"node_modules"
+	],
+	"compilerOptions": {
+		"lib": [
+			"es2020",
+			"dom"
+		],
+		"baseUrl": "./src",
+		"outDir": "build",
+		"target": "esnext",
+		"types": ["node"],
+		"module": "commonjs",
+		"newLine": "lf",
+		"sourceMap": true,
+		"inlineSourceMap": false,
+		"inlineSources": false,
+		"declaration": false,
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"experimentalDecorators": true,
+		"allowSyntheticDefaultImports": true,
+		"removeComments": true,
+		"alwaysStrict": true,
+		"noImplicitUseStrict": false,
+		"strictBindCallApply": true,
+		"strictFunctionTypes": true,
+		"strictPropertyInitialization": false,
+		"strictNullChecks": false,
+		"forceConsistentCasingInFileNames": true,
+		"checkJs": false,
+		"allowJs": true,
+		"esModuleInterop": true,
+		"importHelpers": false
+	}
+}

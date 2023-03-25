@@ -197,7 +197,8 @@ export class ARApp
 	/**
 	 * Start the XR mode.
 	 */
-	start() {
+	start() 
+	{
 		XRManager.start(this.renderer,
 			{
 				optionalFeatures: ["dom-overlay"],
@@ -205,8 +206,8 @@ export class ARApp
 				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
 				depthSensing: {
 					usagePreference: ["cpu-optimized", "gpu-optimized"],
-					dataFormatPreference: ["luminance-alpha", "float32"],
-				},
+					dataFormatPreference: ["luminance-alpha", "float32"]
+				}
 			}, function(error)
 			{
 				alert("Error starting the AR session. " + error);
@@ -215,7 +216,8 @@ export class ARApp
 		// Render loop
 		this.renderer.setAnimationLoop((time, frame) =>
 		{
-			if(this.onFrame) {
+			if (this.onFrame) 
+			{
 				this.onFrame(time, this);
 			}
 			
@@ -303,7 +305,8 @@ export class ARApp
 	{
 		this.mode++;
 
-		if (mode !== null) {
+		if (mode !== null) 
+		{
 			this.mode = mode;
 		}
 

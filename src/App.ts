@@ -13,47 +13,48 @@ import {DepthDataTexture} from "./texture/DepthDataTexture";
 
 export class App
 {
+	/**
+	 * Camera used to view the this.scene.
+	 */
+	public camera = new PerspectiveCamera(60, 1, 0.1, 10);
+
+	/**
+	 * Scene to draw into the screen.
+	 */
+	public scene = new Scene();
+
+	/**
+	 * WebGL this.renderer used to draw the this.scene.
+	 */
+	public renderer = null;
+
+	/**
+	 * Size of the this.rendererer.
+	 */
+	public resolution = new Vector2();
+
+	/**
+	 * WebGL 2.0 context used to render.
+	 */
+	public glContext = null;
+
+	/**
+	 * Callback to update logic of the app before rendering.
+	 */
+	public beforeframe = null;
+
+	/**
+	 * Rendering canvas.
+	 */
+	public canvas = null;
+
+	/**
+	 * DOM container for GUI elements visible in AR mode.
+	 */
+	public domContainer = document.createElement("div");
+
 	constructor()
 	{
-		/**
-		 * Camera used to view the this.scene.
-		 */
-		this.camera = new PerspectiveCamera(60, 1, 0.1, 10);
-
-		/**
-		 * Scene to draw into the screen.
-		 */
-		this.scene = new Scene();
-
-		/**
-		 * WebGL this.renderer used to draw the this.scene.
-		 */
-		this.renderer = null;
-
-		/**
-		 * Size of the this.rendererer.
-		 */
-		this.resolution = new Vector2();
-
-		/**
-		 * WebGL 2.0 context used to render.
-		 */
-		this.glContext = null;
-
-		/**
-		 * Callback to update logic of the app before rendering.
-		 */
-		this.beforeframe = null;
-
-		/**
-		 * Rendering canvas.
-		 */
-		this.canvas = null;
-
-		/**
-		 * DOM container for GUI elements visible in AR mode.
-		 */
-		this.domContainer = document.createElement("div");
 		this.domContainer.style.position = "absolute";
 		this.domContainer.style.top = "0px";
 		this.domContainer.style.left = "0px";
@@ -74,7 +75,7 @@ export class App
 					usagePreference: ["cpu-optimized", "gpu-optimized"],
 					dataFormatPreference: ["luminance-alpha", "float32"],
 				},
-			}, function(error)
+			}, function()
 			{
 				alert("Error starting the AR session. " + error);
 			});

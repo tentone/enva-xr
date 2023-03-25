@@ -38,12 +38,20 @@ module.exports = {
 		}),
 		new Webpack.HotModuleReplacementPlugin()
 	],
+	resolve: {
+		extensions: ['.tsx', '.ts', '.js', '.glsl'],
+	},
 	module: {
 		rules: [
 			{
 				test: /\.glsl$/i,
 				use: "raw-loader"
-			}
+			},
+			{
+				test: /\.ts?$/,
+				use: 'ts-loader',
+				exclude: /node_modules/,
+			  },
 		]
 	}
 };
