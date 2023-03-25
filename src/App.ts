@@ -1,15 +1,5 @@
-import {
-	Vector3, Vector2, Mesh, WebGLRenderer, Scene, PerspectiveCamera,
-	DirectionalLight, AmbientLightProbe,
-	MeshBasicMaterial, MeshDepthMaterial, PlaneBufferGeometry,
-	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, AmbientLight
-} from "three";
-import {World, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3} from "cannon-es";
-import cannonDebugger from 'cannon-es-debugger';
+import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, Object3D} from "three";
 import {XRManager} from "./utils/XRManager";
-import {Cursor} from "./object/Cursor";
-import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
-import {DepthDataTexture} from "./texture/DepthDataTexture";
 
 export class App
 {
@@ -77,7 +67,7 @@ export class App
 				},
 			}, function()
 			{
-				alert("Error starting the AR session. " + error);
+				alert("Error starting the AR session. ");
 			});
 
 		// Render loop
@@ -97,16 +87,12 @@ export class App
 	 */
 	initialize()
 	{
-		this.createScene();
-		// this.createWorld();
 
 		this.resolution.set(window.innerWidth, window.innerHeight);
 
 		document.body.appendChild(this.domContainer);
 
-		this.resetDepthCanvas();
 		this.createRenderer();
-		this.setRenderMode(ARApp.NORMAL);
 
 		// Cursor to select objects
 		this.scene.add(this.cursor);
@@ -117,43 +103,10 @@ export class App
 		this.start();
 	}
 
-
-
-	createScene()
-	{
-		this.depthDataTexture = new DepthDataTexture();
-
-		this.ambientLight = new AmbientLight(0x333333);
-		this.scene.add(this.ambientLight);
-
-		this.directionalLight = new DirectionalLight();
-		this.directionalLight.castShadow = true;
-		this.directionalLight.shadow.mapSize.set(1024, 1024);
-		this.directionalLight.shadow.camera.far = 20;
-		this.directionalLight.shadow.camera.near = 0.1;
-		this.directionalLight.shadow.camera.left = -5;
-		this.directionalLight.shadow.camera.right = 5;
-		this.directionalLight.shadow.camera.bottom = -5;
-		this.directionalLight.shadow.camera.top = 5;
-		this.scene.add(this.directionalLight);
-
-		// this.lightProbe = new AmbientLightProbe();
-		// this.scene.add(this.lightProbe);
-
-		// this.shadowMaterial = new ShadowMaterial({opacity: 0.5});
-		// this.shadowMaterial = AugmentedMaterial.transform(this.shadowMaterial, this.depthDataTexture);
-
-		// this.floorMesh = new Mesh(new PlaneBufferGeometry(100, 100, 1, 1), this.shadowMaterial);
-		// this.floorMesh.rotation.set(-Math.PI / 2, 0, 0);
-		// this.floorMesh.castShadow = false;
-		// this.floorMesh.receiveShadow = true;
-		// this.scene.add(this.floorMesh);
-	}
-
 	/**
 	 * Chnage the random rendering method.
 	 */
-	setShadowType()
+	setShadowType(shadowType: number)
 	{
 		if (!this.renderer.shadowMap.enabled)
 		{
@@ -179,78 +132,17 @@ export class App
 		}
 
 		this.renderer.shadowMap.needsUpdate = true;
-		this.scene.traverse(function(child)
+		this.scene.traverse(function(child: Object3D)
 		{
+			// @ts-ignore
 			if (child.material)
 			{
+				// @ts-ignore
 				child.material.needsUpdate = true;
 			}
 		});
 
 		console.log("enva-xr: Shadow type changed to " + this.renderer.shadowMap.type);
-	}
-
-	/**
-	 * Switch the render mode being used by the framework
-	 * 
-	 * @param mode - Render mode to be used (optional, is missing sets next render mode)
-	 */
-	setRenderMode(mode = null)
-	{
-		this.mode++;
-
-		if (mode !== null) {
-			this.mode = mode;
-		}
-
-		if (this.mode === ARApp.DEBUG_CAMERA_IMAGE)
-		{
-			this.mode = ARApp.NORMAL;
-		}
-
-		if (this.mode === ARApp.NORMAL)
-		{
-			this.scene.overrideMaterial = null;
-			this.scene.traverse(function(child)
-			{
-				if (child.isMesh && child.material && child.material.isAgumentedMaterial)
-				{
-					child.material.userData.uOcclusionEnabled.value = true;
-					child.material.uniformsNeedUpdate = true;
-				}
-			});
-		}
-		else if (this.mode === ARApp.DEBUG_ZBUFFER)
-		{
-			this.scene.overrideMaterial = new MeshDepthMaterial();
-		}
-		else if (this.mode === ARApp.DEBUG_AR_DEPTH)
-		{
-			this.scene.overrideMaterial = null;
-			this.debugDepth = true;
-			this.depthCanvas.style.width = "100%";
-			this.depthCanvas.style.height = "100%";
-			this.depthCanvas.style.right = "0px";
-			this.depthCanvas.style.bottom = "0px";
-			this.depthCanvas.style.borderRadius = "0px";
-		}
-		else if (this.mode === ARApp.DEBUG_NO_OCCLUSION)
-		{
-			this.resetDepthCanvas();
-			this.scene.overrideMaterial = null;
-			this.scene.traverse(function(child)
-			{
-				if (child.isMesh && child.material && child.material.isAgumentedMaterial)
-				{
-					child.material.userData.uOcclusionEnabled.value = false;
-					child.material.uniformsNeedUpdate = true;
-				}
-			});
-		}
-		else if (this.mode === ARApp.DEBUG_CAMERA_IMAGE)
-		{
-			this.scene.overrideMaterial = new MeshBasicMaterial({transparent: true, opacity: 0.0});
-		}
 	}
 
 	/**
@@ -313,68 +205,6 @@ export class App
 		}
 	};
 
-
-	/**
-	 * Create physics this.world for collistion simulation.
-	 */
-	createWorld()
-	{
-		this.world = new World();
-		this.world.gravity.set(0, -9.8, 0);
-		this.world.defaultContactMaterial.contactEquationStiffness = 1e9;
-		this.world.defaultContactMaterial.contactEquationRelaxation = 4;
-		this.world.quatNormalizeSkip = 0;
-		this.world.quatNormalizeFast = false;
-
-		this.world.broadphase = new NaiveBroadphase();
-		this.world.broadphase.useBoundingBoxes = true;
-
-		let solver = new GSSolver();
-		solver.tolerance = 0.1;
-		solver.iterations = 7;
-		this.world.solver = new SplitSolver(solver);
-
-		this.floor = new Body();
-		this.floor.type = Body.STATIC;
-		this.floor.position.set(0, 0, 0);
-		this.floor.velocity.set(0, 0, 0);
-		this.floor.quaternion.setFromAxisAngle(new Vec3(1, 0, 0), -Math.PI / 2);
-		this.floor.addShape(new Plane());
-		this.world.addBody(this.floor);
-	}
-
-	/**
-	 * Enable the physics debugger.
-	 *
-	 * Cannot be disabled after its enabled.
-	 */
-	enablePhysicsDebugger()
-	{
-		cannonDebugger(this.scene, this.world.bodies, {
-			color: 0x00ff00,
-			autoUpdate: true
-		});
-	}
-
-	/**
-	 * Reset the depth debug canvas.
-	 */
-	resetDepthCanvas()
-	{
-		if (!this.depthCanvas)
-		{
-			this.depthCanvas = document.createElement("canvas");
-			this.domContainer.appendChild(this.depthCanvas);
-			this.depthTexture = new DepthCanvasTexture(this.depthCanvas);
-		}
-
-		this.depthCanvas.style.position = "absolute";
-		this.depthCanvas.style.right = "10px";
-		this.depthCanvas.style.bottom = "10px";
-		this.depthCanvas.style.borderRadius = "20px";
-		this.depthCanvas.style.width = "180px";
-		this.depthCanvas.style.height = "320px";
-	}
 
 	/**
 	 * Resize the canvas and this.renderer size.
