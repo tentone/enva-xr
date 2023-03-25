@@ -94,7 +94,7 @@ export class VoxelEnvironment
 	 *
 	 * Depth is checked agains all voxels in the volume, if the depth point gets outside the model is expanded to fit new data.
 	 */
-	public update(camera: Camera, depth: any-)
+	public update(camera: Camera, depth: any)
 	{
 		let width = depth.height;
 		let height = depth.width;

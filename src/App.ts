@@ -53,9 +53,18 @@ export class App
 	}
 
 	/**
-	 * Start the XR mode.
+	 * Initalize the AR app.
 	 */
-	start() {
+	public initialize(): void
+	{
+		this.resolution.set(window.innerWidth, window.innerHeight);
+		this.setupRenderer();
+
+		document.body.appendChild(this.domContainer);
+
+		// Resize this.renderer
+		window.addEventListener("resize", () => {this.resize();}, false);
+
 		XRManager.start(this.renderer,
 			{
 				optionalFeatures: ["dom-overlay"],
@@ -81,56 +90,13 @@ export class App
 		});
 	}
 
-	
-	/**
-	 * Initalize the AR app.
-	 */
-	initialize()
-	{
-
-		this.resolution.set(window.innerWidth, window.innerHeight);
-
-		document.body.appendChild(this.domContainer);
-
-		this.createRenderer();
-
-		// Cursor to select objects
-		this.scene.add(this.cursor);
-
-		// Resize this.renderer
-		window.addEventListener("resize", () => {this.resize();}, false);
-
-		this.start();
-	}
-
 	/**
 	 * Chnage the random rendering method.
 	 */
-	setShadowType(shadowType: number)
+	public setShadowType(shadowType: number): void
 	{
-		if (!this.renderer.shadowMap.enabled)
-		{
-			this.renderer.shadowMap.enabled = true;
-			this.renderer.shadowMap.type = BasicShadowMap;
-		}
-		else if (this.renderer.shadowMap.type === BasicShadowMap)
-		{
-			this.renderer.shadowMap.type = PCFShadowMap;
-		}
-		else if (this.renderer.shadowMap.type === PCFShadowMap)
-		{
-			this.renderer.shadowMap.type = PCFSoftShadowMap;
-		}
-		else if (this.renderer.shadowMap.type === PCFSoftShadowMap)
-		{
-			this.renderer.shadowMap.type = VSMShadowMap;
-		}
-		else if (this.renderer.shadowMap.type === VSMShadowMap)
-		{
-			this.renderer.shadowMap.enabled = false;
-			this.renderer.shadowMap.type = BasicShadowMap;
-		}
-
+		this.renderer.shadowMap.enabled === shadowType !== null;
+		this.renderer.shadowMap.type = shadowType;
 		this.renderer.shadowMap.needsUpdate = true;
 		this.scene.traverse(function(child: Object3D)
 		{
@@ -150,7 +116,7 @@ export class App
 	 *
 	 * @param {*} canvas
 	 */
-	createRenderer()
+	public setupRenderer(): void
 	{
 		this.canvas = document.createElement("canvas");
 		document.body.appendChild(this.canvas);
@@ -174,6 +140,7 @@ export class App
 
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = PCFSoftShadowMap;
+
 		this.renderer.sortObjects = false;
 		this.renderer.physicallyCorrectLights = true;
 
@@ -182,7 +149,7 @@ export class App
 		this.renderer.xr.enabled = true;
 	}
 
-	forceContextLoss()
+	public forceContextLoss(): void
 	{
 		try
 		{
@@ -209,7 +176,7 @@ export class App
 	/**
 	 * Resize the canvas and this.renderer size.
 	 */
-	resize()
+	public resize(): void
 	{
 		this.resolution.set(window.innerWidth, window.innerHeight);
 
@@ -227,7 +194,7 @@ export class App
 	 * @param {*} time
 	 * @param {*} frame
 	 */
-	render(time, frame)
+	public render(time, frame): void
 	{
 		if (!frame)
 		{
@@ -239,44 +206,44 @@ export class App
 		// this.lastTime = time;
 		// this.world.step(delta / 1e3);
 
-		let session = this.renderer.xr.getSession();
-		let referenceSpace = this.renderer.xr.getReferenceSpace();
+		// let session = this.renderer.xr.getSession();
+		// let referenceSpace = this.renderer.xr.getReferenceSpace();
 
-		if (!this.xrGlBinding)
-		{
-			this.xrGlBinding = new XRWebGLBinding(session, this.glContext);
-		}
+		// if (!this.xrGlBinding)
+		// {
+		// 	this.xrGlBinding = new XRWebGLBinding(session, this.glContext);
+		// }
 
-		// Request hit test source
-		if (!this.hitTestSourceRequested)
-		{
-			session.requestReferenceSpace("viewer").then((referenceSpace) =>
-			{
-				session.requestHitTestSource({space: referenceSpace}).then((source) =>
-				{
-					this.xrHitTestSource = source;
-				});
-			});
+		// // Request hit test source
+		// if (!this.hitTestSourceRequested)
+		// {
+		// 	session.requestReferenceSpace("viewer").then((referenceSpace) =>
+		// 	{
+		// 		session.requestHitTestSource({space: referenceSpace}).then((source) =>
+		// 		{
+		// 			this.xrHitTestSource = source;
+		// 		});
+		// 	});
 
-			// session.requestLightProbe().then((probe) =>
-			// {
-			// 	this.xrLightProbe = probe;
+		// 	// session.requestLightProbe().then((probe) =>
+		// 	// {
+		// 	// 	this.xrLightProbe = probe;
 
-			// 	// Get cube map for reflections
-			// 	/* this.xrLightProbe.addEventListener("reflectionchange", () => {
-			// 		let glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
-			// 		console.log(glCubeMap);
-			// 	}); */
-			// });
+		// 	// 	// Get cube map for reflections
+		// 	// 	/* this.xrLightProbe.addEventListener("reflectionchange", () => {
+		// 	// 		let glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
+		// 	// 		console.log(glCubeMap);
+		// 	// 	}); */
+		// 	// });
 
-			session.addEventListener("end", () =>
-			{
-				this.hitTestSourceRequested = false;
-				this.xrHitTestSource = null;
-			});
+		// 	session.addEventListener("end", () =>
+		// 	{
+		// 		this.hitTestSourceRequested = false;
+		// 		this.xrHitTestSource = null;
+		// 	});
 
-			this.hitTestSourceRequested = true;
-		}
+		// 	this.hitTestSourceRequested = true;
+		// }
 
 
 		// Process lighting condition from probe
@@ -297,38 +264,38 @@ export class App
 		// 	}
 		// }
 
-		// Process Hit test
-		if (this.xrHitTestSource)
-		{
-			let hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
-			if (hitTestResults.length)
-			{
-				let hit = hitTestResults[0];
+		// // Process Hit test
+		// if (this.xrHitTestSource)
+		// {
+		// 	let hitTestResults = frame.getHitTestResults(this.xrHitTestSource);
+		// 	if (hitTestResults.length)
+		// 	{
+		// 		let hit = hitTestResults[0];
 				
-				this.cursor.visible = true;
-				this.cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
+		// 		this.cursor.visible = true;
+		// 		this.cursor.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
 
-				// // Update physics floor plane
-				// let position = new Vector3();
-				// position.setFromMatrixPosition(this.cursor.matrix);
-				// if (position.y < this.floor.position.y)
-				// {
-				// 	this.floor.position.y = position.y;
-				// }
+		// 		// // Update physics floor plane
+		// 		// let position = new Vector3();
+		// 		// position.setFromMatrixPosition(this.cursor.matrix);
+		// 		// if (position.y < this.floor.position.y)
+		// 		// {
+		// 		// 	this.floor.position.y = position.y;
+		// 		// }
 
-				// // Shadow plane
-				// this.floorMesh.position.y = position.y;
-			}
-			else
-			{
-				this.cursor.visible = false;
-			}
+		// 		// // Shadow plane
+		// 		// this.floorMesh.position.y = position.y;
+		// 	}
+		// 	else
+		// 	{
+		// 		this.cursor.visible = false;
+		// 	}
 
-			if (this.measurement)
-			{
-				this.measurement.setPointFromMatrix(this.cursor.matrix);
-			}
-		}
+		// 	if (this.measurement)
+		// 	{
+		// 		this.measurement.setPointFromMatrix(this.cursor.matrix);
+		// 	}
+		// }
 
 		// Handle depth
 		// let viewerPose = frame.getViewerPose(referenceSpace);
@@ -359,6 +326,7 @@ export class App
 		// }
 
 		this.renderer.render(this.scene, this.camera);
+
 		// this.timeMeterFrame.tock();
 
 		// if (this.timeMeter.finished() && this.timeMeterFrame.finished())
