@@ -46,7 +46,7 @@ export class PhysicsObject extends Mesh
 	 * @param {Material} material - Material used to render the object. 
 	 * @param {World} world - Physics world where the object will be placed at.
 	 */
-	constructor(geometry, material, world)
+	public constructor(geometry, material, world)
 	{
 		super(geometry, material);
 

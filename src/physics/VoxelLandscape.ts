@@ -32,7 +32,7 @@ export class VoxelLandscape
 	 * @param {number} sy Size of the lanscape Y.
 	 * @param {number} sz Size of the lanscape Z.
 	 */
-	constructor(world, nx, ny, nz, sx, sy, sz)
+	public constructor(world, nx, ny, nz, sx, sy, sz)
 	{
 		this.nx = nx;
 		this.ny = ny;

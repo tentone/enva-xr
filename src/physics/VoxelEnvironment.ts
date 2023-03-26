@@ -43,7 +43,7 @@ export class VoxelEnvironment
 	 */
 	public grid = [];
 
-	constructor(world: World, size: number = 5.0, precision: number = 0.05)
+	public constructor(world: World, size: number = 5.0, precision: number = 0.05)
 	{
 		this.world = world;
 

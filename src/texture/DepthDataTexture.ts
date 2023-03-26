@@ -9,11 +9,11 @@ import {DataTexture, RGFormat, UnsignedByteType, LinearFilter} from "three";
  */
 export class DepthDataTexture extends DataTexture
 {
-	constructor()
+	public constructor()
 	{
-		let width = 160;
-		let height = 90;
-		let data = new Uint8Array(width * height);
+		let width: number = 160;
+		let height: number = 90;
+		let data: Uint8Array = new Uint8Array(width * height);
 
 		super(data, width, height, RGFormat, UnsignedByteType);
 
@@ -28,7 +28,7 @@ export class DepthDataTexture extends DataTexture
 	 *
 	 * @param {*} depthInfo
 	 */
-	updateDepth(depthInfo)
+	public updateDepth(depthInfo: any): void
 	{
 		let dataBuffer = depthInfo.data;
 

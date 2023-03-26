@@ -8,7 +8,7 @@ const output = path.resolve(__dirname, "./build");
 
 module.exports = {
 	mode: 'development',
-	entry: ['./example/main.js'],
+	entry: ['./example/main.ts'],
 	output: {
 		filename: '[name].bundle.js',
 		path: output

@@ -1,7 +1,7 @@
-import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, Object3D} from "three";
+import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D} from "three";
 import {XRManager} from "./utils/XRManager";
 
-export class App
+export class ARRenderer
 {
 	/**
 	 * Camera used to view the this.scene.
@@ -43,23 +43,23 @@ export class App
 	 */
 	public domContainer = document.createElement("div");
 
-	constructor()
+	public constructor()
 	{
 		this.domContainer.style.position = "absolute";
 		this.domContainer.style.top = "0px";
 		this.domContainer.style.left = "0px";
 		this.domContainer.style.width = "100%";
 		this.domContainer.style.height = "100%";
+
+		this.setupRenderer();
 	}
 
 	/**
 	 * Initalize the AR app.
 	 */
-	public initialize(): void
+	public start(): void
 	{
 		this.resolution.set(window.innerWidth, window.innerHeight);
-		this.setupRenderer();
-
 		document.body.appendChild(this.domContainer);
 
 		// Resize this.renderer
@@ -88,6 +88,13 @@ export class App
 			
 			this.render(time, frame);
 		});
+	}
+
+	/**
+	 * Dispose renderer, should be called when the renderer is not longer necessary.
+	 */
+	public dispose(): void {
+		this.forceContextLoss();
 	}
 
 	/**

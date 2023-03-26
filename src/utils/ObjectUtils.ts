@@ -7,7 +7,7 @@ export class ObjectUtils
 	 *
 	 * @param {Object3D} object - Object to center and scale into a unitary box.
 	 */
-	public static centerUnitary(object: Object3D)
+	public static centerUnitary(object: Object3D): void
 	{
 		let box = ObjectUtils.calculateBoundingBox(object);
 

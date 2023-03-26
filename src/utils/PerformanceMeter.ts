@@ -12,42 +12,44 @@ export class PerformanceMeter
 	 *
 	 * It is set active on reset.
 	 */
-	public active = false;
+	public active: boolean = false;
 
 	/**
 	 * List of values registered.
 	 */
-	public values = [];
+	public values: number[] = [];
 
 	/**
 	 * Last value registered for comparison.
 	 */
-	public last = null;
+	public last: number = null;
 
 	/**
 	 * Maximum value registered
 	 */
-	public max = null;
+	public max: number = null;
 
 	/**
 	 * Minimum value registered
 	 */
-	public min = null;
+	public min: number = null;
 
 	/**
 	 * Number of samples to take from the meter.
 	 */
-	public samples = 0;
+	public samples: number = 0;
 
 	/**
 	 * Function used to read measurement, by default performance.now is used.
 	 */
-	public read = function() {return performance.now();};
+	public read: () => number = function() {
+		return performance.now();
+	};
 
 	/**
 	 * @param {number} samples - Number of samples to read performance metrics. 
 	 */
-	constructor(samples: number = 100)
+	public constructor(samples: number = 100)
 	{
 		this.reset(false);
 

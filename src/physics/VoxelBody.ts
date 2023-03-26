@@ -17,7 +17,7 @@ export class VoxelBody extends Body
 	 */
 	public probability: number = 0.0;
 
-	constructor(manager: any, x: number, y: number, z: number)
+	public constructor(manager: any, x: number, y: number, z: number)
 	{
 		super();
 

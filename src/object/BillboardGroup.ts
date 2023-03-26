@@ -7,7 +7,7 @@ import {Mesh, BufferGeometry, MeshBasicMaterial, Quaternion, WebGLRenderer, Scen
  */
 export class BillboardGroup extends Mesh
 {
-	constructor()
+	public constructor()
 	{
 		super(new BufferGeometry(), new MeshBasicMaterial());
 

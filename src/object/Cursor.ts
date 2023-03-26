@@ -17,7 +17,7 @@ export class Cursor extends Mesh
 	 */
 	public onaction: Function = null; 
 
-	constructor(geometry: BufferGeometry, material: Material)
+	public constructor(geometry: BufferGeometry, material: Material)
 	{
 		if (!geometry)
 		{

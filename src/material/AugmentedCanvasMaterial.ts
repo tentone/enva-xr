@@ -7,7 +7,7 @@ import AugmentedMaterialVertex from "./AugmentedBasicMaterialVertex.glsl";
  */
 export class AugmentedCanvasMaterial extends ShaderMaterial
 {
-	constructor(colorMap, depthMap)
+	public constructor(colorMap, depthMap)
 	{
 		super({
 			uniforms: {

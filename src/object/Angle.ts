@@ -16,7 +16,7 @@ export class Angle extends Line
 	 */
 	public text: Text;
 
-	constructor(point: Vector3 = new Vector3(0, 0, 0))
+	public constructor(point: Vector3 = new Vector3(0, 0, 0))
 	{
 		super(new BufferGeometry().setFromPoints([point, point, point]), new LineBasicMaterial(
 			{

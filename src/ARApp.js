@@ -15,7 +15,7 @@ import {AugmentedMaterial} from "./material/AugmentedMaterial";
 
 export class ARApp
 {
-	constructor()
+	public constructor()
 	{
 		/**
 		 * Light probe used to acess the lighting estimation for the this.scene.

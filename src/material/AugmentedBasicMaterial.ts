@@ -9,7 +9,7 @@ import AugmentedBasicMaterialVertex from "./AugmentedBasicMaterialVertex.glsl";
  */
 export class AugmentedMaterial extends ShaderMaterial
 {
-	constructor(colorMap, depthMap)
+	public constructor(colorMap, depthMap)
 	{
 		super({
 			uniforms: {
