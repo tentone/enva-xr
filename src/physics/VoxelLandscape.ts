@@ -159,7 +159,7 @@ export class VoxelLandscape
 		// Remove all old boxes
 		for (let i = 0; i!== boxes.length; i++)
 		{
-			world.remove(boxes[i]);
+			world.removeBody(boxes[i]);
 		}
 
 		boxes.length = 0;

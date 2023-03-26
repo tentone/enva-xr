@@ -39,7 +39,7 @@ module.exports = {
 		new Webpack.HotModuleReplacementPlugin()
 	],
 	resolve: {
-		extensions: ['.tsx', '.ts', '.js', '.glsl'],
+		extensions: ['.ts', '.js', '.glsl'],
 	},
 	module: {
 		rules: [

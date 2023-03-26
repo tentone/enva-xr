@@ -31,6 +31,8 @@ export class DepthDataTexture extends DataTexture
 	updateDepth(depthInfo)
 	{
 		let dataBuffer = depthInfo.data;
+
+		// @ts-ignore
 		this.image.data = new Uint8Array(dataBuffer.buffer, dataBuffer.byteOffset, dataBuffer.byteLength);
 		this.needsUpdate = true;
 	}
