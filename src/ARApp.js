@@ -1,8 +1,8 @@
 import {
-	Vector3, Vector2, Mesh, WebGLRenderer, Scene, PerspectiveCamera,
-	DirectionalLight, AmbientLightProbe,
-	MeshBasicMaterial, MeshDepthMaterial, PlaneBufferGeometry,
-	ShadowMaterial, BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, AmbientLight
+	Vector2, WebGLRenderer, Scene, PerspectiveCamera,
+	DirectionalLight, 
+	MeshBasicMaterial, MeshDepthMaterial, 
+	BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMShadowMap, AmbientLight
 } from "three";
 import {World, NaiveBroadphase, SplitSolver, GSSolver, Body, Plane, Vec3} from "cannon-es";
 import cannonDebugger from 'cannon-es-debugger';
@@ -10,8 +10,6 @@ import {XRManager} from "./utils/XRManager";
 import {Cursor} from "./object/Cursor";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
 import {DepthDataTexture} from "./texture/DepthDataTexture";
-import {PerformanceMeter} from "./utils/PerformanceMeter";
-import {AugmentedMaterial} from "./material/AugmentedMaterial";
 
 export class ARApp
 {
