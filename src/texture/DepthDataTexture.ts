@@ -26,7 +26,7 @@ export class DepthDataTexture extends DataTexture
 	 *
 	 * Depth data is retrieved from the WebXR API.
 	 *
-	 * @param {*} depthInfo
+	 * @param depthInfo
 	 */
 	public updateDepth(depthInfo: any): void
 	{

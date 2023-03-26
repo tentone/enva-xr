@@ -1,12 +1,19 @@
 import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D} from "three";
 import {XRManager} from "./utils/XRManager";
 
+/**
+ * AR renderer is responsible for rendering the scene in AR environment.
+ * 
+ * The scene and internal WebGL renderer are managed by the AR renderer.
+ * 
+ * The renderer handles the render loop execution.
+ */
 export class ARRenderer
 {
 	/**
 	 * Camera used to view the this.scene.
 	 */
-	public camera = new PerspectiveCamera(60, 1, 0.1, 10);
+	public camera = new PerspectiveCamera(60, 1, 1e-1, 1e3);
 
 	/**
 	 * Scene to draw into the screen.
@@ -82,10 +89,6 @@ export class ARRenderer
 		// Render loop
 		this.renderer.setAnimationLoop((time, frame) =>
 		{
-			if(this.beforeframe) {
-				this.beforeframe(time, this);
-			}
-			
 			this.render(time, frame);
 		});
 	}
@@ -95,10 +98,13 @@ export class ARRenderer
 	 */
 	public dispose(): void {
 		this.forceContextLoss();
+		this.renderer.setAnimationLoop(null);
 	}
 
 	/**
-	 * Chnage the random rendering method.
+	 * Change the shadow map rendering method.
+	 * 
+	 * @param shadowType - Type of shadows to use.
 	 */
 	public setShadowType(shadowType: number): void
 	{
@@ -119,14 +125,22 @@ export class ARRenderer
 	}
 
 	/**
-	 * Create and setup webgl this.renderer object.
+	 * Create and setup webglrenderer.
+	 * 
+	 * Creates a webgl2 renderer with XR compatibility enabled.
+	 * 
+	 * If the canvas
 	 *
-	 * @param {*} canvas
+	 * @param canvas - Optional param with canvas to be used for rendering.
 	 */
-	public setupRenderer(): void
+	public setupRenderer(canvas?: HTMLCanvasElement | OffscreenCanvas): void
 	{
-		this.canvas = document.createElement("canvas");
-		document.body.appendChild(this.canvas);
+		if (canvas) {
+			this.canvas = canvas;
+		} else {
+			this.canvas = document.createElement("canvas");
+			document.body.appendChild(this.canvas);
+		}
 
 		this.glContext = this.canvas.getContext("webgl2", {xrCompatible: true});
 
@@ -156,11 +170,16 @@ export class ARRenderer
 		this.renderer.xr.enabled = true;
 	}
 
+	/**
+	 * Force the loss of webgl rendering context.
+	 * 
+	 * To ensure that all webgl resources are dealocatted and the context destroyed.
+	 */
 	public forceContextLoss(): void
 	{
 		try
 		{
-			if (this.renderer !== null)
+			if (this.renderer)
 			{
 				this.renderer.dispose();
 				this.renderer.forceContextLoss();
@@ -173,15 +192,16 @@ export class ARRenderer
 			throw new Error("Failed to destroy WebGL context.");
 		}
 
-		if (this.canvas !== null)
+		// Remove canvas from DOM
+		if (this.canvas)
 		{
-			document.body.removeChild(this.canvas);
+			this.canvas.parent.removeChild(this.canvas);
 		}
 	};
 
 
 	/**
-	 * Resize the canvas and this.renderer size.
+	 * Update the canvas and renderer size based on window size.
 	 */
 	public resize(): void
 	{
@@ -198,15 +218,20 @@ export class ARRenderer
 	/**
 	 * Update logic and render this.scene into the screen.
 	 *
-	 * @param {*} time
-	 * @param {*} frame
+	 * @param time - Time ellapsed since the beginning.
+	 * @param frame - XR frame object.
 	 */
-	public render(time, frame): void
+	public render(time: number, frame: XRFrame): void
 	{
 		if (!frame)
 		{
 			return;
 		}
+
+		if(this.beforeframe) {
+			this.beforeframe(time, this);
+		}
+		
 
 		// Update physics this.world
 		// let delta = time - this.lastTime;

@@ -1,4 +1,4 @@
-import {ShaderMaterial, Matrix4} from "three";
+import {ShaderMaterial, Matrix4, Texture} from "three";
 import AugmentedBasicMaterialFragment from "./AugmentedBasicMaterialFragment.glsl";
 import AugmentedBasicMaterialVertex from "./AugmentedBasicMaterialVertex.glsl";
 
@@ -9,7 +9,7 @@ import AugmentedBasicMaterialVertex from "./AugmentedBasicMaterialVertex.glsl";
  */
 export class AugmentedMaterial extends ShaderMaterial
 {
-	public constructor(colorMap, depthMap)
+	public constructor(colorMap: Texture, depthMap: Texture)
 	{
 		super({
 			uniforms: {

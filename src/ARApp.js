@@ -363,7 +363,7 @@ export class ARApp
 	/**
 	 * Create and setup webgl this.renderer object.
 	 *
-	 * @param {*} canvas
+	 * @param canvas
 	 */
 	createRenderer()
 	{
@@ -501,8 +501,8 @@ export class ARApp
 	/**
 	 * Update logic and render this.scene into the screen.
 	 *
-	 * @param {*} time
-	 * @param {*} frame
+	 * @param time
+	 * @param frame
 	 */
 	render(time, frame)
 	{

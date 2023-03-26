@@ -13,11 +13,11 @@ export class LoaderUtils
 	/**
      * Load GLTF file and place in scene.
      * 
-     * @param {Scene} scene - Scene to place the model at.
-     * 
-     * @param {*} url 
-     * @param {*} rotation 
-     * @param {*} scale 
+     * @param scene - Scene to place the model at.
+	 * @param world - Phyiscs world.
+     * @param url - URL of the file.
+     * @param rotation - Euler rotation.
+     * @param scale - Scale to apply in all axis.
      */
 	static loadGLTF(scene: Scene, world: World, matrix: Matrix4, url: string, rotation: Euler, scale: number, depthDataTexture: any)
 	{

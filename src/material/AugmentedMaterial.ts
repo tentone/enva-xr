@@ -12,8 +12,8 @@ export class AugmentedMaterial
 	 *
 	 * Can be used to test multiple material this.models with the AR functionality.
 	 *
-	 * @param {Material} material - Material to be transformed into an augmented material.
-	 * @param {Texture} depthMap - Depth map bound to the material. A single depth map should be used for all AR materials.
+	 * @param material - Material to be transformed into an augmented material.
+	 * @param depthMap - Depth map bound to the material. A single depth map should be used for all AR materials.
 	 */
 	static transform(material, depthMap)
 	{
@@ -105,8 +105,8 @@ export class AugmentedMaterial
 	 * 
 	 * https://immersive-web.github.io/depth-sensing/
 	 * 
-	 * @param {Scene} scene - Scene to be updated, tarverses all objects and updates materials found.
-	 * @param {XRCPUDepthInformation} depthInfo - Matrix obtained from AR depth from frame.getDepthInformation(view).
+	 * @param scene - Scene to be updated, tarverses all objects and updates materials found.
+	 * @param depthInfo - Matrix obtained from AR depth from frame.getDepthInformation(view).
 	 */
 	static updateUniforms(scene, depthInfo)
 	{

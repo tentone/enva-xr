@@ -72,7 +72,7 @@ export class VoxelEnvironment
 	 * @param {number} x X coordinate.
 	 * @param {number} y Y coordinate.
 	 * @param {number} z Z coordinate.
-	 * @return {number} Return the index of the voxel from its coordinates.
+	 * @returns Return the index of the voxel from its coordinates.
 	 */
 	 public getIndex(x: number, y: number, z: number)
 	 {

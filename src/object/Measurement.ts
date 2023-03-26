@@ -1,4 +1,4 @@
-import {BufferGeometry, Line, Line3, LineBasicMaterial, Vector3} from "three";
+import {BufferGeometry, Line, Line3, LineBasicMaterial, Matrix4, Vector3} from "three";
 import {Text} from "troika-three-text";
 
 /**
@@ -17,7 +17,7 @@ export class Measurement extends Line
 	public text: Text = new Text();
 
 	/**
-	 * @param {Vector3} point - First point of the measurement.
+	 * @param point - First point of the measurement.
 	 */
 	public constructor(point: Vector3 = new Vector3(0, 0, 0))
 	{
@@ -44,9 +44,9 @@ export class Measurement extends Line
 	 *
 	 * Useful for preview in real time the measurement.
 	 *
-	 * @param {Matrix4} matrix - Matrix to extract the position from.
+	 * @param matrix - Matrix to extract the position from.
 	 */
-	setPointFromMatrix(matrix)
+	public setPointFromMatrix(matrix: Matrix4): void
 	{
 		let position = new Vector3(matrix.elements[12], matrix.elements[13], matrix.elements[14]);
 		this.points[this.points.length - 1].copy(position);
@@ -60,7 +60,7 @@ export class Measurement extends Line
 	 *
 	 * Also recalculates the bouding sphere of the geometry to ensure proper camera culling.
 	 */
-	updateGeometry() 
+	public updateGeometry(): void
 	{
 		// @ts-ignore
 		let positions = this.geometry.attributes.position.array;
@@ -79,7 +79,7 @@ export class Measurement extends Line
 	/**
 	 * Update the text of the measurement.
 	 */
-	updateText() 
+	public updateText(): void
 	{
 		let distance = Math.round(this.points[0].distanceTo(this.points[1]) * 100);
 		let line = new Line3(this.points[0], this.points[1]);

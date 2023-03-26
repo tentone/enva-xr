@@ -47,7 +47,7 @@ export class PerformanceMeter
 	};
 
 	/**
-	 * @param {number} samples - Number of samples to read performance metrics. 
+	 * @param samples - Number of samples to read performance metrics. 
 	 */
 	public constructor(samples: number = 100)
 	{

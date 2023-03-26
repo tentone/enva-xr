@@ -5,7 +5,7 @@ export class ObjectUtils
 	/**
 	 * Resize a object to fit a unitary box and center around the origin.
 	 *
-	 * @param {Object3D} object - Object to center and scale into a unitary box.
+	 * @param object - Object to center and scale into a unitary box.
 	 */
 	public static centerUnitary(object: Object3D): void
 	{
@@ -33,7 +33,7 @@ export class ObjectUtils
 	 * Includes booth the object and all of its children, the box is adjusted to world space coordinates.
 	 *
 	 * @param {Object3D} object Root object to be traversed.
-	 * @return {Box3} Bounding box of the object considering all of its children.
+	 * @returns Bounding box of the object considering all of its children.
 	 */
 	public static calculateBoundingBox(object: Object3D): Box3
 	{

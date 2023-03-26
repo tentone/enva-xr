@@ -68,7 +68,7 @@ export class VoxelLandscape
 	 * @param {number} xi X coordinate.
 	 * @param {number} yi Y coordinate.
 	 * @param {number} zi Z coordinate.
-	 * @return {number} Return the index of the voxel from its coordinates.
+	 * @returns Return the index of the voxel from its coordinates.
 	 */
 	getBoxIndex(xi, yi, zi)
 	{
@@ -107,7 +107,7 @@ export class VoxelLandscape
 	 * @param {number} xi X coordinate.
 	 * @param {number} yi Y coordinate.
 	 * @param {number} zi Z coordinate.
-	 * @return {boolean} True if the coordinate is filled, false otherwise.
+	 * @returns True if the coordinate is filled, false otherwise.
 	 */
 	isFilled(xi, yi, zi)
 	{
@@ -135,7 +135,7 @@ export class VoxelLandscape
 	 * @param {number} yi Y coordinate.
 	 * @param {number} zi Z coordinate.
 	 * @param {boolean} boxified Boxified status to be set.
-	 * @return {boolean} The boxified status set in the position.
+	 * @returns The boxified status set in the position.
 	 */
 	setBoxified(xi, yi, zi, boxified)
 	{

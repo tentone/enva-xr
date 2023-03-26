@@ -8,8 +8,8 @@ export class MathUtils
 	/**
 	 * Project a point in the world to the screen correct screen position.
 	 *
-	 * @param {Vector3} point - Point to project from world coordinates to screen coordinates.
-	 * @param {Camera} camera - Camera object to extract the projection matrix used to project the point.
+	 * @param point - Point to project from world coordinates to screen coordinates.
+	 * @param camera - Camera object to extract the projection matrix used to project the point.
 	 */
 	static projectPoint(point: Vector3, resolution: Vector2, camera: Camera): Vector3
 	{

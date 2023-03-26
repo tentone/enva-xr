@@ -1,5 +1,5 @@
 import {Body, Shape, World} from "cannon-es";
-import {Vector3, Mesh, Quaternion, Matrix4} from "three";
+import {Vector3, Mesh, Quaternion, Matrix4, Material, BufferGeometry} from "three";
 
 /**
  * Wrapper for cannon.js physics objects.
@@ -42,11 +42,11 @@ export class PhysicsObject extends Mesh
 	public world: World = null;
 
 	/**
-	 * @param {BufferGeometry} geometry - Geometry of the object. 
-	 * @param {Material} material - Material used to render the object. 
-	 * @param {World} world - Physics world where the object will be placed at.
+	 * @param geometry - Geometry of the object. 
+	 * @param material - Material used to render the object. 
+	 * @param world - Physics world where the object will be placed at.
 	 */
-	public constructor(geometry, material, world)
+	public constructor(geometry: BufferGeometry, material: Material, world: World)
 	{
 		super(geometry, material);
 
@@ -94,7 +94,7 @@ export class PhysicsObject extends Mesh
 	 * Update object position and rotation based on cannon.js body.
 	 */
 	// @ts-ignore
-	public onBeforeRender(renderer, scene, camera, geometry, material, group): void
+	public onBeforeRender(renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: Group)
 	{
 		if (this.mode === PhysicsObject.LOCAL)
 		{

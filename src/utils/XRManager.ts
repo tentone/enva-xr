@@ -14,9 +14,9 @@ export class XRManager
 	 * 
 	 * If there is a session already running the method will throw an error.
 	 *
-	 * @param {WebGLRenderer} renderer - WebGL renderer object.
-	 * @param {any} sessionInit - Session initialization data.
-	 * @param {Function} onError - Callback method called if an error occurs.
+	 * @param renderer - WebGL renderer object.
+	 * @param sessionInit - Session initialization data.
+	 * @param onError - Callback method called if an error occurs.
 	 */
 	static async start(renderer, sessionInit = {}, onError = function() {}): Promise<void>
 	{

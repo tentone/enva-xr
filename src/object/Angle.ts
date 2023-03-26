@@ -1,4 +1,4 @@
-import {BufferGeometry, Line, LineBasicMaterial, Vector3} from "three";
+import {BufferGeometry, Line, LineBasicMaterial, Matrix4, Vector3} from "three";
 import {Text} from "troika-three-text";
 
 /**
@@ -41,9 +41,9 @@ export class Angle extends Line
 	 *
 	 * Useful for preview in real time the measurement.
 	 *
-	 * @param {*} matrix
+	 * @param matrix - Matrix to extract point.
 	 */
-	setPointFromMatrix(matrix)
+	public setPointFromMatrix(matrix: Matrix4): void
 	{
 		let position = new Vector3(matrix.elements[12], matrix.elements[13], matrix.elements[14]);
 		this.points[this.points.length - 1].copy(position);
@@ -57,7 +57,7 @@ export class Angle extends Line
 	 *
 	 * Also recalculates the bouding sphere of the geometry to ensure proper camera culling.
 	 */
-	updateGeometry()
+	public updateGeometry(): void
 	{
 		// @ts-ignore
 		let positions = this.geometry.attributes.position.array;
@@ -82,7 +82,7 @@ export class Angle extends Line
 	/**
 	 * Update the label text and position.
 	 */
-	getAngle()
+	public getAngle(): number
 	{
 		if (this.points.length < 3)
 		{
@@ -113,7 +113,7 @@ export class Angle extends Line
 	/**
 	 * Update the text of the measurement.
 	 */
-	updateText()
+	public updateText(): void
 	{
 		if (this.points.length < 3)
 		{
