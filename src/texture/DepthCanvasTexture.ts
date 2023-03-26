@@ -5,7 +5,7 @@ import {CanvasTexture} from "three";
  */
 export class DepthCanvasTexture extends CanvasTexture
 {
-	public public constructor(canvas: HTMLCanvasElement | OffscreenCanvas)
+	public constructor(canvas: HTMLCanvasElement | OffscreenCanvas)
 	{
 		super(canvas);
 	}

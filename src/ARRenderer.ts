@@ -52,6 +52,11 @@ export class ARRenderer
 
 	public constructor()
 	{
+		if (window.isSecureContext === false)
+		{
+			throw new Error("WebXR is not available trough HTTP.");
+		}
+
 		this.domContainer.style.position = "absolute";
 		this.domContainer.style.top = "0px";
 		this.domContainer.style.left = "0px";
@@ -111,6 +116,8 @@ export class ARRenderer
 		this.renderer.shadowMap.enabled === shadowType !== null;
 		this.renderer.shadowMap.type = shadowType;
 		this.renderer.shadowMap.needsUpdate = true;
+
+		// Update materials
 		this.scene.traverse(function(child: Object3D)
 		{
 			// @ts-ignore
