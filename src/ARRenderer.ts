@@ -38,7 +38,7 @@ export class ARRenderer
 	/**
 	 * Callback to update logic of the app before rendering.
 	 */
-	public beforeframe = null;
+	public onFrame:(time: number, renderer: ARRenderer) => void = null;
 
 	/**
 	 * Rendering canvas.
@@ -69,7 +69,7 @@ export class ARRenderer
 	/**
 	 * Initalize the AR app.
 	 */
-	public start(): void
+	public async start(): Promise<void>
 	{
 		this.resolution.set(window.innerWidth, window.innerHeight);
 		document.body.appendChild(this.domContainer);
@@ -77,22 +77,19 @@ export class ARRenderer
 		// Resize this.renderer
 		window.addEventListener("resize", () => {this.resize();}, false);
 
-		XRManager.start(this.renderer,
-			{
-				optionalFeatures: ["dom-overlay"],
-				domOverlay: {root: this.domContainer},
-				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
-				depthSensing: {
-					usagePreference: ["cpu-optimized", "gpu-optimized"],
-					dataFormatPreference: ["luminance-alpha", "float32"],
-				},
-			}, function()
-			{
-				alert("Error starting the AR session. ");
-			});
+		await XRManager.start(this.renderer,
+		{
+			optionalFeatures: ["dom-overlay"],
+			domOverlay: {root: this.domContainer},
+			requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
+			depthSensing: {
+				usagePreference: ["cpu-optimized", "gpu-optimized"],
+				dataFormatPreference: ["luminance-alpha", "float32"],
+			},
+		});
 
 		// Render loop
-		this.renderer.setAnimationLoop((time, frame) =>
+		this.renderer.setAnimationLoop((time: number, frame: any) =>
 		{
 			this.render(time, frame);
 		});
@@ -235,8 +232,8 @@ export class ARRenderer
 			return;
 		}
 
-		if(this.beforeframe) {
-			this.beforeframe(time, this);
+		if(this.onFrame) {
+			this.onFrame(time, this);
 		}
 		
 

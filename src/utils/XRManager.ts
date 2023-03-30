@@ -16,9 +16,8 @@ export class XRManager
 	 *
 	 * @param renderer - WebGL renderer object.
 	 * @param sessionInit - Session initialization data.
-	 * @param onError - Callback method called if an error occurs.
 	 */
-	static async start(renderer, sessionInit = {}, onError = function() {}): Promise<void>
+	static async start(renderer, sessionInit = {}): Promise<void>
 	{
 		if (XRManager.session)
 		{
