@@ -15,7 +15,7 @@ export class Cursor extends Mesh
 	 * 
 	 * Receives the pose of the cursor in world coordinates.
 	 */
-	public onaction: Function = null; 
+	public onAction: Function = null; 
 
 	public constructor(geometry: BufferGeometry, material: Material)
 	{
@@ -36,4 +36,6 @@ export class Cursor extends Mesh
 		this.matrixAutoUpdate = false;
 		this.visible = false;
 	}
+
+	
 }
