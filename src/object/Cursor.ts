@@ -1,14 +1,14 @@
 import {Mesh, MeshBasicMaterial, RingGeometry, CircleGeometry, BufferGeometry, Material} from "three";
 import {mergeBufferGeometries} from "three/examples/jsm/utils/BufferGeometryUtils";
+import {ARObject} from "./ARObject";
+import {ARRenderer} from "ARRenderer";
 
 /**
  * Cursor is used to interfact with the environment.
  * 
  * The cursor moves around with the device.
- * 
- * @extends {Mesh}
  */
-export class Cursor extends Mesh
+export class Cursor extends Mesh implements ARObject
 {
 	/**
 	 * Callback method to execute when the cursor is pressed.
@@ -35,6 +35,12 @@ export class Cursor extends Mesh
 
 		this.matrixAutoUpdate = false;
 		this.visible = false;
+	}
+
+	public isARObject: boolean = true;
+	
+	public beforeARUpdate(renderer: ARRenderer, frame: XRFrame) {
+		throw new Error("Method not implemented.");
 	}
 
 	

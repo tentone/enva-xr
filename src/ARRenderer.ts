@@ -2,6 +2,21 @@ import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Obje
 import {XRManager} from "./utils/XRManager";
 
 /**
+ * Configuration of the AR renderer.
+ * 
+ * Indicates the capabilities required by the renderer.
+ */
+class ARRendererConfig {
+	/**
+	 * Hit test allow the user to ray cast into real-wolrd depth data.
+	 * 
+	 * Useful for interaction, object placement, etc. 
+	 */
+	public hitTest: boolean = true;
+}
+
+
+/**
  * AR renderer is responsible for rendering the scene in AR environment.
  * 
  * The scene and internal WebGL renderer are managed by the AR renderer.
@@ -11,29 +26,56 @@ import {XRManager} from "./utils/XRManager";
 export class ARRenderer
 {
 	/**
+	 * Configuration of the AR renderer.
+	 */
+	public config: ARRendererConfig = new ARRendererConfig();
+
+	/**
 	 * Camera used to view the this.scene.
 	 */
-	public camera = new PerspectiveCamera(60, 1, 1e-1, 1e3);
+	public camera: PerspectiveCamera = new PerspectiveCamera(60, 1, 1e-1, 1e3);
 
 	/**
 	 * Scene to draw into the screen.
 	 */
-	public scene = new Scene();
+	public scene: Scene = new Scene();
 
 	/**
 	 * WebGL this.renderer used to draw the this.scene.
 	 */
-	public renderer = null;
+	public renderer: WebGLRenderer = null;
 
 	/**
 	 * Size of the this.rendererer.
 	 */
-	public resolution = new Vector2();
+	public resolution: Vector2 = new Vector2();
 
 	/**
 	 * WebGL 2.0 context used to render.
 	 */
-	public glContext = null;
+	public glContext: WebGLRenderingContext = null;
+
+	/**
+	 * XR session data.
+	 */
+	public xrSession: XRSession = null;
+
+	/**
+	 * XR Binding object used get additional gl data.
+	 */
+	public xrGlBinding: XRWebGLBinding = null;
+
+	/**
+	 * XR reference space.
+	 */
+	public xrReferenceSpace: XRReferenceSpace = null;
+
+	/**
+	 * XR hit test source.
+	 * 
+	 * Available when config.hitTest is set true.
+	 */
+	public xrHitTestSource: XRHitTestSource = null;
 
 	/**
 	 * Callback to update logic of the app before rendering.
@@ -110,7 +152,7 @@ export class ARRenderer
 	 */
 	public setShadowType(shadowType: number): void
 	{
-		this.renderer.shadowMap.enabled === shadowType !== null;
+		this.renderer.shadowMap.enabled = shadowType !== null;
 		this.renderer.shadowMap.type = shadowType;
 		this.renderer.shadowMap.needsUpdate = true;
 
@@ -231,6 +273,14 @@ export class ARRenderer
 		{
 			return;
 		}
+
+		if (!this.xrSession) {
+			this.xrSession = this.renderer.xr.getSession();
+			this.xrReferenceSpace = this.renderer.xr.getReferenceSpace();
+
+			this.xrGlBinding = new XRWebGLBinding(this.xrSession, this.glContext);
+		}
+	
 
 		if(this.onFrame) {
 			this.onFrame(time, this);
