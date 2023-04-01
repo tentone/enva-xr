@@ -17,6 +17,8 @@ export class Cursor extends Mesh implements ARObject
 	 */
 	public onAction: Function = null; 
 
+	public isARObject: boolean = true;
+
 	public constructor(geometry: BufferGeometry, material: Material)
 	{
 		if (!geometry)
@@ -36,12 +38,8 @@ export class Cursor extends Mesh implements ARObject
 		this.matrixAutoUpdate = false;
 		this.visible = false;
 	}
-
-	public isARObject: boolean = true;
 	
-	public beforeARUpdate(renderer: ARRenderer, frame: XRFrame) {
+	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void {
 		throw new Error("Method not implemented.");
-	}
-
-	
+	}	
 }

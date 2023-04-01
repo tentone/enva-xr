@@ -16,5 +16,5 @@ export interface ARObject
      * @param renderer - AR renderer instance.
      * @param frame - XR frame
      */
-    beforeARUpdate(renderer: ARRenderer, frame: XRFrame)
+    beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame)
 }
