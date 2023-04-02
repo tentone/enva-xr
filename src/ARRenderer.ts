@@ -23,6 +23,11 @@ class ARRendererConfig {
 	public lightProbe: boolean = true;
 
 	/**
+	 * Reflection cube map allow the obtain visual information of the user surrondings.
+	 */
+	public reflectionCubeMap: boolean = false;
+
+	/**
 	 * Depth information captured from the environment.
 	 */
 	public depth: boolean = true;
@@ -92,6 +97,20 @@ export class ARRenderer
 	public xrViewerPose: XRViewerPose = null;
 
 	/**
+	 * List of XR views available. Will depende on the type of hardware being used.
+	 * 
+	 * Multi screen hardware (e.g. HMD) might have multiple views into the AR scene.
+	 */
+	public xrViews: XRView[] = [];
+
+	/**
+	 * Depth information for each of the views available.
+	 * 
+	 * Updated when config.depth is set true.
+	 */
+	public xrDepth: XRDepthInformation[] = [];
+
+	/**
 	 * XR hit test source.
 	 * 
 	 * Hit test allow the user to ray cast into real-wolrd depth data.
@@ -107,7 +126,16 @@ export class ARRenderer
 	 * 
 	 * Available when config.lightProbe is set true.
 	 */
-	public xrLightProbe: any = null;
+	public xrLightProbe: XRLightProbe = null;
+
+	/**
+	 * Reflection cube map contains a WebGL cube map with the surrondings of the user/device.
+	 * 
+	 * https://developer.mozilla.org/en-US/docs/Web/API/XRWebGLBinding/getReflectionCubeMap
+	 * 
+	 * Available when config.lightProbe and config.reflectionCubeMap are set true.
+	 */
+	public xrReflectionCubeMap: any = null;
 
 	/**
 	 * Callback to update logic of the app before rendering.
@@ -136,8 +164,6 @@ export class ARRenderer
 		this.domContainer.style.left = "0px";
 		this.domContainer.style.width = "100%";
 		this.domContainer.style.height = "100%";
-
-		this.setupRenderer();
 	}
 
 	/**
@@ -145,6 +171,8 @@ export class ARRenderer
 	 */
 	public async start(): Promise<void>
 	{
+		await this.setupRenderer();
+
 		this.resolution.set(window.innerWidth, window.innerHeight);
 		document.body.appendChild(this.domContainer);
 
@@ -155,6 +183,7 @@ export class ARRenderer
 		{
 			optionalFeatures: ["dom-overlay"],
 			domOverlay: {root: this.domContainer},
+
 			requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
 			depthSensing: {
 				usagePreference: ["cpu-optimized", "gpu-optimized"],
@@ -211,7 +240,7 @@ export class ARRenderer
 	 *
 	 * @param canvas - Optional param with canvas to be used for rendering.
 	 */
-	public setupRenderer(canvas?: HTMLCanvasElement | OffscreenCanvas): void
+	public async setupRenderer(canvas?: HTMLCanvasElement | OffscreenCanvas): Promise<void>
 	{
 		if (canvas) {
 			this.canvas = canvas;
@@ -221,6 +250,8 @@ export class ARRenderer
 		}
 
 		this.glContext = this.canvas.getContext("webgl2", {xrCompatible: true});
+
+		await this.glContext.makeXRCompatible();
 
 		this.renderer = new WebGLRenderer(
 			{
@@ -313,8 +344,11 @@ export class ARRenderer
 				this.xrHitTestSource = null;
 			});
 
-			this.xrReferenceSpace = this.renderer.xr.getReferenceSpace();
+			// @ts-ignore
+			console.log('enva-xr: XR depth usage mode', this.xrSession.depthUsage, this.xrSession.depthDataFormat);
 
+
+			this.xrReferenceSpace = this.renderer.xr.getReferenceSpace();
 			this.xrGlBinding = new XRWebGLBinding(this.xrSession, this.glContext);
 		}
 	
@@ -329,11 +363,20 @@ export class ARRenderer
 		// Light probe
 		if (this.config.lightProbe && !this.xrLightProbe) {
 			// @ts-ignore
-			this.xrLightProbe = await this.xrSession.requestLightProbe();
-			this.xrLightProbe.addEventListener("reflectionchange", () => {
-				// let glCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
-				// console.log(glCubeMap);
+			this.xrLightProbe = await this.xrSession.requestLightProbe({
+				// @ts-ignore
+				reflectionFormat: this.xrSession.preferredReflectionFormat
 			});
+
+			if (this.config.reflectionCubeMap) {
+				this.xrLightProbe.onreflectionchange = () => {
+					// @ts-ignore
+					this.xrReflectionCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
+					
+					// console.log('enva-xr: XR light probe reflection change', this.xrReflectionCubeMap);
+				};
+	
+			}
 
 			console.log('enva-xr: XR light probe', this.xrLightProbe);
 		}
@@ -342,15 +385,27 @@ export class ARRenderer
 		this.xrViewerPose = frame.getViewerPose(this.xrReferenceSpace);
 		if (this.xrViewerPose)
 		{
-			for (let view of this.xrViewerPose.views)
-			{
-				// @ts-ignore
-				let depthInfo = frame.getDepthInformation(view);
-				if (depthInfo)
+			// console.log('enva-xr: XR viewer pose', depthInfo);
+
+			// @ts-ignore
+			this.xrViews = this.xrViewerPose.views;
+
+			// Update depth information
+			if (this.config.depth) {
+				this.xrDepth = [];
+				for (const view of this.xrViews)
 				{
-					// TODO <ADD CODE HERE>
+					// @ts-ignore
+					const depthInfo: XRDepthInformation = frame.getDepthInformation(view);
+					if (depthInfo)
+					{
+						// console.log('enva-xr: XR depth information', depthInfo);
+						this.xrDepth.push(depthInfo);
+					}
+					
 				}
 			}
+
 		}
 
 		// Update AR objects

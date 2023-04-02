@@ -12,3 +12,11 @@ declare module "*.glsl" {
     const value: string;
     export default value;
   }
+
+  type XRLightProbe = any;
+
+
+  type XRDepthInformation = any;
+  type XRCPUDepthInformation = any;
+
+  type XRWebGLDepthInformation = any;
