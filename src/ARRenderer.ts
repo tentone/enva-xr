@@ -345,13 +345,17 @@ export class ARRenderer
 			});
 
 			// @ts-ignore
-			console.log('enva-xr: XR depth usage mode', this.xrSession.depthUsage, this.xrSession.depthDataFormat);
+			console.log('enva-xr: XR got session, depth usage mode', this.xrSession.depthUsage, this.xrSession.depthDataFormat);
+		}
 
-
+		if (!this.xrReferenceSpace) {
 			this.xrReferenceSpace = this.renderer.xr.getReferenceSpace();
+		}
+		
+		if (!this.xrGlBinding) {
 			this.xrGlBinding = new XRWebGLBinding(this.xrSession, this.glContext);
 		}
-	
+		
 		// Hit test source
 		if (this.config.hitTest && !this.xrHitTestSource)
 		{

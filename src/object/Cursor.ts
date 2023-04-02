@@ -19,7 +19,7 @@ export class Cursor extends Mesh implements ARObject
 
 	public isARObject: boolean = true;
 
-	public constructor(geometry: BufferGeometry, material: Material)
+	public constructor(geometry?: BufferGeometry, material?: Material)
 	{
 		if (!geometry)
 		{
@@ -40,6 +40,17 @@ export class Cursor extends Mesh implements ARObject
 	}
 	
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void {
-		throw new Error("Method not implemented.");
+		
+		let hitTestResults = frame.getHitTestResults(renderer.xrHitTestSource);
+		if (hitTestResults.length)
+		{
+			let hit = hitTestResults[0];
+			this.visible = true;
+			this.matrix.fromArray(hit.getPose(renderer.xrReferenceSpace).transform.matrix);
+		}
+		else
+		{
+			this.visible = false;
+		}
 	}	
 }
