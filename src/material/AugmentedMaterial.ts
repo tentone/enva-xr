@@ -59,14 +59,14 @@ export class AugmentedMaterial
 			// Fragment depth logic
 
 			shader.fragmentShader = shader.fragmentShader.replace("void main",
-                `float getDepthInMeters(in sampler2D depthText, in vec2 uv)
+				`float getDepthInMeters(in sampler2D depthText, in vec2 uv)
             {
                 vec2 packedDepth = texture2D(depthText, uv).rg;
                 return dot(packedDepth, vec2(255.0, 256.0 * 255.0)) * uRawValueToMeters;
             }
             void main`);
 
-            shader.fragmentShader = shader.fragmentShader.replace(fragmentEntryPoint, `
+			shader.fragmentShader = shader.fragmentShader.replace(fragmentEntryPoint, `
             ${fragmentEntryPoint}
             if(uOcclusionEnabled)
             {

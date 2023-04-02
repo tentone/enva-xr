@@ -1,7 +1,7 @@
 import {Mesh, MeshBasicMaterial, RingGeometry, CircleGeometry, BufferGeometry, Material} from "three";
 import {mergeBufferGeometries} from "three/examples/jsm/utils/BufferGeometryUtils";
-import {ARObject} from "./ARObject";
 import {ARRenderer} from "ARRenderer";
+import {ARObject} from "./ARObject";
 
 /**
  * Cursor is used to interfact with the environment.
@@ -15,9 +15,9 @@ export class Cursor extends Mesh implements ARObject
 	 * 
 	 * Receives the pose of the cursor in world coordinates.
 	 */
-	public onAction: Function = null; 
+	public onAction: ()=> void = null; 
 
-	public isARObject: boolean = true;
+	public isARObject = true;
 
 	public constructor(geometry?: BufferGeometry, material?: Material)
 	{
@@ -39,8 +39,8 @@ export class Cursor extends Mesh implements ARObject
 		this.visible = false;
 	}
 	
-	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void {
-	
+	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void 
+	{
 		const hitResults: XRHitTestResult[] = frame.getHitTestResults(renderer.xrHitTestSource);
 		console.log('enva-xr: Hit test result', hitResults);
 		if (hitResults.length)

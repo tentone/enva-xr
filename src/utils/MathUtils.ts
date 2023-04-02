@@ -23,5 +23,5 @@ export class MathUtils
 		vector.z = 0;
 
 		return vector;
-	};
+	}
 }

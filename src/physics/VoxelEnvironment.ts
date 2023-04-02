@@ -43,7 +43,7 @@ export class VoxelEnvironment
 	 */
 	public grid = [];
 
-	public constructor(world: World, size: number = 5.0, precision: number = 0.05)
+	public constructor(world: World, size = 5.0, precision = 0.05)
 	{
 		this.world = world;
 
@@ -74,19 +74,19 @@ export class VoxelEnvironment
 	 * @param {number} z Z coordinate.
 	 * @returns Return the index of the voxel from its coordinates.
 	 */
-	 public getIndex(x: number, y: number, z: number)
-	 {
-		 let nx = this.length.x;
-		 let ny = this.length.y;
-		 let nz = this.length.z;
+	public getIndex(x: number, y: number, z: number)
+	{
+		let nx = this.length.x;
+		let ny = this.length.y;
+		let nz = this.length.z;
 
-		 if (x >= 0 && x < nx && y >= 0 && y < ny && z >= 0 && z < nz)
-		 {
-			 return x + nx * y + nx * ny * z;
-		 }
+		if (x >= 0 && x < nx && y >= 0 && y < ny && z >= 0 && z < nz)
+		{
+			return x + nx * y + nx * ny * z;
+		}
 
-		 return -1;
-	 }
+		return -1;
+	}
 
 
 	/**

@@ -11,8 +11,8 @@ export class DepthDataTexture extends DataTexture
 {
 	public constructor()
 	{
-		let width: number = 160;
-		let height: number = 90;
+		let width = 160;
+		let height = 90;
 		let data: Uint8Array = new Uint8Array(width * height);
 
 		super(data, width, height, RGFormat, UnsignedByteType);

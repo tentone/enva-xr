@@ -6,8 +6,14 @@ module.exports = {
 		ecmaVersion: 2015,
 		ecmaFeatures: {modules: true}
 	},
-	plugins: ["import"],
+	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+	parser: '@typescript-eslint/parser',
+	plugins: ['@typescript-eslint', "import"],
 	rules: {
+		"@typescript-eslint/no-unused-vars": "off",
+		"@typescript-eslint/ban-ts-comment": "off",
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-empty-function": "off",
 		"arrow-body-style": ["error", "always"],
 		"arrow-parens": "error",
 		"brace-style": ["error", "allman", {allowSingleLine: true}],
@@ -39,6 +45,7 @@ module.exports = {
 		"no-bitwise": "off",
 		"no-caller": "error",
 		"no-cond-assign": "error",
+		"no-constant-condition": "off",
 		"no-console": "off",
 		"no-debugger": "error",
 		"no-duplicate-imports": "error",

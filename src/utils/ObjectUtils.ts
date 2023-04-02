@@ -25,7 +25,7 @@ export class ObjectUtils
 			object.scale.set(scale, scale, scale);
 			object.position.set(-center.x, -scale * box.min.y, -center.z);
 		}
-	};
+	}
 
 	/**
 	 * Calculates a bounding box for an object considering all its children.

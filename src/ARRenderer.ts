@@ -1,36 +1,37 @@
 import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D} from "three";
+import {ARObject} from "object/ARObject";
 import {XRManager} from "./utils/XRManager";
-import { ARObject } from "object/ARObject";
 
 /**
  * Configuration of the AR renderer.
  * 
  * Indicates the capabilities required by the renderer.
  */
-class ARRendererConfig {
+class ARRendererConfig 
+{
 	/**
 	 * Hit test allow the user to ray cast into real-wolrd depth data.
 	 * 
 	 * Useful for interaction, object placement, etc. 
 	 */
-	public hitTest: boolean = true;
+	public hitTest = true;
 
 	/**
 	 * Lighting probe allow the system to check environment ligthing.
 	 * 
 	 * Tracks the intensity direction and color of the main light source.
 	 */
-	public lightProbe: boolean = true;
+	public lightProbe = true;
 
 	/**
 	 * Reflection cube map allow the obtain visual information of the user surrondings.
 	 */
-	public reflectionCubeMap: boolean = false;
+	public reflectionCubeMap = false;
 
 	/**
 	 * Depth information captured from the environment.
 	 */
-	public depth: boolean = true;
+	public depth = true;
 }
 
 /**
@@ -180,15 +181,15 @@ export class ARRenderer
 		window.addEventListener("resize", () => {this.resize();}, false);
 
 		await XRManager.start(this.renderer,
-		{
-			optionalFeatures: ["dom-overlay"],
-			domOverlay: {root: this.domContainer},
-			requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
-			depthSensing: {
-				// usagePreference: ["cpu-optimized", "gpu-optimized"],
-				// dataFormatPreference: ["luminance-alpha", "float32"],
-			},
-		});
+			{
+				optionalFeatures: ["dom-overlay"],
+				domOverlay: {root: this.domContainer},
+				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
+				depthSensing: {
+					usagePreference: ["cpu-optimized", "gpu-optimized"],
+					dataFormatPreference: ["luminance-alpha", "float32"]
+				}
+			});
 
 		// Render loop
 		this.renderer.setAnimationLoop((time: number, frame: any) =>
@@ -200,7 +201,8 @@ export class ARRenderer
 	/**
 	 * Dispose renderer, should be called when the renderer is not longer necessary.
 	 */
-	public dispose(): void {
+	public dispose(): void 
+	{
 		this.forceContextLoss();
 		this.renderer.setAnimationLoop(null);
 	}
@@ -241,9 +243,12 @@ export class ARRenderer
 	 */
 	public async setupRenderer(canvas?: HTMLCanvasElement | OffscreenCanvas): Promise<void>
 	{
-		if (canvas) {
+		if (canvas) 
+		{
 			this.canvas = canvas;
-		} else {
+		}
+		else 
+		{
 			this.canvas = document.createElement("canvas");
 			document.body.appendChild(this.canvas);
 		}
@@ -305,7 +310,7 @@ export class ARRenderer
 		{
 			this.canvas.parent.removeChild(this.canvas);
 		}
-	};
+	}
 
 
 	/**
@@ -336,7 +341,8 @@ export class ARRenderer
 			return;
 		}
 
-		if (!this.xrSession) {
+		if (!this.xrSession) 
+		{
 			this.xrSession = this.renderer.xr.getSession();
 			this.xrSession.addEventListener("end", () =>
 			{
@@ -347,11 +353,13 @@ export class ARRenderer
 			console.log('enva-xr: XR got session, depth usage mode', this.xrSession.depthUsage, this.xrSession.depthDataFormat);
 		}
 
-		if (!this.xrReferenceSpace) {
+		if (!this.xrReferenceSpace) 
+		{
 			this.xrReferenceSpace = this.renderer.xr.getReferenceSpace();
 		}
 		
-		if (!this.xrGlBinding) {
+		if (!this.xrGlBinding) 
+		{
 			this.xrGlBinding = new XRWebGLBinding(this.xrSession, this.glContext);
 		}
 
@@ -368,15 +376,18 @@ export class ARRenderer
 		}
 
 		// Light probe
-		if (this.config.lightProbe && !this.xrLightProbe) {
+		if (this.config.lightProbe && !this.xrLightProbe) 
+		{
 			// @ts-ignore
 			this.xrLightProbe = await this.xrSession.requestLightProbe({
 				// @ts-ignore
 				reflectionFormat: this.xrSession.preferredReflectionFormat
 			});
 
-			if (this.config.reflectionCubeMap) {
-				this.xrLightProbe.onreflectionchange = () => {
+			if (this.config.reflectionCubeMap) 
+			{
+				this.xrLightProbe.onreflectionchange = () => 
+				{
 					// @ts-ignore
 					this.xrReflectionCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
 					
@@ -398,7 +409,8 @@ export class ARRenderer
 			this.xrViews = this.xrViewerPose.views;
 
 			// Update depth information
-			if (this.config.depth) {
+			if (this.config.depth) 
+			{
 				this.xrDepth = [];
 				for (const view of this.xrViews)
 				{
@@ -416,15 +428,18 @@ export class ARRenderer
 		}
 
 		// Update AR objects
-		this.scene.traverse((object: Object3D): void => {
+		this.scene.traverse((object: Object3D): void => 
+		{
 			const ar = object as any as ARObject; 
-			if (ar.isARObject) {
+			if (ar.isARObject) 
+			{
 				ar.beforeARUpdate(this, time, frame);
 			}
 		});
 
 		// onFrame callback
-		if(this.onFrame) {
+		if (this.onFrame) 
+		{
 			this.onFrame(time, this);
 		}
 		

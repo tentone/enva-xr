@@ -17,14 +17,14 @@ export class PhysicsObject extends Mesh
 	 *
 	 * Faster but the physics object should not carry any world transformations.
 	 */
-	public static LOCAL: number = 100;
+	public static LOCAL = 100;
 
 	/**
 	 * The position of the object is adjusted to follow the parent object transformation.
 	 *
 	 * This mode should be used for objects placed inside others.
 	 */
-	public static WORLD: number = 101;
+	public static WORLD = 101;
 
 	/**
 	 * Physics body contains the following attributes:
@@ -88,7 +88,7 @@ export class PhysicsObject extends Mesh
 			// @ts-ignore
 			this.body.quaternion.copy(quaternion);
 		}
-	};
+	}
 
 	/**
 	 * Update object position and rotation based on cannon.js body.
@@ -135,7 +135,7 @@ export class PhysicsObject extends Mesh
 			inverse.multiply(transform);
 			inverse.decompose(this.position, this.quaternion, scale);
 		}
-	};
+	}
 
 	/**
 	 * Add shape to physics object body.
@@ -148,7 +148,7 @@ export class PhysicsObject extends Mesh
 		}
 
 		this.body.addShape(shape);
-	};
+	}
 }
 
 

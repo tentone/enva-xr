@@ -1,15 +1,16 @@
 import {Group} from "three";
-import {ARObject} from "./ARObject";
 import {ARRenderer} from "ARRenderer";
+import {ARObject} from "./ARObject";
 
 
 export class LightProbe extends Group implements ARObject
 {
 
-	public isARObject: boolean = true;
+	public isARObject = true;
 
 
-	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void {
+	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void 
+	{
 
 	}	
 }

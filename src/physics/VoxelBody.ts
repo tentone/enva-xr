@@ -5,7 +5,7 @@ export class VoxelBody extends Body
 	/**
 	 * Indicates if the body is enabled of disabled.
 	 */
-	public active: boolean = false;
+	public active = false;
 
 	/**
 	 * Voxel enviroment manager to wich this voxel body belongs.
@@ -15,7 +15,7 @@ export class VoxelBody extends Body
 	/**
 	 * Current probability of this voxel belonging to the enviroment.
 	 */
-	public probability: number = 0.0;
+	public probability = 0.0;
 
 	public constructor(manager: any, x: number, y: number, z: number)
 	{

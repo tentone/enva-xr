@@ -5,18 +5,26 @@ import {Vec3, Box, Body, World} from "cannon-es";
  */
 export class VoxelLandscape
 {
-	public nx: number = 0;
-	public ny: number = 0;
-	public nz: number = 0;
+	public nx = 0;
 
-	public sx: number = 0;
-	public sy: number = 0;
-	public sz: number = 0;
+	public ny = 0;
+
+	public nz = 0;
+
+	public sx = 0;
+
+	public sy = 0;
+
+	public sz = 0;
 
 	public world: World = null;
+
 	public map: any[] = [];
+
 	public boxified: any[] = [];
+
 	public boxes: any[] = [];
+
 	public boxShape: Box = null;
 
 	/**
@@ -147,7 +155,7 @@ export class VoxelLandscape
 	 *
 	 * Should not be called in the main loop it takes a while to update.
 	 */
-	update()
+	public update(): void
 	{
 		let boxes = this.boxes;
 		let world = this.world;

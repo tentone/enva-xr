@@ -42,7 +42,8 @@ export class XRManager
 	 */
 	static end()
 	{
-		if (!XRManager.session) {
+		if (!XRManager.session) 
+		{
 			throw new Error("No XR Session running.");
 		}
 

@@ -12,7 +12,7 @@ export class PerformanceMeter
 	 *
 	 * It is set active on reset.
 	 */
-	public active: boolean = false;
+	public active = false;
 
 	/**
 	 * List of values registered.
@@ -37,19 +37,20 @@ export class PerformanceMeter
 	/**
 	 * Number of samples to take from the meter.
 	 */
-	public samples: number = 0;
+	public samples = 0;
 
 	/**
 	 * Function used to read measurement, by default performance.now is used.
 	 */
-	public read: () => number = function() {
+	public read: () => number = function() 
+	{
 		return performance.now();
 	};
 
 	/**
 	 * @param samples - Number of samples to read performance metrics. 
 	 */
-	public constructor(samples: number = 100)
+	public constructor(samples = 100)
 	{
 		this.reset(false);
 
