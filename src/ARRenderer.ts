@@ -355,7 +355,7 @@ export class ARRenderer
 		if (!this.xrGlBinding) {
 			this.xrGlBinding = new XRWebGLBinding(this.xrSession, this.glContext);
 		}
-		
+
 		// Hit test source
 		if (this.config.hitTest && !this.xrHitTestSource)
 		{
@@ -413,7 +413,7 @@ export class ARRenderer
 		}
 
 		// Update AR objects
-		this.scene.traverse(function(object: Object3D): void {
+		this.scene.traverse((object: Object3D): void => {
 			const ar = object as any as ARObject; 
 			if (ar.isARObject) {
 				ar.beforeARUpdate(this, time, frame);
