@@ -131,11 +131,11 @@ export class ARRenderer
 	/**
 	 * Reflection cube map contains a WebGL cube map with the surrondings of the user/device.
 	 * 
-	 * https://developer.mozilla.org/en-US/docs/Web/API/XRWebGLBinding/getReflectionCubeMap
+	 * More information at https://developer.mozilla.org/en-US/docs/Web/API/XRWebGLBinding/getReflectionCubeMap
 	 * 
 	 * Available when config.lightProbe and config.reflectionCubeMap are set true.
 	 */
-	public xrReflectionCubeMap: any = null;
+	public xrReflectionCubeMap: WebGLTexture = null;
 
 	/**
 	 * Callback to update logic of the app before rendering.
@@ -183,11 +183,10 @@ export class ARRenderer
 		{
 			optionalFeatures: ["dom-overlay"],
 			domOverlay: {root: this.domContainer},
-
 			requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
 			depthSensing: {
-				usagePreference: ["cpu-optimized", "gpu-optimized"],
-				dataFormatPreference: ["luminance-alpha", "float32"],
+				// usagePreference: ["cpu-optimized", "gpu-optimized"],
+				// dataFormatPreference: ["luminance-alpha", "float32"],
 			},
 		});
 
@@ -359,7 +358,11 @@ export class ARRenderer
 		// Hit test source
 		if (this.config.hitTest && !this.xrHitTestSource)
 		{
-			this.xrHitTestSource = await this.xrSession.requestHitTestSource({space: this.xrReferenceSpace});
+			this.xrHitTestSource = await this.xrSession.requestHitTestSource({
+				space: this.xrReferenceSpace,
+				entityTypes: ['point', 'plane', 'mesh'],
+				offsetRay: new XRRay()
+			});
 
 			console.log('enva-xr: XR hit test source', this.xrHitTestSource);
 		}
@@ -377,7 +380,7 @@ export class ARRenderer
 					// @ts-ignore
 					this.xrReflectionCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
 					
-					// console.log('enva-xr: XR light probe reflection change', this.xrReflectionCubeMap);
+					console.log('enva-xr: XR light probe reflection change', this.xrReflectionCubeMap);
 				};
 	
 			}
@@ -389,7 +392,7 @@ export class ARRenderer
 		this.xrViewerPose = frame.getViewerPose(this.xrReferenceSpace);
 		if (this.xrViewerPose)
 		{
-			// console.log('enva-xr: XR viewer pose', depthInfo);
+			// console.log('enva-xr: XR viewer pose', this.xrViewerPose);
 
 			// @ts-ignore
 			this.xrViews = this.xrViewerPose.views;
