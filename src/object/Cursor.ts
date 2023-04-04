@@ -35,6 +35,7 @@ export class Cursor extends Mesh implements ARObject
 
 		super(geometry, material);
 
+		this.matrixAutoUpdate = false;
 		this.visible = false;
 	}
 	

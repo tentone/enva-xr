@@ -31,7 +31,7 @@ class ARRendererConfig
 	/**
 	 * Depth information captured from the environment.
 	 */
-	public depth = true;
+	public depth = false;
 }
 
 /**
@@ -182,13 +182,13 @@ export class ARRenderer
 
 		this.xrSession = await XRManager.start(this.renderer,
 			{
-				domOverlay: {root: this.domContainer},
+				// domOverlay: {root: this.domContainer},
 				requiredFeatures: ["hit-test", "light-estimation"],
-				optionalFeatures: ["dom-overlay", "depth-sensing"],
-				depthSensing: {
-					usagePreference: ["gpu-optimized", "cpu-optimized"],
-					dataFormatPreference: ["float32", "luminance-alpha"]
-				}
+				// optionalFeatures: ["dom-overlay"], //, "depth-sensing"],
+				// depthSensing: {
+				// 	usagePreference: ["gpu-optimized", "cpu-optimized"],
+				// 	dataFormatPreference: ["float32", "luminance-alpha"]
+				// }
 			});
 
 		this.xrSession.addEventListener("end", () =>
@@ -236,10 +236,10 @@ export class ARRenderer
 		}
 
 		// @ts-ignore
-		console.log('enva-xr: XR session ', this.xrSession.depthUsage, ' depth usage mode ', this.xrSession.depthDataFormat);
+		console.log('enva-xr: XR session ', this.xrSession);
 
 		console.log('enva-xr: Start render loop');
-		
+
 		// Render loop
 		this.renderer.setAnimationLoop((time: number, frame: any) =>
 		{
@@ -420,6 +420,18 @@ export class ARRenderer
 					{
 						// console.log('enva-xr: XR depth information', depthInfo);
 						this.xrDepth.push(depthInfo);
+
+						// // Update textures
+						// this.depthDataTexture.updateDepth(depthInfo);
+
+						// // Draw canvas texture depth
+						// if (this.debugDepth)
+						// {
+						// 	this.depthTexture.updateDepth(depthInfo, this.camera.near, this.camera.far);
+						// }
+
+						// // Update normal matrix
+						// AugmentedMaterial.updateUniforms(this.scene, depthInfo);
 					}
 					
 				}
