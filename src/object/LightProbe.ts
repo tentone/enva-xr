@@ -19,7 +19,8 @@ export class LightProbe extends Group implements ARObject
 
 	public isARObject = true;
 
-	public constructor() {
+	public constructor() 
+	{
 		super();
 
 		this.directionalLight = new DirectionalLight();
@@ -44,6 +45,9 @@ export class LightProbe extends Group implements ARObject
 		{
 			// @ts-ignore
 			let lightEstimate = frame.getLightEstimate(renderer.xrLightProbe);
+
+			console.log('enva-xr: Light estimated', lightEstimate);
+			
 			if (lightEstimate)
 			{
 				let directionalPosition = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);

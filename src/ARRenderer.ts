@@ -180,16 +180,26 @@ export class ARRenderer
 		// Resize this.renderer
 		window.addEventListener("resize", () => {this.resize();}, false);
 
-		await XRManager.start(this.renderer,
+		this.xrSession = await XRManager.start(this.renderer,
 			{
-				optionalFeatures: ["dom-overlay"],
 				domOverlay: {root: this.domContainer},
-				requiredFeatures: ["depth-sensing", "hit-test", "light-estimation"],
+				requiredFeatures: ["hit-test", "light-estimation"],
+				optionalFeatures: ["dom-overlay", "depth-sensing"],
 				depthSensing: {
 					usagePreference: ["cpu-optimized", "gpu-optimized"],
 					dataFormatPreference: ["luminance-alpha", "float32"]
 				}
 			});
+
+		this.xrSession.addEventListener("end", () =>
+		{
+			this.xrHitTestSource = null;
+			this.xrReferenceSpace = null;
+			this.xrGlBinding = null;
+		});
+
+		// @ts-ignore
+		console.log('enva-xr: XR got session, depth usage mode', this.xrSession.depthUsage, this.xrSession.depthDataFormat);
 
 		// Render loop
 		this.renderer.setAnimationLoop((time: number, frame: any) =>
@@ -341,21 +351,9 @@ export class ARRenderer
 			return;
 		}
 
-		if (!this.xrSession) 
-		{
-			this.xrSession = this.renderer.xr.getSession();
-			this.xrSession.addEventListener("end", () =>
-			{
-				this.xrHitTestSource = null;
-			});
-
-			// @ts-ignore
-			console.log('enva-xr: XR got session, depth usage mode', this.xrSession.depthUsage, this.xrSession.depthDataFormat);
-		}
-
 		if (!this.xrReferenceSpace) 
 		{
-			this.xrReferenceSpace = this.renderer.xr.getReferenceSpace();
+			this.xrReferenceSpace = await this.xrSession.requestReferenceSpace('local');
 		}
 		
 		if (!this.xrGlBinding) 
@@ -366,10 +364,11 @@ export class ARRenderer
 		// Hit test source
 		if (this.config.hitTest && !this.xrHitTestSource)
 		{
+			
 			this.xrHitTestSource = await this.xrSession.requestHitTestSource({
-				space: this.xrReferenceSpace,
-				entityTypes: ['point', 'plane', 'mesh'],
-				offsetRay: new XRRay()
+				space: await this.xrSession.requestReferenceSpace('viewer')
+				// entityTypes: ['point', 'plane', 'mesh'],
+				// offsetRay: new XRRay()
 			});
 
 			console.log('enva-xr: XR hit test source', this.xrHitTestSource);

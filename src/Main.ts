@@ -6,6 +6,8 @@ export {BillboardGroup} from "./object/BillboardGroup";
 export {Cursor} from "./object/Cursor";
 export {Measurement} from "./object/Measurement";
 export {PhysicsObject} from "./object/PhysicsObject";
+export {LightProbe} from "./object/LightProbe";
+export {FloorPlane} from "./object/FloorPlane";
 
 export {VoxelBody} from "./physics/VoxelBody";
 export {VoxelEnvironment} from "./physics/VoxelEnvironment";

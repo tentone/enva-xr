@@ -21,7 +21,8 @@ export class FloorPlane extends Group implements ARObject
 
 	public isARObject = true;
 
-	public constructor() {
+	public constructor() 
+	{
 		super();
 
 		this.shadowMaterial = new ShadowMaterial({opacity: 0.5});

@@ -16,8 +16,9 @@ export class XRManager
 	 *
 	 * @param renderer - WebGL renderer object.
 	 * @param sessionInit - Session initialization data.
+	 * @returns The XR session created.
 	 */
-	static async start(renderer, sessionInit = {}): Promise<void>
+	static async start(renderer, sessionInit = {}): Promise<XRSession>
 	{
 		if (XRManager.session)
 		{
@@ -26,15 +27,10 @@ export class XRManager
 
 		XRManager.session = await navigator.xr.requestSession("immersive-ar", sessionInit);
 
-		const onSessionEnded = (event) =>
-		{
-			XRManager.session.removeEventListener("end", onSessionEnded);
-			XRManager.session = null;
-		};
-
-		XRManager.session.addEventListener("end", onSessionEnded);
-		renderer.xr.setReferenceSpaceType("local");
+		renderer.xr.setReferenceSpaceType('local');
 		renderer.xr.setSession(XRManager.session);
+
+		return XRManager.session;
 	}
 
 	/**
