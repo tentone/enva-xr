@@ -186,8 +186,8 @@ export class ARRenderer
 				requiredFeatures: ["hit-test", "light-estimation"],
 				optionalFeatures: ["dom-overlay", "depth-sensing"],
 				depthSensing: {
-					usagePreference: ["cpu-optimized", "gpu-optimized"],
-					dataFormatPreference: ["luminance-alpha", "float32"]
+					usagePreference: ["gpu-optimized", "cpu-optimized"],
+					dataFormatPreference: ["float32", "luminance-alpha"]
 				}
 			});
 
@@ -196,9 +196,50 @@ export class ARRenderer
 			this.dispose();
 		});
 
-		// @ts-ignore
-		console.log('enva-xr: XR got session, depth usage mode', this.xrSession.depthUsage, this.xrSession.depthDataFormat);
+		this.xrReferenceSpace = await this.xrSession.requestReferenceSpace('local');
+		this.xrGlBinding = new XRWebGLBinding(this.xrSession, this.glContext);
 
+		// Hit test source
+		if (this.config.hitTest)
+		{
+			this.xrHitTestSource = await this.xrSession.requestHitTestSource({
+				space: await this.xrSession.requestReferenceSpace('viewer'),
+				entityTypes: ['point', 'plane', 'mesh'],
+				offsetRay: new XRRay()
+			});
+
+			console.log('enva-xr: XR hit test source', this.xrHitTestSource);
+		}
+
+		// Light probe
+		if (this.config.lightProbe) 
+		{
+			// @ts-ignore
+			this.xrLightProbe = await this.xrSession.requestLightProbe({
+				// @ts-ignore
+				reflectionFormat: this.xrSession.preferredReflectionFormat
+			});
+
+			if (this.config.reflectionCubeMap) 
+			{
+				this.xrLightProbe.onreflectionchange = () => 
+				{
+					// @ts-ignore
+					this.xrReflectionCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
+					
+					console.log('enva-xr: XR light probe reflection change', this.xrReflectionCubeMap);
+				};
+	
+			}
+
+			console.log('enva-xr: XR light probe', this.xrLightProbe);
+		}
+
+		// @ts-ignore
+		console.log('enva-xr: XR session ', this.xrSession.depthUsage, ' depth usage mode ', this.xrSession.depthDataFormat);
+
+		console.log('enva-xr: Start render loop');
+		
 		// Render loop
 		this.renderer.setAnimationLoop((time: number, frame: any) =>
 		{
@@ -356,53 +397,6 @@ export class ARRenderer
 		if (!frame)
 		{
 			return;
-		}
-
-		if (!this.xrReferenceSpace) 
-		{
-			this.xrReferenceSpace = await this.xrSession.requestReferenceSpace('local');
-		}
-		
-		if (!this.xrGlBinding) 
-		{
-			this.xrGlBinding = new XRWebGLBinding(this.xrSession, this.glContext);
-		}
-
-		// Hit test source
-		if (this.config.hitTest && !this.xrHitTestSource)
-		{
-			
-			this.xrHitTestSource = await this.xrSession.requestHitTestSource({
-				space: await this.xrSession.requestReferenceSpace('viewer')
-				// entityTypes: ['point', 'plane', 'mesh'],
-				// offsetRay: new XRRay()
-			});
-
-			console.log('enva-xr: XR hit test source', this.xrHitTestSource);
-		}
-
-		// Light probe
-		if (this.config.lightProbe && !this.xrLightProbe) 
-		{
-			// @ts-ignore
-			this.xrLightProbe = await this.xrSession.requestLightProbe({
-				// @ts-ignore
-				reflectionFormat: this.xrSession.preferredReflectionFormat
-			});
-
-			if (this.config.reflectionCubeMap) 
-			{
-				this.xrLightProbe.onreflectionchange = () => 
-				{
-					// @ts-ignore
-					this.xrReflectionCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
-					
-					console.log('enva-xr: XR light probe reflection change', this.xrReflectionCubeMap);
-				};
-	
-			}
-
-			console.log('enva-xr: XR light probe', this.xrLightProbe);
 		}
 
 		// Update viewer pose

@@ -1,5 +1,5 @@
-import {BoxGeometry, LightProbe, Mesh, MeshBasicMaterial, MeshPhysicalMaterial} from "three";
-import {ARRenderer, Cursor} from "../src/Main";
+import {BoxGeometry, Mesh, MeshBasicMaterial, MeshPhysicalMaterial} from "three";
+import {ARRenderer} from "../src/Main";
 
 const renderer = new ARRenderer();
 
