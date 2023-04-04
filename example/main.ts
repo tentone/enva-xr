@@ -13,8 +13,8 @@ box.scale.setScalar(0.1);
 box.position.set(0, 0, -1);
 renderer.scene.add(box);
 
-const probe = new LightProbe();
-renderer.scene.add(probe);
+// const probe = new LightProbe();
+// renderer.scene.add(probe);
 
 // const cursor = new Cursor();
 // renderer.scene.add(cursor);

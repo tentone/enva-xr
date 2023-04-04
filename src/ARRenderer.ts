@@ -193,9 +193,7 @@ export class ARRenderer
 
 		this.xrSession.addEventListener("end", () =>
 		{
-			this.xrHitTestSource = null;
-			this.xrReferenceSpace = null;
-			this.xrGlBinding = null;
+			this.dispose();
 		});
 
 		// @ts-ignore
@@ -215,6 +213,15 @@ export class ARRenderer
 	{
 		this.forceContextLoss();
 		this.renderer.setAnimationLoop(null);
+
+		this.xrHitTestSource = null;
+		this.xrReferenceSpace = null;
+		this.xrGlBinding = null;
+		this.xrDepth = null;
+		this.xrLightProbe = null;
+		this.xrReflectionCubeMap = null;
+		this.xrViewerPose = null;
+		this.xrViews = [];
 	}
 
 	/**
