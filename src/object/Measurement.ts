@@ -9,7 +9,7 @@ export class Measurement extends Line
 	/**
 	 * List of points that compose the measurement.
 	 */
-	public points: any[] ;
+	public points: Vector3[] = [];
 
 	/**
 	 * Text used to display the measurement value.
@@ -17,19 +17,22 @@ export class Measurement extends Line
 	public text: Text = new Text();
 
 	/**
-	 * @param point - First point of the measurement.
+	 * @param points - Points of the measurement, length must be 2.
 	 */
-	public constructor(point: Vector3 = new Vector3(0, 0, 0))
+	public constructor(points: Vector3[])
 	{
-		super(new BufferGeometry().setFromPoints([point, point]), new LineBasicMaterial(
+		if (points.length !== 2) {
+			throw new Error("Point array should have length 2");
+		}
+
+		super(new BufferGeometry().setFromPoints(points), new LineBasicMaterial(
 			{
 				color: 0xffffff,
 				linewidth: 5
 			}));
 
-		this.points = [point.clone(), point.clone()];
+		this.points = points;
 
-	
 		this.text = new Text();
 		this.text.fontSize = 0.1;
 		this.text.color = 0xFFFFFF;
@@ -37,6 +40,8 @@ export class Measurement extends Line
 		this.text.anchorY = "middle";
 		this.text.rotation.set(Math.PI, Math.PI, Math.PI);
 		this.add(this.text);
+
+		this.updateText();
 	}
 
 	/**

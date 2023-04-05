@@ -146,12 +146,12 @@ export class ARRenderer
 	/**
 	 * Rendering canvas.
 	 */
-	public canvas = null;
+	public canvas: HTMLCanvasElement = null;
 
 	/**
 	 * DOM container for GUI elements visible in AR mode.
 	 */
-	public domContainer = document.createElement("div");
+	public domContainer: HTMLElement = document.createElement("div");
 
 	public constructor()
 	{
@@ -302,6 +302,7 @@ export class ARRenderer
 	{
 		if (canvas) 
 		{
+			// @ts-ignore
 			this.canvas = canvas;
 		}
 		else 
@@ -363,9 +364,11 @@ export class ARRenderer
 		}
 
 		// Remove canvas from DOM
-		if (this.canvas)
+		if (this.canvas && !(this.canvas instanceof OffscreenCanvas))
 		{
-			this.canvas.parent.removeChild(this.canvas);
+			try {
+				this.canvas.parentElement.removeChild(this.canvas);
+			} catch(e) {}
 		}
 	}
 

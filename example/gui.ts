@@ -91,7 +91,7 @@ export class GUI
 				{
 					var position = new Vector3();
 					position.setFromMatrixPosition(this.app.cursor.matrix);
-					this.app.measurement = new Measurement(position);
+					this.app.measurement = new Measurement([position, position]);
 					this.app.scene.add(this.app.measurement);
 				}
 			}

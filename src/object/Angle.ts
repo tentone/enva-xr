@@ -16,16 +16,20 @@ export class Angle extends Line
 	 */
 	public text: Text;
 
-	public constructor(point: Vector3 = new Vector3(0, 0, 0))
+	public constructor(points: Vector3[])
 	{
-		super(new BufferGeometry().setFromPoints([point, point, point]), new LineBasicMaterial(
+		if (points.length !== 3) {
+			throw new Error("Point array should have length 3");
+		}
+
+		super(new BufferGeometry().setFromPoints(points), new LineBasicMaterial(
 			{
 				color: 0xffffff,
 				linewidth: 5
 			}));
 
 
-		this.points = [point.clone()];
+		this.points = points;
 
 		this.text = new Text();
 		this.text.fontSize = 0.1;

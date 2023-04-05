@@ -24,6 +24,8 @@ export class PlaneData {
 
 /**
  * AR planes can be created using the "plane-detection" feature when available.
+ * 
+ * Planes can be used for objects to cast shadows and for physics interaction. 
  */
 export class Planes extends Group implements ARObject {
 	public isARObject: boolean = true;
@@ -38,10 +40,20 @@ export class Planes extends Group implements ARObject {
 	 */
 	public planes: Map<number, PlaneData> = new Map();
 
-	public constructor() {
-		super();
+	/**
+	 * Callback method called when a plane has been created.
+	 */
+	public onCreate: (data: PlaneData) => void = null;
 
-	}
+	/**
+	 * Callback method called when a plane is updated.
+	 */
+	public onUpdate: (data: PlaneData) => void = null;
+
+	/**
+	 * Callback method called when a plane is deleted.
+	 */
+	public onDelete: (data: PlaneData) => void = null;
 
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) {
 		// @ts-ignore
@@ -54,6 +66,11 @@ export class Planes extends Group implements ARObject {
 					// plane was removed
 					this.planes.delete(plane);
 					this.remove(planeData.mesh);
+
+					if(this.onDelete)
+					{
+						this.onDelete(planeData);
+					}
 				}
 			});
 
@@ -71,24 +88,37 @@ export class Planes extends Group implements ARObject {
 					// Compare timestamp to check for updates
 					if (planeData.timestamp < plane.lastChangedTime) {
 						planeData.timestamp = plane.lastChangedTime;
-						const geometry = Planes.createGeometryFromPolygon(plane.polygon);
+						const geometry = Planes.createGeometry(plane.polygon);
 						planeData.mesh.geometry.dispose();
 						planeData.mesh.geometry = geometry;
+
+						if(this.onUpdate)
+						{
+							this.onUpdate(planeData);
+						}
 					}
 				}
 				// Create new plane
 				else
 				{
-					const geometry = Planes.createGeometryFromPolygon(plane.polygon);
+					const geometry = Planes.createGeometry(plane.polygon);
 					planeMesh = new Mesh(geometry, new MeshBasicMaterial({color: 0xFF0000, opacity: 0.4, transparent: true}));
 					planeMesh.matrixAutoUpdate = false;
 					this.add(planeMesh);
 
-					this.planes.set(plane, {
+					const data: PlaneData = {
 						id: Planes.id++,
 						timestamp: plane.lastChangedTime,
 						mesh: planeMesh,
-					});
+					};
+
+					this.planes.set(plane, data);
+					
+					if(this.onCreate)
+					{
+						this.onCreate(data);
+					}
+					
 
 					Planes.id++;
 				}
@@ -110,7 +140,7 @@ export class Planes extends Group implements ARObject {
 	 * @param polygon Vertices that compose the polygon
 	 * @returns The geometry created to represent the plane.
 	 */
-	public static createGeometryFromPolygon(polygon: Vector3[]): BufferGeometry {
+	public static createGeometry(polygon: Vector3[]): BufferGeometry {
 		const geometry = new BufferGeometry();
 
 		const vertices = [];
