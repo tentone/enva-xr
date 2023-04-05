@@ -1,4 +1,4 @@
-import {Mesh, MeshBasicMaterial, RingGeometry, CircleGeometry, BufferGeometry, Material} from "three";
+import {Mesh, MeshBasicMaterial, RingGeometry, CircleGeometry, BufferGeometry, Material, Matrix4} from "three";
 import {mergeBufferGeometries} from "three/examples/jsm/utils/BufferGeometryUtils";
 import {ARRenderer} from "ARRenderer";
 import {ARObject} from "./ARObject";
@@ -7,16 +7,11 @@ import {ARObject} from "./ARObject";
  * Cursor is used to interfact with the environment.
  * 
  * The cursor moves around with the device.
+ * 
+ * The position of the cursor can be used to place object or interact with other objects in the scene.
  */
 export class Cursor extends Mesh implements ARObject
 {
-	/**
-	 * Callback method to execute when the cursor is pressed.
-	 * 
-	 * Receives the pose of the cursor in world coordinates.
-	 */
-	public onAction: ()=> void = null; 
-
 	public isARObject = true;
 
 	public constructor(geometry?: BufferGeometry, material?: Material)
@@ -35,7 +30,6 @@ export class Cursor extends Mesh implements ARObject
 
 		super(geometry, material);
 
-		this.matrixAutoUpdate = false;
 		this.visible = false;
 	}
 	
@@ -47,7 +41,12 @@ export class Cursor extends Mesh implements ARObject
 		{
 			const hit = hitResults[0];
 			const pose = hit.getPose(renderer.xrReferenceSpace);
-			this.matrix.fromArray(pose.transform.matrix);
+
+			const matrix = new Matrix4();
+			matrix.fromArray(pose.transform.matrix);
+
+			this.position.setFromMatrixPosition(matrix);
+
 			this.visible = true;
 		}
 		else

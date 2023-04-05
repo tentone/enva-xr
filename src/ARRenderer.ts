@@ -182,9 +182,9 @@ export class ARRenderer
 
 		this.xrSession = await XRManager.start(this.renderer,
 			{
-				// domOverlay: {root: this.domContainer},
-				requiredFeatures: ["hit-test", "light-estimation"],
-				// optionalFeatures: ["dom-overlay"], //, "depth-sensing"],
+				domOverlay: {root: this.domContainer},
+				requiredFeatures: ["hit-test", "light-estimation", "dom-overlay"],
+				optionalFeatures: ['anchors', 'plane-detection'] //, "depth-sensing"],
 				// depthSensing: {
 				// 	usagePreference: ["gpu-optimized", "cpu-optimized"],
 				// 	dataFormatPreference: ["float32", "luminance-alpha"]
@@ -226,7 +226,6 @@ export class ARRenderer
 				{
 					// @ts-ignore
 					this.xrReflectionCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
-					
 					console.log('enva-xr: XR light probe reflection change', this.xrReflectionCubeMap);
 				};
 	

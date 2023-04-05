@@ -1,4 +1,4 @@
-import {BoxGeometry, Mesh, MeshBasicMaterial, MeshPhysicalMaterial} from "three";
+import {BoxGeometry, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, SphereGeometry} from "three";
 import {ARRenderer, Cursor, LightProbe} from "../src/Main";
 
 const renderer = new ARRenderer();
@@ -17,9 +17,19 @@ renderer.scene.add(probe);
 
 const cursor = new Cursor();
 renderer.scene.add(cursor);
-
 renderer.onFrame = function() {
     box.rotation.y += 0.01;
+};
+
+renderer.domContainer.onclick = function() {
+    console.log('click');
+    
+    if (cursor.visible) {
+        let sphere = new Mesh(new SphereGeometry(), new MeshPhysicalMaterial());
+        sphere.scale.setScalar(0.1);
+        sphere.position.copy(cursor.position);
+        renderer.scene.add(sphere);
+    }
 };
 
 // const gui = new GUI(app, app.domContainer);
