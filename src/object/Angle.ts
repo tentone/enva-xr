@@ -38,6 +38,8 @@ export class Angle extends Line
 		this.text.anchorY = "middle";
 		this.text.rotation.set(Math.PI, Math.PI, Math.PI);
 		this.add(this.text);
+
+		this.updateText();
 	}
 
 	/**
