@@ -9,6 +9,8 @@ import {DataTexture, RGFormat, UnsignedByteType, LinearFilter} from "three";
  */
 export class DepthDataTexture extends DataTexture
 {
+	
+
 	public constructor()
 	{
 		let width = 160;
@@ -28,7 +30,7 @@ export class DepthDataTexture extends DataTexture
 	 *
 	 * @param depthInfo
 	 */
-	public updateDepth(depthInfo: any): void
+	public updateDepth(depthInfo: XRDepthInformation): void
 	{
 		let dataBuffer = depthInfo.data;
 

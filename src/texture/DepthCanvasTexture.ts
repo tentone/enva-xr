@@ -15,7 +15,7 @@ export class DepthCanvasTexture extends CanvasTexture
 	 *
 	 * Uses the camera planes to correctly adjust the values.
 	 */
-	public updateDepth(depthInfo: any, near: number, far: number): void
+	public updateDepth(depthInfo: XRDepthInformation, near: number, far: number): void
 	{
 		let canvas = this.image;
 
