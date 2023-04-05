@@ -12,7 +12,7 @@ export class FloorPlane extends Group implements ARObject
 	/**
 	 * Mesh used to cast shadows into the floor.
 	 */
-	public floorMesh: Mesh = null;
+	public mesh: Mesh = null;
 	
 	/**
 	 * Shadow material, only renders shadow map.
@@ -29,11 +29,11 @@ export class FloorPlane extends Group implements ARObject
 		// this.material = new ShadowMaterial({opacity: 0.5});
 		// this.material = AugmentedMaterial.transform(this.material, this.depthDataTexture);
 
-		this.floorMesh = new Mesh(new PlaneGeometry(100, 100, 1, 1), this.material);
-		this.floorMesh.rotation.set(-Math.PI / 2, 0, 0);
-		this.floorMesh.castShadow = false;
-		this.floorMesh.receiveShadow = true;
-		this.add(this.floorMesh);
+		this.mesh = new Mesh(new PlaneGeometry(100, 100, 1, 1), this.material);
+		this.mesh.rotation.set(-Math.PI / 2, 0, 0);
+		this.mesh.castShadow = false;
+		this.mesh.receiveShadow = true;
+		this.add(this.mesh);
 	}
 
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void 
@@ -41,7 +41,7 @@ export class FloorPlane extends Group implements ARObject
 		if (renderer.xrHitTestSource)
 		{
 			let hitResults = frame.getHitTestResults(renderer.xrHitTestSource);
-			if (hitResults.length)
+			if (hitResults.length > 0)
 			{
 				const hit = hitResults[0];
 				
@@ -50,9 +50,9 @@ export class FloorPlane extends Group implements ARObject
 
 				const position = new Vector3();
 				position.setFromMatrixPosition(matrix);
-				if (position.y < this.floorMesh.position.y)
+				if (position.y < this.mesh.position.y)
 				{
-					this.floorMesh.position.y = position.y;
+					this.mesh.position.y = position.y;
 				}
 			}
 		}

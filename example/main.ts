@@ -26,15 +26,6 @@ renderer.scene.add(planes);
 const floor = new FloorPlane();
 renderer.scene.add(floor);
 
-const light = new PointLight(0xFFFFFF);
-light.position.set(0, 3, -2);
-light.shadow.autoUpdate = true;
-light.shadow.mapSize.set(1024, 1024);
-light.shadow.camera.far = 20;
-light.shadow.camera.near = 0.1;
-light.castShadow = true;
-renderer.scene.add(light);
-
 const ruler = new Measurement([new Vector3(0, 0, 0), new Vector3(1, 0, -2)]);
 renderer.scene.add(ruler);
 

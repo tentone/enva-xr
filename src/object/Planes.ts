@@ -102,7 +102,8 @@ export class Planes extends Group implements ARObject {
 				else
 				{
 					const geometry = Planes.createGeometry(plane.polygon);
-					const material = new MeshBasicMaterial({opacity: 0.1, transparent: true, color: 0xFF0000}); // new ShadowMaterial({opacity: 0.5});
+					const material = new MeshBasicMaterial({opacity: 0.1, transparent: true, color: 0xFF0000});
+					// const material =  new ShadowMaterial({opacity: 0.5});
 					planeMesh = new Mesh(geometry, material);
 					planeMesh.castShadow = false;
 					planeMesh.receiveShadow = true;
