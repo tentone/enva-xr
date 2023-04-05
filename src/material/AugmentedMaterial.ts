@@ -15,7 +15,7 @@ export class AugmentedMaterial
 	 * @param material - Material to be transformed into an augmented material.
 	 * @param depthMap - Depth map bound to the material. A single depth map should be used for all AR materials.
 	 */
-	static transform(material, depthMap)
+	public static transform(material: Material, depthMap: Texture)
 	{
 		material.userData = {
 			uDepthTexture: {value: depthMap},
@@ -26,6 +26,7 @@ export class AugmentedMaterial
 			uRawValueToMeters: {value: 0.0}
 		};
 
+		// @ts-ignore
 		material.isAgumentedMaterial = true;
 
 		material.onBeforeCompile = (shader) =>

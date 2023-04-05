@@ -1,5 +1,5 @@
 import { ARRenderer } from "../ARRenderer";
-import { BufferGeometry, BufferAttribute, Vector3, Group, Mesh, MeshBasicMaterial } from "three";
+import { BufferGeometry, BufferAttribute, Vector3, Group, Mesh, ShadowMaterial, MeshBasicMaterial } from "three";
 import { ARObject } from "./ARObject";
 
 /**
@@ -102,7 +102,10 @@ export class Planes extends Group implements ARObject {
 				else
 				{
 					const geometry = Planes.createGeometry(plane.polygon);
-					planeMesh = new Mesh(geometry, new MeshBasicMaterial({color: 0xFF0000, opacity: 0.4, transparent: true}));
+					const material = new MeshBasicMaterial({opacity: 0.1, transparent: true, color: 0xFF0000}); // new ShadowMaterial({opacity: 0.5});
+					planeMesh = new Mesh(geometry, material);
+					planeMesh.castShadow = false;
+					planeMesh.receiveShadow = true;
 					planeMesh.matrixAutoUpdate = false;
 					this.add(planeMesh);
 

@@ -8,10 +8,10 @@ import { ARRenderer } from "ARRenderer";
  * Uses the "anchor" feature when available to track environment features an ensure accurate positioning.
  */
 export class ArchorGroup extends Group implements ARObject {
-  public isARObject: boolean = true;
+	public isARObject: boolean = true;
 
-  public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) {
-    throw new Error("Method not implemented.");
-  }
+	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) {
+		throw new Error("Method not implemented.");
+	}
 
 }

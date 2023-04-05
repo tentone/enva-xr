@@ -1,4 +1,4 @@
-import {Group, Matrix4, Mesh, PlaneGeometry, ShadowMaterial, Vector3} from "three";
+import {Group, Matrix4, Mesh, PlaneGeometry, ShadowMaterial, MeshBasicMaterial, Material, Vector3} from "three";
 import {ARRenderer} from "ARRenderer";
 import {ARObject} from "./ARObject";
 
@@ -17,7 +17,7 @@ export class FloorPlane extends Group implements ARObject
 	/**
 	 * Shadow material, only renders shadow map.
 	 */
-	public shadowMaterial: ShadowMaterial = null;
+	public material: Material = null;
 
 	public isARObject = true;
 
@@ -25,22 +25,19 @@ export class FloorPlane extends Group implements ARObject
 	{
 		super();
 
-		this.shadowMaterial = new ShadowMaterial({opacity: 0.5});
-		// this.shadowMaterial = AugmentedMaterial.transform(this.shadowMaterial, this.depthDataTexture);
-		// TODO <ADD CODE HERE>
+		this.material = new MeshBasicMaterial({opacity: 0.1, transparent: true, color: 0x00FF00});
+		// this.material = new ShadowMaterial({opacity: 0.5});
+		// this.material = AugmentedMaterial.transform(this.material, this.depthDataTexture);
 
-		this.floorMesh = new Mesh(new PlaneGeometry(100, 100, 1, 1), this.shadowMaterial);
+		this.floorMesh = new Mesh(new PlaneGeometry(100, 100, 1, 1), this.material);
 		this.floorMesh.rotation.set(-Math.PI / 2, 0, 0);
 		this.floorMesh.castShadow = false;
 		this.floorMesh.receiveShadow = true;
 		this.add(this.floorMesh);
-
 	}
 
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void 
 	{
-		// TODO <ADD CODE HERE>
-
 		if (renderer.xrHitTestSource)
 		{
 			let hitResults = frame.getHitTestResults(renderer.xrHitTestSource);

@@ -52,14 +52,12 @@ export class PhysicsObject extends Mesh
 
 		this.frustumCulled = false;
 
-
 		this.body = new Body();
 		this.body.type = Body.DYNAMIC;
 		this.body.mass = 1.0;
 
 		this.mode = PhysicsObject.LOCAL;
 
-		
 		this.world = world;
 		this.world.addBody(this.body);
 	}
