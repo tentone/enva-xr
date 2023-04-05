@@ -333,7 +333,7 @@ export class ARRenderer
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = PCFSoftShadowMap;
 
-		this.renderer.sortObjects = false;
+		this.renderer.sortObjects = true;
 		this.renderer.physicallyCorrectLights = true;
 
 		this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -386,7 +386,6 @@ export class ARRenderer
 		this.renderer.setSize(this.resolution.x, this.resolution.y);
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 	}
-
 
 	/**
 	 * Update logic and render this.scene into the screen.
