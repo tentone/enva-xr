@@ -1,4 +1,4 @@
-import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D} from "three";
+import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D, ShadowMapType} from "three";
 import {ARObject} from "object/ARObject";
 import {XRManager} from "./utils/XRManager";
 
@@ -269,7 +269,7 @@ export class ARRenderer
 	 * 
 	 * @param shadowType - Type of shadows to use.
 	 */
-	public setShadowType(shadowType: number): void
+	public setShadowType(shadowType: ShadowMapType): void
 	{
 		this.renderer.shadowMap.enabled = shadowType !== null;
 		this.renderer.shadowMap.type = shadowType;
@@ -334,7 +334,6 @@ export class ARRenderer
 		this.renderer.shadowMap.type = PCFSoftShadowMap;
 
 		this.renderer.sortObjects = true;
-		this.renderer.physicallyCorrectLights = true;
 
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
