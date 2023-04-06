@@ -9,15 +9,9 @@ import {DataTexture, RGFormat, UnsignedByteType, LinearFilter} from "three";
  */
 export class DepthDataTexture extends DataTexture
 {
-	
-
-	public constructor()
+	public constructor(width: number = 160, height: number = 90)
 	{
-		let width = 160;
-		let height = 90;
-		let data: Uint8Array = new Uint8Array(width * height);
-
-		super(data, width, height, RGFormat, UnsignedByteType);
+		super(new Uint8Array(width * height), width, height, RGFormat, UnsignedByteType);
 
 		this.magFilter = LinearFilter;
 		this.minFilter = LinearFilter;
