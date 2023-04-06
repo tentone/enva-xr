@@ -10,8 +10,16 @@ import { ARRenderer } from "ARRenderer";
 export class ArchorGroup extends Group implements ARObject {
 	public isARObject: boolean = true;
 
+	public static maxAnchoredObjects: number = 30;
+
+	public anchoredObjects: any[] = [];
+
+	public constructor() {
+		super();
+		
+	}
+
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) {
 		throw new Error("Method not implemented.");
 	}
-
 }
