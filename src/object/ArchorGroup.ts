@@ -10,13 +10,20 @@ import { ARRenderer } from "ARRenderer";
 export class ArchorGroup extends Group implements ARObject {
 	public isARObject: boolean = true;
 
+	/**
+	 * How many objects can be anchored simultaneously to the environment.
+	 */
 	public static maxAnchoredObjects: number = 30;
 
+	/**
+	 * List of existing anchored objects.
+	 */
 	public anchoredObjects: any[] = [];
 
 	public constructor() {
 		super();
-		
+
+		// TODO
 	}
 
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) {

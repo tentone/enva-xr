@@ -1,4 +1,4 @@
-import {BoxGeometry, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, SphereGeometry, Vector3, PointLight} from "three";
+import {BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, Vector2, Vector3} from "three";
 import {ARRenderer, Cursor, LightProbe, Measurement, Planes, FloorPlane} from "../src/Main";
 
 const renderer = new ARRenderer();
@@ -20,20 +20,31 @@ renderer.scene.add(box);
 const probe = new LightProbe();
 renderer.scene.add(probe);
 
-const planes = new Planes();
-renderer.scene.add(planes);
+// const planes = new Planes();
+// renderer.scene.add(planes);
 
-const floor = new FloorPlane();
-renderer.scene.add(floor);
+// const floor = new FloorPlane();
+// renderer.scene.add(floor);
 
-const ruler = new Measurement([new Vector3(0, 0, 0), new Vector3(1, 0, -2)]);
-renderer.scene.add(ruler);
+// const ruler = new Measurement([new Vector3(0, 0, 0), new Vector3(1, 0, -2)]);
+// renderer.scene.add(ruler);
 
 const cursor = new Cursor();
 renderer.scene.add(cursor);
 
-renderer.domContainer.onclick = function() {
-    if (cursor.visible) {
+renderer.domContainer.onclick = function(event: MouseEvent) {
+    const size = new Vector2(window.innerWidth, window.innerHeight);
+    const pos = new Vector2(event.clientX, event.clientY);
+
+    const normalized = new Vector2((pos.x / size.x) * 2 - 1, (-pos.y / size.y) * 2 + 1);
+
+    console.log('enva-xr: Normalized coordinates', normalized, pos, size);
+
+    const intersections = renderer.raycast(normalized);
+    if (intersections.length > 0) {
+        console.log('enva-xr: Raycast results', intersections);
+    }
+    else if (cursor.visible) {
         let sphere = new Mesh(new SphereGeometry(), new MeshPhysicalMaterial());
         sphere.receiveShadow = true;
         sphere.castShadow = true;

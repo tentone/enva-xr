@@ -1,4 +1,4 @@
-import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D, ShadowMapType} from "three";
+import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D, ShadowMapType, Raycaster, Intersection} from "three";
 import {ARObject} from "object/ARObject";
 import {XRManager} from "./utils/XRManager";
 
@@ -251,8 +251,9 @@ export class ARRenderer
 	 */
 	public dispose(): void 
 	{
-		this.forceContextLoss();
 		this.renderer.setAnimationLoop(null);
+
+		this.forceContextLoss();
 
 		this.xrHitTestSource = null;
 		this.xrReferenceSpace = null;
@@ -382,8 +383,31 @@ export class ARRenderer
 		this.camera.aspect = this.resolution.x / this.resolution.y;
 		this.camera.updateProjectionMatrix();
 
-		this.renderer.setSize(this.resolution.x, this.resolution.y);
-		this.renderer.setPixelRatio(window.devicePixelRatio);
+		if (this.renderer) {
+			this.renderer.setSize(this.resolution.x, this.resolution.y);
+			this.renderer.setPixelRatio(window.devicePixelRatio);
+		}
+	}
+
+	/**
+	 * Raycast into the AR scene.
+	 * 
+	 * @param origin - Origin of the ray in screen space from -1 to 1.
+	 * @param object - Object to raycast (optional). By default the entire scene is used. 
+	 */
+	public raycast(origin: Vector2, object?: Object3D): Intersection<Object3D<Event>>[] {
+		if (!object) {
+			object = this.scene;
+		}
+
+		const intersections: Intersection<Object3D<Event>>[] = [];
+		
+		const raycaster = new Raycaster();
+		raycaster.setFromCamera(origin, this.camera);
+
+		raycaster.intersectObject(object, true, intersections);
+
+		return intersections;
 	}
 
 	/**

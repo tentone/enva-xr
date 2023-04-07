@@ -25,8 +25,8 @@ export class FloorPlane extends Group implements ARObject
 	{
 		super();
 
-		this.material = new MeshBasicMaterial({opacity: 0.1, transparent: true, color: 0x00FF00});
-		// this.material = new ShadowMaterial({opacity: 0.5});
+		// this.material = new MeshBasicMaterial({opacity: 0.1, transparent: true, color: 0x00FF00});
+		this.material = new ShadowMaterial({opacity: 0.5});
 		// this.material = AugmentedMaterial.transform(this.material, this.depthDataTexture);
 
 		this.mesh = new Mesh(new PlaneGeometry(100, 100, 1, 1), this.material);
