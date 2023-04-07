@@ -10,6 +10,15 @@ import {XRManager} from "./utils/XRManager";
 class ARRendererConfig 
 {
 	/**
+	 * DOM overlay will create a DOM container to place custom HTML elements in the screen.
+	 * 
+	 * Usefull to place button and other GUI elements on top of the AR scene.
+	 * 
+	 * Can be used alongside CSS 3D to have HTML element following the environment.
+	 */
+	public domOverlay = true;
+
+	/**
 	 * Hit test allow the user to ray cast into real-wolrd depth data.
 	 * 
 	 * Useful for interaction, object placement, etc. 
@@ -31,7 +40,7 @@ class ARRendererConfig
 	/**
 	 * Depth information captured from the environment.
 	 */
-	public depth = false;
+	public depthSensing = false;
 }
 
 /**
@@ -180,16 +189,34 @@ export class ARRenderer
 		// Resize this.renderer
 		window.addEventListener("resize", () => {this.resize();}, false);
 
-		this.xrSession = await XRManager.start(this.renderer,
-			{
-				domOverlay: {root: this.domContainer},
-				requiredFeatures: ["hit-test", "light-estimation", "dom-overlay"],
-				optionalFeatures: ['anchors', 'plane-detection'] //, "depth-sensing"],
-				// depthSensing: {
-				// 	usagePreference: ["gpu-optimized", "cpu-optimized"],
-				// 	dataFormatPreference: ["float32", "luminance-alpha"]
-				// }
-			});
+		const config: any = {
+			requiredFeatures: [],
+			optionalFeatures: ['anchors', 'plane-detection']
+		}
+
+		if (this.config.domOverlay) {
+			config.domOverlay = {root: this.domContainer};
+			config.requiredFeatures.push("dom-overlay");
+		}
+
+		if (this.config.hitTest) {
+			config.requiredFeatures.push("hit-test");
+		}
+
+		if (this.config.lightProbe) {
+			config.requiredFeatures.push("light-estimation");
+		}
+
+		if (this.config.depthSensing) {
+			config.depthSensing = {
+				usagePreference: ["gpu-optimized"], //, "cpu-optimized"],
+				dataFormatPreference: ["luminance-alpha"] //, "float32"]
+			};
+			config.requiredFeatures.push("depth-sensing");
+		}
+
+
+		this.xrSession = await XRManager.start(this.renderer, config);
 
 		this.xrSession.addEventListener("end", () =>
 		{
@@ -204,7 +231,7 @@ export class ARRenderer
 		{
 			this.xrHitTestSource = await this.xrSession.requestHitTestSource({
 				space: await this.xrSession.requestReferenceSpace('viewer'),
-				entityTypes: ['point', 'plane', 'mesh'],
+				entityTypes: ['plane', 'point', 'mesh'],
 				offsetRay: new XRRay()
 			});
 
@@ -433,7 +460,7 @@ export class ARRenderer
 			this.xrViews = this.xrViewerPose.views;
 
 			// Update depth information
-			if (this.config.depth) 
+			if (this.config.depthSensing) 
 			{
 				this.xrDepth = [];
 				for (const view of this.xrViews)
