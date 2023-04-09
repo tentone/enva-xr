@@ -204,11 +204,13 @@ export class ARRenderer
 		
 		// Set resolution 
 		this.resolution.set(window.innerWidth, window.innerHeight);
-		document.body.appendChild(this.domContainer);
 		window.addEventListener("resize", () => {this.resize();}, false);
 
-		await this.setupRenderer();
-
+		// Renderer
+		if (!this.renderer) {
+			await this.setupRenderer();
+		}
+		
 		const config: any = {
 			requiredFeatures: [],
 			optionalFeatures: ['anchors', 'plane-detection']
@@ -216,6 +218,7 @@ export class ARRenderer
 
 		if (this.config.domOverlay) 
 		{
+			document.body.appendChild(this.domContainer);
 			config.domOverlay = {root: this.domContainer};
 			config.requiredFeatures.push("dom-overlay");
 		}
@@ -241,13 +244,15 @@ export class ARRenderer
 
 		this.xrSession = await navigator.xr.requestSession("immersive-ar", config);
 
+		// @ts-ignore
+		console.log('enva-xr: XR session ', this.xrSession);
+
 		this.renderer.xr.setReferenceSpaceType('local');
 		this.renderer.xr.setSession(this.xrSession);
 	
-
 		this.xrSession.addEventListener("end", () =>
 		{
-			this.dispose();
+			this.stop();
 		});
 
 		this.xrReferenceSpace = await this.xrSession.requestReferenceSpace('local');
@@ -262,7 +267,7 @@ export class ARRenderer
 				offsetRay: new XRRay()
 			});
 
-			console.log('enva-xr: XR hit test source', this.xrHitTestSource);
+			// console.log('enva-xr: XR hit test source', this.xrHitTestSource);
 		}
 
 		// Light probe
@@ -274,24 +279,19 @@ export class ARRenderer
 				reflectionFormat: this.xrSession.preferredReflectionFormat
 			});
 
-			if (this.config.reflectionCubeMap) 
+			if (this.config.reflectionCubeMap)
 			{
 				this.xrLightProbe.onreflectionchange = () => 
 				{
 					// @ts-ignore
 					this.xrReflectionCubeMap = this.xrGlBinding.getReflectionCubeMap(this.xrLightProbe);
-					console.log('enva-xr: XR light probe reflection change', this.xrReflectionCubeMap);
+					// console.log('enva-xr: XR light probe reflection change', this.xrReflectionCubeMap);
 				};
 	
 			}
 
-			console.log('enva-xr: XR light probe', this.xrLightProbe);
+			// console.log('enva-xr: XR light probe', this.xrLightProbe);
 		}
-
-		// @ts-ignore
-		console.log('enva-xr: XR session ', this.xrSession);
-
-		console.log('enva-xr: Start render loop');
 
 		// Render loop
 		this.renderer.setAnimationLoop((time: number, frame: any) =>
@@ -301,18 +301,28 @@ export class ARRenderer
 	}
 
 	/**
-	 * Dispose renderer, should be called when the renderer is not longer necessary.
+	 * Stop the XR session.
+	 * 
+	 * Destroys all elements related with the XR session but keeps rendering context alive.
+	 * 
+	 * If the renderer will no longer be used call dispose() to clean up graphics context.
 	 */
-	public async dispose(): Promise<void> 
+	public async stop(): Promise<void> 
 	{
 		// Stop animation loop
 		this.renderer.setAnimationLoop(null);
 
-		// Destroy XR context
-		this.forceContextLoss();
+		// Remove DOM overlay
+		if (this.config.domOverlay) 
+		{
+			document.body.removeChild(this.domContainer);
+		}
 
 		// End XR session
-		await this.xrSession.end();
+		try {
+			await this.xrSession.end();
+		} catch(e) {}
+		
 		this.xrSession = null;
 
 		// Clean XR structures
@@ -324,6 +334,16 @@ export class ARRenderer
 		this.xrReflectionCubeMap = null;
 		this.xrViewerPose = null;
 		this.xrViews = [];
+	}
+
+
+	/**
+	 * Dispose renderer, should be called when the renderer is not longer necessary.
+	 */
+	public async dispose(): Promise<void> 
+	{
+		this.stop();
+		this.forceContextLoss();
 	}
 
 	/**
@@ -348,7 +368,7 @@ export class ARRenderer
 			}
 		});
 
-		console.log("enva-xr: Shadow type changed to " + this.renderer.shadowMap.type);
+		// console.log("enva-xr: Shadow type changed to " + this.renderer.shadowMap.type);
 	}
 
 	/**
@@ -367,7 +387,7 @@ export class ARRenderer
 			// @ts-ignore
 			this.canvas = canvas;
 		}
-		else 
+		else if (!this.canvas)
 		{
 			this.canvas = document.createElement("canvas");
 			document.body.appendChild(this.canvas);
@@ -417,6 +437,8 @@ export class ARRenderer
 				this.renderer.forceContextLoss();
 				this.renderer = null;
 			}
+
+			this.glContext = null;
 		}
 		catch (e)
 		{
@@ -513,11 +535,11 @@ export class ARRenderer
 						// @ts-ignore
 						if (depthInfo instanceof XRCPUDepthInformation) 
 						{
-							if (!this.depthCanvasTexture) {
-								this.depthCanvasTexture = new DepthCanvasTexture(new OffscreenCanvas(depthInfo.width, depthInfo.height));
-							}
+							// if (!this.depthCanvasTexture) {
+							// 	this.depthCanvasTexture = new DepthCanvasTexture(new OffscreenCanvas(depthInfo.height, depthInfo.width));
+							// }
 
-							this.depthCanvasTexture.updateDepth(depthInfo, this.camera.near, this.camera.far);
+							// this.depthCanvasTexture.updateDepth(depthInfo, this.camera.near, this.camera.far);
 						}
 						// @ts-ignore
 						else if (depthInfo instanceof XRGPUDepthInformation) 
