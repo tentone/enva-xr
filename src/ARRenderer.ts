@@ -181,6 +181,11 @@ export class ARRenderer
 	 */
 	public async start(): Promise<void>
 	{
+		if (this.xrSession)
+		{
+			throw new Error("XR Session already running.");
+		}
+		
 		await this.setupRenderer();
 
 		this.resolution.set(window.innerWidth, window.innerHeight);
@@ -208,15 +213,14 @@ export class ARRenderer
 		}
 
 		if (this.config.depthSensing) {
-			config.depthSensing = {
-				usagePreference: ["gpu-optimized"], //, "cpu-optimized"],
-				dataFormatPreference: ["luminance-alpha"] //, "float32"]
-			};
 			config.requiredFeatures.push("depth-sensing");
+			config.depthSensing = {
+				usagePreference: ["gpu-optimized", "cpu-optimized"],
+				dataFormatPreference: ["luminance-alpha", "float32"]
+			};	
 		}
 
-
-		this.xrSession = await XRManager.start(this.renderer, config);
+		this.xrSession = await this.createSession(config);
 
 		this.xrSession.addEventListener("end", () =>
 		{
@@ -276,11 +280,14 @@ export class ARRenderer
 	/**
 	 * Dispose renderer, should be called when the renderer is not longer necessary.
 	 */
-	public dispose(): void 
+	public async dispose(): Promise<void> 
 	{
 		this.renderer.setAnimationLoop(null);
 
 		this.forceContextLoss();
+
+		await this.xrSession.end();
+		this.xrSession = null;
 
 		this.xrHitTestSource = null;
 		this.xrReferenceSpace = null;
@@ -369,6 +376,18 @@ export class ARRenderer
 	}
 
 	/**
+	 * Create XR session using the renderer object.
+	 */
+	public async createSession(sessionInit: XRSessionInit = {}): Promise<XRSession> {
+		const xrSession = await navigator.xr.requestSession("immersive-ar", sessionInit);
+
+		this.renderer.xr.setReferenceSpaceType('local');
+		this.renderer.xr.setSession(this.xrSession);
+
+		return xrSession;
+	}
+
+	/**
 	 * Force the loss of webgl rendering context.
 	 * 
 	 * To ensure that all webgl resources are dealocatted and the context destroyed.
@@ -386,7 +405,6 @@ export class ARRenderer
 		}
 		catch (e)
 		{
-			this.renderer = null;
 			throw new Error("Failed to destroy WebGL context.");
 		}
 
@@ -431,7 +449,6 @@ export class ARRenderer
 		
 		const raycaster = new Raycaster();
 		raycaster.setFromCamera(origin, this.camera);
-
 		raycaster.intersectObject(object, true, intersections);
 
 		return intersections;
@@ -467,9 +484,10 @@ export class ARRenderer
 				{
 					// @ts-ignore
 					const depthInfo: XRDepthInformation = frame.getDepthInformation(view);
+
 					if (depthInfo)
 					{
-						// console.log('enva-xr: XR depth information', depthInfo);
+						console.log('enva-xr: XR depth information', depthInfo);
 						this.xrDepth.push(depthInfo);
 
 						// // Update textures

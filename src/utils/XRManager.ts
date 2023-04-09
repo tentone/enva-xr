@@ -1,3 +1,4 @@
+import { WebGLRenderer } from "three";
 
 /**
  * XR manager is used to manage wich XR session is currently running and prevent multiple sessions from running concorrently.
@@ -18,7 +19,7 @@ export class XRManager
 	 * @param sessionInit - Session initialization data.
 	 * @returns The XR session created.
 	 */
-	static async start(renderer, sessionInit = {}): Promise<XRSession>
+	static async start(renderer: WebGLRenderer, sessionInit: XRSessionInit = {}): Promise<XRSession>
 	{
 		if (XRManager.session)
 		{
@@ -36,14 +37,14 @@ export class XRManager
 	/**
 	 * End the session.
 	 */
-	static end()
+	static async end(): Promise<void>
 	{
 		if (!XRManager.session) 
 		{
 			throw new Error("No XR Session running.");
 		}
 
-		XRManager.session.end();
+		await XRManager.session.end();
 		XRManager.session = null;
 	}
 }
