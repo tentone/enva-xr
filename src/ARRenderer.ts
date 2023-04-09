@@ -202,7 +202,6 @@ export class ARRenderer
 			throw new Error("XR Session already running.");
 		}
 		
-
 		// Set resolution 
 		this.resolution.set(window.innerWidth, window.innerHeight);
 		document.body.appendChild(this.domContainer);
@@ -240,7 +239,11 @@ export class ARRenderer
 			};	
 		}
 
-		this.xrSession = await this.createSession(config);
+		this.xrSession = await navigator.xr.requestSession("immersive-ar", config);
+
+		this.renderer.xr.setReferenceSpaceType('local');
+		this.renderer.xr.setSession(this.xrSession);
+	
 
 		this.xrSession.addEventListener("end", () =>
 		{
@@ -397,19 +400,6 @@ export class ARRenderer
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.xr.enabled = true;
-	}
-
-	/**
-	 * Create XR session using the renderer object.
-	 */
-	public async createSession(sessionInit: XRSessionInit = {}): Promise<XRSession> 
-	{
-		const xrSession = await navigator.xr.requestSession("immersive-ar", sessionInit);
-
-		this.renderer.xr.setReferenceSpaceType('local');
-		this.renderer.xr.setSession(this.xrSession);
-		
-		return xrSession;
 	}
 
 	/**
