@@ -237,8 +237,10 @@ export class ARRenderer
 		{
 			config.requiredFeatures.push("depth-sensing");
 			config.depthSensing = {
-				usagePreference: ["gpu-optimized", "cpu-optimized"],
-				dataFormatPreference: ["luminance-alpha", "float32"]
+				usagePreference: ["cpu-optimized"],
+				dataFormatPreference: ["luminance-alpha"]
+				// usagePreference: ["gpu-optimized", "cpu-optimized"],
+				// dataFormatPreference: ["luminance-alpha", "float32"]
 			};	
 		}
 
@@ -539,19 +541,19 @@ export class ARRenderer
 
 								// let canvas = new OffscreenCanvas(depthInfo.width, depthInfo.height);
 								let canvas = document.createElement('canvas');
-								canvas.width = depthInfo.width;
-								canvas.height = depthInfo.heigh;
 								canvas.style.position = 'absolute';
 								canvas.style.top = '0px';
 								canvas.style.left = '0px';
-								canvas.style.height = '50%';
-								canvas.style.width = '50%';
+								// canvas.style.width = (depthInfo.width * 3) + 'px';
+								// canvas.style.height = (depthInfo.heigh * 3) + 'px';
+								canvas.width = 90;
+								canvas.height = 160;
 								this.domContainer.appendChild(canvas);
 
 								this.depthCanvasTexture = new DepthCanvasTexture(canvas);
 							}
-
-							this.depthCanvasTexture.updateDepth(depthInfo, 0, 2); //this.camera.near, this.camera.far);
+							
+							this.depthCanvasTexture.updateDepth(depthInfo, 0, 2);
 						}
 						// @ts-ignore
 						else if (depthInfo instanceof XRGPUDepthInformation) 
