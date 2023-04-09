@@ -40,7 +40,7 @@ class ARRendererConfig
 	/**
 	 * Depth information captured from the environment.
 	 */
-	public depthSensing = false;
+	public depthSensing = true;
 }
 
 /**
