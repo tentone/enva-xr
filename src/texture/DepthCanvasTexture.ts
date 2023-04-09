@@ -23,18 +23,8 @@ export class DepthCanvasTexture extends CanvasTexture
 	{
 		// Adjust size of the canvas to match depth information
 		let canvas = this.image;
-		
-		// // Portrait
-		// if (depthInfo.width > depthInfo.height) {
-		// 	canvas.width = depthInfo.height;
-		// 	canvas.height = depthInfo.width;
-		// }
-		// // Landscape
-		// else
-		// {
 		// 	canvas.width = depthInfo.width;
 		// 	canvas.height = depthInfo.height;
-		// }
 
 		// Get image data
 		let context: CanvasRenderingContext2D = canvas.getContext("2d");
