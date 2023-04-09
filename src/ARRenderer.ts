@@ -535,11 +535,23 @@ export class ARRenderer
 						// @ts-ignore
 						if (depthInfo instanceof XRCPUDepthInformation) 
 						{
-							// if (!this.depthCanvasTexture) {
-							// 	this.depthCanvasTexture = new DepthCanvasTexture(new OffscreenCanvas(depthInfo.height, depthInfo.width));
-							// }
+							if (!this.depthCanvasTexture) {
 
-							// this.depthCanvasTexture.updateDepth(depthInfo, this.camera.near, this.camera.far);
+								// let canvas = new OffscreenCanvas(depthInfo.width, depthInfo.height);
+								let canvas = document.createElement('canvas');
+								canvas.width = depthInfo.width;
+								canvas.height = depthInfo.heigh;
+								canvas.style.position = 'absolute';
+								canvas.style.top = '0px';
+								canvas.style.left = '0px';
+								canvas.style.height = '50%';
+								canvas.style.width = '50%';
+								this.domContainer.appendChild(canvas);
+
+								this.depthCanvasTexture = new DepthCanvasTexture(canvas);
+							}
+
+							this.depthCanvasTexture.updateDepth(depthInfo, 0, 2); //this.camera.near, this.camera.far);
 						}
 						// @ts-ignore
 						else if (depthInfo instanceof XRGPUDepthInformation) 
