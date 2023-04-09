@@ -1,13 +1,14 @@
 import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D, ShadowMapType, Raycaster, Intersection} from "three";
 import {ARObject} from "object/ARObject";
 import {XRManager} from "./utils/XRManager";
+import { DepthCanvasTexture } from "texture/DepthCanvasTexture";
 
 /**
  * Configuration of the AR renderer.
  * 
  * Indicates the capabilities required by the renderer.
  */
-class ARRendererConfig 
+export class ARRendererConfig 
 {
 	/**
 	 * DOM overlay will create a DOM container to place custom HTML elements in the screen.
@@ -41,6 +42,13 @@ class ARRendererConfig
 	 * Depth information captured from the environment.
 	 */
 	public depthSensing = true;
+
+	/**
+	 * Provide a canvas texture with depth information.
+	 * 
+	 * Automatically updated by the renderer every frame.
+	 */
+	public depthCanvasTexture = true;
 }
 
 /**
@@ -146,6 +154,15 @@ export class ARRenderer
 	 * Available when config.lightProbe and config.reflectionCubeMap are set true.
 	 */
 	public xrReflectionCubeMap: WebGLTexture = null;
+
+	/**
+	 * Canvas depth texture created from depth data.
+	 * 
+	 * Automatically updated by the renderer when CPU depth information is available.
+	 * 
+	 * Available when the config.depthCanvasTexture flag is set true.
+	 */
+	public depthCanvasTexture: DepthCanvasTexture = null;
 
 	/**
 	 * Callback to update logic of the app before rendering.
@@ -503,14 +520,18 @@ export class ARRenderer
 						// @ts-ignore
 						if (depthInfo instanceof XRCPUDepthInformation) 
 						{
+							if (!this.depthCanvasTexture) {
+								this.depthCanvasTexture = new DepthCanvasTexture(new OffscreenCanvas(depthInfo.width, depthInfo.height));
+							}
 
+							this.depthCanvasTexture.updateDepth(depthInfo, this.camera.near, this.camera.far);
 						}
 						// @ts-ignore
 						else if (depthInfo instanceof XRGPUDepthInformation) 
 						{
 
 						}
-						
+
 						// // Update textures
 						// this.depthDataTexture.updateDepth(depthInfo);
 
