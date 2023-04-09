@@ -1,7 +1,6 @@
 import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D, ShadowMapType, Raycaster, Intersection} from "three";
-import {ARObject} from "object/ARObject";
-import {XRManager} from "./utils/XRManager";
-import { DepthCanvasTexture } from "texture/DepthCanvasTexture";
+import {ARObject} from "./object/ARObject";
+import { DepthCanvasTexture } from "./texture/DepthCanvasTexture";
 
 /**
  * Configuration of the AR renderer.
@@ -203,13 +202,13 @@ export class ARRenderer
 			throw new Error("XR Session already running.");
 		}
 		
-		await this.setupRenderer();
 
+		// Set resolution 
 		this.resolution.set(window.innerWidth, window.innerHeight);
 		document.body.appendChild(this.domContainer);
-
-		// Resize this.renderer
 		window.addEventListener("resize", () => {this.resize();}, false);
+
+		await this.setupRenderer();
 
 		const config: any = {
 			requiredFeatures: [],
@@ -303,13 +302,17 @@ export class ARRenderer
 	 */
 	public async dispose(): Promise<void> 
 	{
+		// Stop animation loop
 		this.renderer.setAnimationLoop(null);
 
+		// Destroy XR context
 		this.forceContextLoss();
 
+		// End XR session
 		await this.xrSession.end();
 		this.xrSession = null;
 
+		// Clean XR structures
 		this.xrHitTestSource = null;
 		this.xrReferenceSpace = null;
 		this.xrGlBinding = null;
@@ -405,7 +408,7 @@ export class ARRenderer
 
 		this.renderer.xr.setReferenceSpaceType('local');
 		this.renderer.xr.setSession(this.xrSession);
-
+		
 		return xrSession;
 	}
 
