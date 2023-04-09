@@ -1,4 +1,4 @@
-import {BufferGeometry, Line, Line3, LineBasicMaterial, Matrix4, Vector3} from "three";
+import {BufferGeometry, Event, Intersection, Line, Line3, LineBasicMaterial, Matrix4, Object3D, Raycaster, Vector3} from "three";
 import {Text} from "troika-three-text";
 
 /**
@@ -43,6 +43,8 @@ export class Measurement extends Line
 
 		this.updateText();
 	}
+
+	public raycast(raycaster: Raycaster, intersects: Intersection<Object3D<Event>>[]): void {}
 
 	/**
 	 * Update the second measurement line with new position.

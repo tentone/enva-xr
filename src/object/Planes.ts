@@ -25,7 +25,9 @@ export class PlaneData {
 /**
  * AR planes can be created using the "plane-detection" feature when available.
  * 
- * Planes can be used for objects to cast shadows and for physics interaction. 
+ * Planes can be used for objects to cast shadows and for physics interaction.
+ * 
+ * More detail at https://immersive-web.github.io/real-world-geometry/plane-detection.html.
  */
 export class Planes extends Group implements ARObject {
 	public isARObject: boolean = true;
