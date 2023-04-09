@@ -9,7 +9,7 @@ import {DataTexture, RGFormat, UnsignedByteType, LinearFilter} from "three";
  */
 export class DepthDataTexture extends DataTexture
 {
-	public constructor(width: number = 160, height: number = 90)
+	public constructor(width = 160, height = 90)
 	{
 		super(new Uint8Array(width * height), width, height, RGFormat, UnsignedByteType);
 

@@ -20,7 +20,7 @@ export class LightProbe extends Group implements ARObject
 	/**
 	 * Height (altitude) to place the ambient directional light.
 	 */
-	public lightHeight: number = 5.0;
+	public lightHeight = 5.0;
 
 	public isARObject = true;
 

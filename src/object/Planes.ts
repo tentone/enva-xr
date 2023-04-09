@@ -1,11 +1,12 @@
-import { ARRenderer } from "../ARRenderer";
-import { BufferGeometry, BufferAttribute, Vector3, Group, Mesh, ShadowMaterial, MeshBasicMaterial } from "three";
-import { ARObject } from "./ARObject";
+import {BufferGeometry, BufferAttribute, Vector3, Group, Mesh, ShadowMaterial, MeshBasicMaterial} from "three";
+import {ARRenderer} from "../ARRenderer";
+import {ARObject} from "./ARObject";
 
 /**
  * Data of a specific plane being managed in the Planes object.
  */
-export class PlaneData {
+export class PlaneData 
+{
 	/**
 	 * ID of the plane.
 	 */
@@ -29,13 +30,14 @@ export class PlaneData {
  * 
  * More detail at https://immersive-web.github.io/real-world-geometry/plane-detection.html.
  */
-export class Planes extends Group implements ARObject {
-	public isARObject: boolean = true;
+export class Planes extends Group implements ARObject 
+{
+	public isARObject = true;
 	
 	/**
 	 * ID counter.
 	 */
-	public static id: number = 0; 
+	public static id = 0; 
 
 	/**
 	 * Map with all existing planes.
@@ -57,19 +59,23 @@ export class Planes extends Group implements ARObject {
 	 */
 	public onDelete: (data: PlaneData) => void = null;
 
-	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) {
+	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) 
+	{
 		// @ts-ignore
-		if (frame.detectedPlanes) {
+		if (frame.detectedPlanes) 
+		{
 
 			// Delete planes that are no longer visible
-			this.planes.forEach((planeData: PlaneData, plane: any) => {
+			this.planes.forEach((planeData: PlaneData, plane: any) => 
+			{
 				// @ts-ignore
-				if (!frame.detectedPlanes.has(plane)) {
+				if (!frame.detectedPlanes.has(plane)) 
+				{
 					// plane was removed
 					this.planes.delete(plane);
 					this.remove(planeData.mesh);
 
-					if(this.onDelete)
+					if (this.onDelete)
 					{
 						this.onDelete(planeData);
 					}
@@ -77,24 +83,27 @@ export class Planes extends Group implements ARObject {
 			});
 
 			// @ts-ignore
-			frame.detectedPlanes.forEach(plane => {
+			frame.detectedPlanes.forEach((plane) => 
+			{
 				const planePose = frame.getPose(plane.planeSpace, renderer.xrReferenceSpace);
 
 				let planeMesh: Mesh;
 				
 				// Existing plane (update)
-				if (this.planes.has(plane)) {
+				if (this.planes.has(plane)) 
+				{
 					const planeData = this.planes.get(plane);
 					planeMesh = planeData.mesh;
 					
 					// Compare timestamp to check for updates
-					if (planeData.timestamp < plane.lastChangedTime) {
+					if (planeData.timestamp < plane.lastChangedTime) 
+					{
 						planeData.timestamp = plane.lastChangedTime;
 						const geometry = Planes.createGeometry(plane.polygon);
 						planeData.mesh.geometry.dispose();
 						planeData.mesh.geometry = geometry;
 
-						if(this.onUpdate)
+						if (this.onUpdate)
 						{
 							this.onUpdate(planeData);
 						}
@@ -115,12 +124,12 @@ export class Planes extends Group implements ARObject {
 					const data: PlaneData = {
 						id: Planes.id++,
 						timestamp: plane.lastChangedTime,
-						mesh: planeMesh,
+						mesh: planeMesh
 					};
 
 					this.planes.set(plane, data);
 					
-					if(this.onCreate)
+					if (this.onCreate)
 					{
 						this.onCreate(data);
 					}
@@ -129,11 +138,13 @@ export class Planes extends Group implements ARObject {
 					Planes.id++;
 				}
 				
-				if (planePose) {
+				if (planePose) 
+				{
 					planeMesh.visible = true;
 					planeMesh.matrix.fromArray(planePose.transform.matrix);
 				}
-				else {
+				else 
+				{
 					planeMesh.visible = false;
 				}
 			});
@@ -146,24 +157,27 @@ export class Planes extends Group implements ARObject {
 	 * @param polygon Vertices that compose the polygon
 	 * @returns The geometry created to represent the plane.
 	 */
-	public static createGeometry(polygon: Vector3[]): BufferGeometry {
+	public static createGeometry(polygon: Vector3[]): BufferGeometry 
+	{
 		const geometry = new BufferGeometry();
 
 		const vertices = [];
 		const uvs = [];
 
-		polygon.forEach(point => {
+		polygon.forEach((point) => 
+		{
 			vertices.push(point.x, point.y, point.z);
 			uvs.push(point.x, point.z);
-		})
+		});
 
 		const indices = [];
-		for(let i = 2; i < polygon.length; ++i) {
+		for (let i = 2; i < polygon.length; ++i) 
+		{
 			indices.push(0, i-1, i);
 		}
 
 		geometry.setAttribute('position', new BufferAttribute(new Float32Array(vertices), 3));
-		geometry.setAttribute('uv', new BufferAttribute(new Float32Array(uvs), 2))
+		geometry.setAttribute('uv', new BufferAttribute(new Float32Array(uvs), 2));
 		geometry.setIndex(indices);
 
 		return geometry;

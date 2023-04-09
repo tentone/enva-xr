@@ -1,4 +1,4 @@
-import { WebGLRenderer } from "three";
+import {WebGLRenderer} from "three";
 
 /**
  * XR manager is used to manage wich XR session is currently running and prevent multiple sessions from running concorrently.

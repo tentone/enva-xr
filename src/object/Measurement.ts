@@ -21,7 +21,8 @@ export class Measurement extends Line
 	 */
 	public constructor(points: Vector3[])
 	{
-		if (points.length !== 2) {
+		if (points.length !== 2) 
+		{
 			throw new Error("Point array should have length 2");
 		}
 

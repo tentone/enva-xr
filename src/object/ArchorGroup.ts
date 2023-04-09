@@ -1,6 +1,6 @@
-import { Group } from "three";
-import { ARObject } from "./ARObject";
-import { ARRenderer } from "ARRenderer";
+import {Group} from "three";
+import {ARRenderer} from "ARRenderer";
+import {ARObject} from "./ARObject";
 
 /**
  * Archor groups can be used to attach (anchor) object to the real-world environment.
@@ -9,15 +9,17 @@ import { ARRenderer } from "ARRenderer";
  * 
  * Check https://immersive-web.github.io/anchors/ for more details.
  */
-export class AnchorGroup extends Group implements ARObject {
-	public isARObject: boolean = true;
+export class AnchorGroup extends Group implements ARObject 
+{
+	public isARObject = true;
 
 	/**
 	 * XR anchor associated with this object.
 	 */
 	public anchor: XRAnchor = null;
 
-	public constructor(anchor: XRAnchor) {
+	public constructor(anchor: XRAnchor) 
+	{
 		super();
 
 		this.anchor = anchor;
@@ -30,7 +32,8 @@ export class AnchorGroup extends Group implements ARObject {
 	 * @param hit - Hit test result. 
 	 * @returns Anchor object created.
 	 */
-	public static async createGroup(hit: XRHitResult): Promise<AnchorGroup> {
+	public static async createGroup(hit: XRHitResult): Promise<AnchorGroup> 
+	{
 		// @ts-ignore
 		const anchor = hit.createAnchor();
 		const group = new AnchorGroup(anchor);
@@ -38,9 +41,11 @@ export class AnchorGroup extends Group implements ARObject {
 		return group;
 	}
 
-	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) {
+	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) 
+	{
 		// Check if the anchor is visible in frame
-		if (!frame.trackedAnchors.has(this.anchor)) {
+		if (!frame.trackedAnchors.has(this.anchor)) 
+		{
 			return;
 		}
 

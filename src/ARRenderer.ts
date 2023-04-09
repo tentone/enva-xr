@@ -197,22 +197,26 @@ export class ARRenderer
 		const config: any = {
 			requiredFeatures: [],
 			optionalFeatures: ['anchors', 'plane-detection']
-		}
+		};
 
-		if (this.config.domOverlay) {
+		if (this.config.domOverlay) 
+		{
 			config.domOverlay = {root: this.domContainer};
 			config.requiredFeatures.push("dom-overlay");
 		}
 
-		if (this.config.hitTest) {
+		if (this.config.hitTest) 
+		{
 			config.requiredFeatures.push("hit-test");
 		}
 
-		if (this.config.lightProbe) {
+		if (this.config.lightProbe) 
+		{
 			config.requiredFeatures.push("light-estimation");
 		}
 
-		if (this.config.depthSensing) {
+		if (this.config.depthSensing) 
+		{
 			config.requiredFeatures.push("depth-sensing");
 			config.depthSensing = {
 				usagePreference: ["gpu-optimized", "cpu-optimized"],
@@ -378,7 +382,8 @@ export class ARRenderer
 	/**
 	 * Create XR session using the renderer object.
 	 */
-	public async createSession(sessionInit: XRSessionInit = {}): Promise<XRSession> {
+	public async createSession(sessionInit: XRSessionInit = {}): Promise<XRSession> 
+	{
 		const xrSession = await navigator.xr.requestSession("immersive-ar", sessionInit);
 
 		this.renderer.xr.setReferenceSpaceType('local');
@@ -411,9 +416,11 @@ export class ARRenderer
 		// Remove canvas from DOM
 		if (this.canvas && !(this.canvas instanceof OffscreenCanvas))
 		{
-			try {
+			try 
+			{
 				this.canvas.parentElement.removeChild(this.canvas);
-			} catch(e) {}
+			}
+			catch (e) {}
 		}
 	}
 
@@ -428,7 +435,8 @@ export class ARRenderer
 		this.camera.aspect = this.resolution.x / this.resolution.y;
 		this.camera.updateProjectionMatrix();
 
-		if (this.renderer) {
+		if (this.renderer) 
+		{
 			this.renderer.setSize(this.resolution.x, this.resolution.y);
 			this.renderer.setPixelRatio(window.devicePixelRatio);
 		}
@@ -440,8 +448,10 @@ export class ARRenderer
 	 * @param origin - Origin of the ray in screen space from -1 to 1.
 	 * @param object - Object to raycast (optional). By default the entire scene is used. 
 	 */
-	public raycast(origin: Vector2, object?: Object3D): Intersection<Object3D<Event>>[] {
-		if (!object) {
+	public raycast(origin: Vector2, object?: Object3D): Intersection<Object3D<Event>>[] 
+	{
+		if (!object) 
+		{
 			object = this.scene;
 		}
 
@@ -489,7 +499,18 @@ export class ARRenderer
 					{
 						console.log('enva-xr: XR depth information', depthInfo);
 						this.xrDepth.push(depthInfo);
+						
+						// @ts-ignore
+						if (depthInfo instanceof XRCPUDepthInformation) 
+						{
 
+						}
+						// @ts-ignore
+						else if (depthInfo instanceof XRGPUDepthInformation) 
+						{
+
+						}
+						
 						// // Update textures
 						// this.depthDataTexture.updateDepth(depthInfo);
 

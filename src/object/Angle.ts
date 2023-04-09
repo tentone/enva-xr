@@ -18,7 +18,8 @@ export class Angle extends Line
 
 	public constructor(points: Vector3[])
 	{
-		if (points.length !== 3) {
+		if (points.length !== 3) 
+		{
 			throw new Error("Point array should have length 3");
 		}
 
