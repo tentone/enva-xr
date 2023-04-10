@@ -16,6 +16,10 @@ export class ARRendererConfig
 	 * The front-facing camera API enables AR experiences to express their preference to use a front-facing (or "selfie") camera when creating immersive sessions.
 	 * 
 	 * Some XR device form factors, most notably smartphones, have multiple cameras that can be used to power an immersive (generally AR) experience.
+	 * 
+	 * Might not work alongside other features (e.g. depth-sensing, light-probe)
+	 * 
+	 * More information about the feature https://github.com/immersive-web/front-facing-camera/blob/main/explainer.md
 	 */
 	public frontFacing = false;
 
