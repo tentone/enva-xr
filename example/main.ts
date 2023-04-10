@@ -1,4 +1,4 @@
-import {BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, Vector2, Vector3} from "three";
+import {AmbientLight, BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, Vector2, Vector3} from "three";
 import {ARRenderer, Cursor, LightProbe, Measurement, Planes, FloorPlane} from "../src/Main";
 
 const renderer = new ARRenderer();
@@ -16,6 +16,9 @@ box.castShadow = true;
 box.scale.setScalar(0.1);
 box.position.set(0, 0, -1);
 renderer.scene.add(box);
+
+const ambient = new AmbientLight(0x333333);
+renderer.scene.add(ambient);
 
 const probe = new LightProbe();
 renderer.scene.add(probe);
@@ -47,7 +50,7 @@ renderer.domContainer.onclick = function(event: MouseEvent) {
 
 renderer.domContainer.ondblclick = function(event: MouseEvent) {
     if (cursor.visible) {
-        let sphere = new Mesh(new SphereGeometry(), new MeshPhysicalMaterial());
+        let sphere = new Mesh(new SphereGeometry(), new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)}));
         sphere.receiveShadow = true;
         sphere.castShadow = true;
         sphere.scale.setScalar(0.1);
