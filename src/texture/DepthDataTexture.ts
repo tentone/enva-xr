@@ -24,9 +24,9 @@ export class DepthDataTexture extends DataTexture
 	 *
 	 * @param depthInfo
 	 */
-	public updateDepth(depthInfo: XRDepthInformation): void
+	public updateDepth(depthInfo: XRCPUDepthInformation): void
 	{
-		let dataBuffer = depthInfo.data;
+		const dataBuffer = depthInfo.data;
 
 		// @ts-ignore
 		this.image.data = new Uint8Array(dataBuffer.buffer, dataBuffer.byteOffset, dataBuffer.byteLength);
