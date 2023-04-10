@@ -74,9 +74,8 @@ export class AugmentedMaterial
                 // Normalize x, y to range [0, 1]
                 float x = gl_FragCoord.x / uWidth;
                 float y = gl_FragCoord.y / uHeight;
-                vec2 uv = gl_FragCoord.xy / uResolution.xy;
-                
-                vec2 depthUV = (uUvTransform * vec4(uv, 0, 1)).xy;
+
+   				vec2 depthUV = (uUvTransform * vec4(vec2(x, y), 0, 1)).xy;
                 float depth = getDepthInMeters(uDepthTexture, depthUV);
                 if (depth < vDepth)
                 {
