@@ -18,7 +18,7 @@ box.scale.setScalar(0.1);
 box.position.set(0, 0, -1);
 renderer.scene.add(box);
 
-const ambient = new AmbientLight(0x333333);
+const ambient = new AmbientLight(0x111111);
 renderer.scene.add(ambient);
 
 const probe = new LightProbe();
@@ -52,7 +52,7 @@ renderer.domContainer.onclick = function(event: MouseEvent) {
 renderer.domContainer.ondblclick = function(event: MouseEvent) {
     if (cursor.visible) {
         let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-        material = AugmentedMaterial.transform(material, renderer.depthTexture);
+        // material = AugmentedMaterial.transform(material, renderer.depthTexture);
         
         let sphere = new Mesh(new SphereGeometry(), material);
         sphere.receiveShadow = true;
