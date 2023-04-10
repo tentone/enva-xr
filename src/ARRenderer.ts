@@ -175,21 +175,23 @@ export class ARRenderer
 
 	/**
 	 * DOM container for GUI elements visible in AR mode.
+	 * 
+	 * The container is only displayed when the renderer starts.
 	 */
-	public domContainer: HTMLElement = document.createElement("div");
+	public domContainer: HTMLElement = null;
 
 	public constructor()
 	{
+		if (!navigator.xr) {
+			throw new Error("WebXR is not supported by the device/browser.");
+		}
+
 		if (window.isSecureContext === false)
 		{
 			throw new Error("WebXR is not available trough HTTP.");
 		}
 
-		this.domContainer.style.position = "absolute";
-		this.domContainer.style.top = "0px";
-		this.domContainer.style.left = "0px";
-		this.domContainer.style.width = "100%";
-		this.domContainer.style.height = "100%";
+		this.domContainer = this.createDOMContainer();
 	}
 
 	/**
@@ -338,6 +340,22 @@ export class ARRenderer
 		this.xrViews = [];
 	}
 
+
+	/**
+	 * Create DOM container to place DOM elements as overlay of the AR scene.
+	 */
+	public createDOMContainer(): HTMLElement {
+		const div = document.createElement("div");
+		div.style.position = "absolute";
+		div.style.display = "block";
+		div.style.top = "0px";
+		div.style.left = "0px";
+		div.style.width = "100%";
+		div.style.height = "100%";
+		div.style.backgroundColor = "#FF0000";
+
+		return div;
+	}
 
 	/**
 	 * Dispose renderer, should be called when the renderer is not longer necessary.
@@ -542,18 +560,15 @@ export class ARRenderer
 								// let canvas = new OffscreenCanvas(depthInfo.width, depthInfo.height);
 								let canvas = document.createElement('canvas');
 								canvas.style.position = 'absolute';
+								canvas.style.display = 'block';
 								canvas.style.top = '0px';
 								canvas.style.left = '0px';
-								// canvas.style.width = (depthInfo.width * 3) + 'px';
-								// canvas.style.height = (depthInfo.heigh * 3) + 'px';
-								canvas.width = 90;
-								canvas.height = 160;
 								this.domContainer.appendChild(canvas);
 
 								this.depthCanvasTexture = new DepthCanvasTexture(canvas);
 							}
 							
-							this.depthCanvasTexture.updateDepth(depthInfo, 0, 2);
+							// this.depthCanvasTexture.updateDepth(depthInfo, 0, 2);
 						}
 						// @ts-ignore
 						else if (depthInfo instanceof XRGPUDepthInformation) 
