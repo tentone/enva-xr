@@ -52,7 +52,7 @@ renderer.domContainer.onclick = function(event: MouseEvent) {
 renderer.domContainer.ondblclick = function(event: MouseEvent) {
     if (cursor.visible) {
         let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-        material = AugmentedMaterial.transform(material, renderer.depthTexture);
+        // material = AugmentedMaterial.transform(material, renderer.depthTexture);
         
         let sphere = new Mesh(new SphereGeometry(), material);
         sphere.receiveShadow = true;

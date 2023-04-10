@@ -54,14 +54,14 @@ export class ARRendererConfig
 	/**
 	 * Depth information captured from the environment.
 	 */
-	public depthSensing = true;
+	public depthSensing = false;
 
 	/**
 	 * Provide a texture with the depth data captured by the system.
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthTexture = true;
+	public depthTexture = false;
 
 	/**
 	 * Provide a canvas texture with depth information.
