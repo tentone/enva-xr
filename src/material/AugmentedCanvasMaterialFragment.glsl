@@ -30,8 +30,6 @@ void main() {
 
 	vec4 depthPixel = texture2D(uDepthTexture, depthUV);
 	if (depthPixel.x < z) {
-		// gl_FragColor = vec4(1.0, pixel.gb, 1.0);
-		// return;
 		discard;
 	}
 
