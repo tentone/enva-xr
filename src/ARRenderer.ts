@@ -1,6 +1,7 @@
 import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D, ShadowMapType, Raycaster, Intersection} from "three";
 import {ARObject} from "./object/ARObject";
 import { DepthCanvasTexture } from "./texture/DepthCanvasTexture";
+import { EventManager } from "./utils/EventManager";
 
 /**
  * Configuration of the AR renderer.
@@ -47,7 +48,7 @@ export class ARRendererConfig
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthCanvasTexture = true;
+	public depthCanvasTexture = false;
 }
 
 /**
@@ -180,6 +181,11 @@ export class ARRenderer
 	 */
 	public domContainer: HTMLElement = null;
 
+	/**
+	 * Event manager used to start and destroy browser events.
+	 */
+	public event: EventManager = new EventManager();
+
 	public constructor()
 	{
 		if (!navigator.xr) {
@@ -206,7 +212,6 @@ export class ARRenderer
 		
 		// Set resolution 
 		this.resolution.set(window.innerWidth, window.innerHeight);
-		window.addEventListener("resize", () => {this.resize();}, false);
 
 		// Renderer
 		if (!this.renderer) {
@@ -253,11 +258,10 @@ export class ARRenderer
 
 		this.renderer.xr.setReferenceSpaceType('local');
 		this.renderer.xr.setSession(this.xrSession);
-	
-		this.xrSession.addEventListener("end", () =>
-		{
-			this.stop();
-		});
+		
+		this.event.add(window, "resize", () => {this.resize();});
+		this.event.add(this.xrSession, "end", () => {this.stop();});
+		this.event.create();
 
 		this.xrReferenceSpace = await this.xrSession.requestReferenceSpace('local');
 		this.xrGlBinding = new XRWebGLBinding(this.xrSession, this.glContext);
@@ -327,9 +331,11 @@ export class ARRenderer
 			await this.xrSession.end();
 		} catch(e) {}
 		
-		this.xrSession = null;
+		// Destroy and clear events associated
+		this.event.clear();
 
 		// Clean XR structures
+		this.xrSession = null;
 		this.xrHitTestSource = null;
 		this.xrReferenceSpace = null;
 		this.xrGlBinding = null;
@@ -542,6 +548,7 @@ export class ARRenderer
 			if (this.config.depthSensing) 
 			{
 				this.xrDepth = [];
+				
 				for (const view of this.xrViews)
 				{
 					// @ts-ignore
@@ -549,32 +556,35 @@ export class ARRenderer
 
 					if (depthInfo)
 					{
-						console.log('enva-xr: XR depth information', depthInfo);
+						// console.log('enva-xr: XR depth information', depthInfo);
 						this.xrDepth.push(depthInfo);
 						
-						// @ts-ignore
-						if (depthInfo instanceof XRCPUDepthInformation) 
-						{
-							if (!this.depthCanvasTexture) {
-
-								// let canvas = new OffscreenCanvas(depthInfo.width, depthInfo.height);
-								let canvas = document.createElement('canvas');
-								canvas.style.position = 'absolute';
-								canvas.style.display = 'block';
-								canvas.style.top = '0px';
-								canvas.style.left = '0px';
-								this.domContainer.appendChild(canvas);
-
-								this.depthCanvasTexture = new DepthCanvasTexture(canvas);
+						if (this.config.depthCanvasTexture) {
+							// @ts-ignore
+							if (depthInfo instanceof XRCPUDepthInformation) 
+							{
+								if (!this.depthCanvasTexture) {
+	
+									const canvas = new OffscreenCanvas(depthInfo.width, depthInfo.height);
+									// const canvas = document.createElement('canvas');
+									// canvas.style.position = 'absolute';
+									// canvas.style.display = 'block';
+									// canvas.style.top = '0px';
+									// canvas.style.left = '0px';
+									// this.domContainer.appendChild(canvas);
+	
+									this.depthCanvasTexture = new DepthCanvasTexture(canvas);
+								}
+								
+								this.depthCanvasTexture.updateDepth(depthInfo, 0, 2);
 							}
-							
-							// this.depthCanvasTexture.updateDepth(depthInfo, 0, 2);
+							// @ts-ignore
+							else if (depthInfo instanceof XRGPUDepthInformation) 
+							{
+	
+							}
 						}
-						// @ts-ignore
-						else if (depthInfo instanceof XRGPUDepthInformation) 
-						{
-
-						}
+	
 
 						// // Update textures
 						// this.depthDataTexture.updateDepth(depthInfo);
