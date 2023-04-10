@@ -1,7 +1,9 @@
 import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D, ShadowMapType, Raycaster, Intersection} from "three";
+import {DepthDataTexture} from "texture/DepthDataTexture";
 import {ARObject} from "./object/ARObject";
-import { DepthCanvasTexture } from "./texture/DepthCanvasTexture";
-import { EventManager } from "./utils/EventManager";
+import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
+import {EventManager} from "./utils/EventManager";
+import {AugmentedMaterial} from "./material/AugmentedMaterial";
 
 /**
  * Configuration of the AR renderer.
@@ -10,6 +12,13 @@ import { EventManager } from "./utils/EventManager";
  */
 export class ARRendererConfig 
 {
+	/**
+	 * The front-facing camera API enables AR experiences to express their preference to use a front-facing (or "selfie") camera when creating immersive sessions.
+	 * 
+	 * Some XR device form factors, most notably smartphones, have multiple cameras that can be used to power an immersive (generally AR) experience.
+	 */
+	public frontFacing = false;
+
 	/**
 	 * DOM overlay will create a DOM container to place custom HTML elements in the screen.
 	 * 
@@ -41,10 +50,19 @@ export class ARRendererConfig
 	/**
 	 * Depth information captured from the environment.
 	 */
-	public depthSensing = false;
+	public depthSensing = true;
+
+	/**
+	 * Provide a texture with the depth data captured by the system.
+	 * 
+	 * Automatically updated by the renderer every frame.
+	 */
+	public depthTexture = true;
 
 	/**
 	 * Provide a canvas texture with depth information.
+	 * 
+	 * Canvas texture is acessible on CPU, it is slower to update.
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
@@ -156,6 +174,13 @@ export class ARRenderer
 	public xrReflectionCubeMap: WebGLTexture = null;
 
 	/**
+	 * Depth texture created from depth data.
+	 * 
+	 * Available when the config.depthtexture flag is set true.
+	 */
+	public depthtexture: DepthDataTexture = null;
+
+	/**
 	 * Canvas depth texture created from depth data.
 	 * 
 	 * Automatically updated by the renderer when CPU depth information is available.
@@ -188,7 +213,8 @@ export class ARRenderer
 
 	public constructor()
 	{
-		if (!navigator.xr) {
+		if (!navigator.xr) 
+		{
 			throw new Error("WebXR is not supported by the device/browser.");
 		}
 
@@ -214,7 +240,8 @@ export class ARRenderer
 		this.resolution.set(window.innerWidth, window.innerHeight);
 
 		// Renderer
-		if (!this.renderer) {
+		if (!this.renderer) 
+		{
 			await this.setupRenderer();
 		}
 		
@@ -228,6 +255,11 @@ export class ARRenderer
 			document.body.appendChild(this.domContainer);
 			config.domOverlay = {root: this.domContainer};
 			config.requiredFeatures.push("dom-overlay");
+		}
+
+		if (this.config.frontFacing)
+		{
+			config.optionalFeatures.push('front-facing');
 		}
 
 		if (this.config.hitTest) 
@@ -248,7 +280,7 @@ export class ARRenderer
 				dataFormatPreference: ["luminance-alpha"]
 				// usagePreference: ["gpu-optimized", "cpu-optimized"],
 				// dataFormatPreference: ["luminance-alpha", "float32"]
-			};	
+			};
 		}
 
 		this.xrSession = await navigator.xr.requestSession("immersive-ar", config);
@@ -270,12 +302,14 @@ export class ARRenderer
 		if (this.config.depthSensing)
 		{
 			// @ts-ignore
-			if(this.xrSession.depthUsage !== "cpu-optimized") {
+			if (this.xrSession.depthUsage !== "cpu-optimized") 
+			{
 				throw new Error("Unsupported depth API usage!");
 			}
 
 			// @ts-ignore
-			if(this.xrSession.depthDataFormat !== "luminance-alpha") {
+			if (this.xrSession.depthDataFormat !== "luminance-alpha") 
+			{
 				throw new Error("Unsupported depth data format!");
 			}
 		}
@@ -341,9 +375,11 @@ export class ARRenderer
 		}
 
 		// End XR session
-		try {
+		try 
+		{
 			await this.xrSession.end();
-		} catch(e) {}
+		}
+		catch (e) {}
 		
 		// Destroy and clear events associated
 		this.event.clear();
@@ -364,7 +400,8 @@ export class ARRenderer
 	/**
 	 * Create DOM container to place DOM elements as overlay of the AR scene.
 	 */
-	public createDOMContainer(): HTMLElement {
+	public createDOMContainer(): HTMLElement 
+	{
 		const div = document.createElement("div");
 		div.style.position = "absolute";
 		div.style.display = "block";
@@ -572,44 +609,25 @@ export class ARRenderer
 						// console.log('enva-xr: XR depth information', depthInfo);
 						this.xrDepth.push(depthInfo);
 						
-						if (this.config.depthCanvasTexture) {
+						if (this.config.depthCanvasTexture) 
+						{
 							// @ts-ignore
 							if (depthInfo instanceof XRCPUDepthInformation) 
 							{
-								if (!this.depthCanvasTexture) {
+								if (!this.depthCanvasTexture) 
+								{
 	
 									const canvas = new OffscreenCanvas(depthInfo.width, depthInfo.height);
-									// const canvas = document.createElement('canvas');
-									// canvas.style.position = 'absolute';
-									// canvas.style.display = 'block';
-									// canvas.style.top = '0px';
-									// canvas.style.left = '0px';
-									// this.domContainer.appendChild(canvas);
-	
 									this.depthCanvasTexture = new DepthCanvasTexture(canvas);
 								}
 								
 								this.depthCanvasTexture.updateDepth(depthInfo, 0, 2);
 							}
-							// @ts-ignore
-							else if (depthInfo instanceof XRGPUDepthInformation) 
-							{
-	
-							}
 						}
-	
 
-						// // Update textures
-						// this.depthDataTexture.updateDepth(depthInfo);
 
-						// // Draw canvas texture depth
-						// if (this.debugDepth)
-						// {
-						// 	this.depthTexture.updateDepth(depthInfo, this.camera.near, this.camera.far);
-						// }
-
-						// // Update normal matrix
-						// AugmentedMaterial.updateUniforms(this.scene, depthInfo);
+						// Update normal matrix
+						AugmentedMaterial.updateUniforms(this.scene, depthInfo);
 					}
 					
 				}

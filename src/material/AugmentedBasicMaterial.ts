@@ -7,7 +7,7 @@ import AugmentedBasicMaterialVertex from "./AugmentedBasicMaterialVertex.glsl";
  *
  * Uses raw packed data from the WebXR API.
  */
-export class AugmentedMaterial extends ShaderMaterial
+export class AugmentedBasicMaterial extends ShaderMaterial
 {
 	public constructor(colorMap: Texture, depthMap: Texture)
 	{

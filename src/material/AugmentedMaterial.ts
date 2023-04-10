@@ -1,4 +1,4 @@
-import {Material, Scene, Texture, Matrix4, ShadowMaterial} from "three";
+import {Material, Texture, Matrix4, ShadowMaterial, Object3D} from "three";
 
 /**
  * Augmented Material has static tools to transform regular three.js materials into AR materials.
@@ -15,7 +15,7 @@ export class AugmentedMaterial
 	 * @param material - Material to be transformed into an augmented material.
 	 * @param depthMap - Depth map bound to the material. A single depth map should be used for all AR materials.
 	 */
-	public static transform(material: Material, depthMap: Texture)
+	public static transform(material: Material, depthMap: Texture): Material
 	{
 		material.userData = {
 			uDepthTexture: {value: depthMap},
@@ -109,14 +109,14 @@ export class AugmentedMaterial
 	 * @param scene - Scene to be updated, tarverses all objects and updates materials found.
 	 * @param depthInfo - Matrix obtained from AR depth from frame.getDepthInformation(view).
 	 */
-	static updateUniforms(scene, depthInfo)
+	public static updateUniforms(scene: Object3D, depthInfo: XRDepthInformation): void
 	{
 		const normTextureFromNormViewMatrix = depthInfo.normDepthBufferFromNormView.matrix;
 		const rawValueToMeters = depthInfo.rawValueToMeters;
 		
-		scene.traverse(function(child)
+		scene.traverse(function(child: any)
 		{
-			if ( child.material && child.material.isAgumentedMaterial)
+			if (child.material && child.material.isAgumentedMaterial)
 			{
 				child.material.userData.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
 				child.material.userData.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);

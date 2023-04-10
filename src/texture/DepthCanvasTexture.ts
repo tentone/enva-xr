@@ -44,7 +44,8 @@ export class DepthCanvasTexture extends CanvasTexture
 		}
 
 		// Get image data
-		if (!this.imageData) {
+		if (!this.imageData) 
+		{
 			this.imageData = this.context.createImageData(canvas.width, canvas.height);
 		}
 		
@@ -57,11 +58,12 @@ export class DepthCanvasTexture extends CanvasTexture
 		{
 			for (let y = 0; y < depthInfo.height; y++)
 			{	
-				const coords = new Vector3(x, y, 0)
+				const coords = new Vector3(x, y, 0);
 				coords.multiply(inverseDepth);
 				coords.applyMatrix4(viewFromNorm);
 
-				if (coords.x < 0.0 || coords.x > 1.0 || coords.y < 0.0 || coords.y > 1.0) {
+				if (coords.x < 0.0 || coords.x > 1.0 || coords.y < 0.0 || coords.y > 1.0) 
+				{
 					continue;
 				}
 				

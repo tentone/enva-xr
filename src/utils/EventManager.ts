@@ -3,7 +3,8 @@
  *
  * Events can be created for multiple DOM objects and managed from a single point.
  */
-export class EventManager {
+export class EventManager 
+{
 	/**
 	 * Stores all events in the manager, their target and callback.
 	 *
@@ -18,7 +19,8 @@ export class EventManager {
 	 * @param event - Event name.
 	 * @param callback - Callback function.
 	 */
-	public add(target: any, event: string, callback: Function): void {
+	public add(target: any, event: string, callback: Function): void 
+	{
 		this.events.push([target, event, callback, false]);
 	}
 
@@ -31,7 +33,8 @@ export class EventManager {
 	 * @param event - Event name.
 	 * @param callback - Callback function.
 	 */
-	public addAndCreate(target: any, event: string, callback: Function): void {
+	public addAndCreate(target: any, event: string, callback: Function): void 
+	{
 		target.addEventListener(event, callback);
 		this.events.push([target, event, callback, true]);
 	}
@@ -39,7 +42,8 @@ export class EventManager {
 	/**
 	 * Destroys this manager and remove all events.
 	 */
-	public clear(): void {
+	public clear(): void 
+	{
 		this.destroy();
 		this.events = [];
 	}
@@ -50,12 +54,16 @@ export class EventManager {
 	 * @param target - Event target element to remove elements from.
 	 * @param event - Event name to be removed.
 	 */
-	public remove(target: any, event: string): void {
-		for (let i = this.events.length - 1; i >= 0; i--) {
+	public remove(target: any, event: string): void 
+	{
+		for (let i = this.events.length - 1; i >= 0; i--) 
+		{
 			// Check if the target and event matches
-			if (this.events[i][0] === target && this.events[i][1] === event) {
+			if (this.events[i][0] === target && this.events[i][1] === event) 
+			{
 				// Destroy event if it is active
-				if (this.events[i][3]) {
+				if (this.events[i][3]) 
+				{
 					this.events[i][0].removeEventListener(this.events[i][1], this.events[i][2]);
 					this.events[i][3] = false;
 				}
@@ -68,8 +76,10 @@ export class EventManager {
 	/**
 	 * Creates all events in this manager.
 	 */
-	public create(): void {
-		for (let i = 0; i < this.events.length; i++) {
+	public create(): void 
+	{
+		for (let i = 0; i < this.events.length; i++) 
+		{
 			const event = this.events[i];
 			event[0].addEventListener(event[1], event[2]);
 			event[3] = true;
@@ -79,8 +89,10 @@ export class EventManager {
 	/**
 	 * Removes all events in this manager.
 	 */
-	public destroy(): void {
-		for (let i = 0; i < this.events.length; i++) {
+	public destroy(): void 
+	{
+		for (let i = 0; i < this.events.length; i++) 
+		{
 			const event = this.events[i];
 			event[0].removeEventListener(event[1], event[2]);
 			event[3] = false;

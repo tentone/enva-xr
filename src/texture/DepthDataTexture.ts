@@ -26,10 +26,10 @@ export class DepthDataTexture extends DataTexture
 	 */
 	public updateDepth(depthInfo: XRCPUDepthInformation): void
 	{
-		const dataBuffer = depthInfo.data;
+		const buffer = depthInfo.data;
 
 		// @ts-ignore
-		this.image.data = new Uint8Array(dataBuffer.buffer, dataBuffer.byteOffset, dataBuffer.byteLength);
+		this.image.data = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
 		this.needsUpdate = true;
 	}
 }
