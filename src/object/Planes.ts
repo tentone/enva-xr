@@ -1,4 +1,4 @@
-import {BufferGeometry, BufferAttribute, Vector3, Group, Mesh, ShadowMaterial, MeshBasicMaterial} from "three";
+import {BufferGeometry, BufferAttribute, Vector3, Group, Mesh, ShadowMaterial, Material, MeshBasicMaterial} from "three";
 import {ARRenderer} from "../ARRenderer";
 import {ARObject} from "./ARObject";
 
@@ -40,6 +40,11 @@ export class Planes extends Group implements ARObject
 	public static id = 0; 
 
 	/**
+	 * Shadow material, only renders shadow map.
+	 */
+	public material: Material = null;
+
+	/**
 	 * Map with all existing planes.
 	 */
 	public planes: Map<number, PlaneData> = new Map();
@@ -58,6 +63,16 @@ export class Planes extends Group implements ARObject
 	 * Callback method called when a plane is deleted.
 	 */
 	public onDelete: (data: PlaneData) => void = null;
+
+
+	public constructor() 
+	{
+		super();
+
+		this.material = new ShadowMaterial({opacity: 0.5});
+		// this.material = new MeshBasicMaterial({opacity: 0.1, transparent: true, color: 0xFF0000});
+		// this.material = AugmentedMaterial.transform(this.material, this.depthDataTexture);
+	}
 
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) 
 	{
@@ -87,13 +102,13 @@ export class Planes extends Group implements ARObject
 			{
 				const planePose = frame.getPose(plane.planeSpace, renderer.xrReferenceSpace);
 
-				let planeMesh: Mesh;
+				let mesh: Mesh;
 				
 				// Existing plane (update)
 				if (this.planes.has(plane)) 
 				{
 					const planeData = this.planes.get(plane);
-					planeMesh = planeData.mesh;
+					mesh = planeData.mesh;
 					
 					// Compare timestamp to check for updates
 					if (planeData.timestamp < plane.lastChangedTime) 
@@ -113,18 +128,16 @@ export class Planes extends Group implements ARObject
 				else
 				{
 					const geometry = Planes.createGeometry(plane.polygon);
-					const material = new MeshBasicMaterial({opacity: 0.1, transparent: true, color: 0xFF0000});
-					// const material =  new ShadowMaterial({opacity: 0.5});
-					planeMesh = new Mesh(geometry, material);
-					planeMesh.castShadow = false;
-					planeMesh.receiveShadow = true;
-					planeMesh.matrixAutoUpdate = false;
-					this.add(planeMesh);
+					mesh = new Mesh(geometry, this.material);
+					mesh.castShadow = false;
+					mesh.receiveShadow = true;
+					mesh.matrixAutoUpdate = false;
+					this.add(mesh);
 
 					const data: PlaneData = {
 						id: Planes.id++,
 						timestamp: plane.lastChangedTime,
-						mesh: planeMesh
+						mesh: mesh
 					};
 
 					this.planes.set(plane, data);
@@ -140,12 +153,12 @@ export class Planes extends Group implements ARObject
 				
 				if (planePose) 
 				{
-					planeMesh.visible = true;
-					planeMesh.matrix.fromArray(planePose.transform.matrix);
+					mesh.visible = true;
+					mesh.matrix.fromArray(planePose.transform.matrix);
 				}
 				else 
 				{
-					planeMesh.visible = false;
+					mesh.visible = false;
 				}
 			});
 		}
@@ -171,9 +184,9 @@ export class Planes extends Group implements ARObject
 		});
 
 		const indices = [];
-		for (let i = 2; i < polygon.length; ++i) 
+		for (let i = 2; i < polygon.length; i++) 
 		{
-			indices.push(0, i-1, i);
+			indices.push(0, i - 1, i);
 		}
 
 		geometry.setAttribute('position', new BufferAttribute(new Float32Array(vertices), 3));

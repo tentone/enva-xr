@@ -41,7 +41,7 @@ export class ARRendererConfig
 	/**
 	 * Depth information captured from the environment.
 	 */
-	public depthSensing = true;
+	public depthSensing = false;
 
 	/**
 	 * Provide a canvas texture with depth information.
@@ -263,8 +263,22 @@ export class ARRenderer
 		this.event.add(this.xrSession, "end", () => {this.stop();});
 		this.event.create();
 
+		this.xrGlBinding = this.renderer.xr.getBinding();
 		this.xrReferenceSpace = await this.xrSession.requestReferenceSpace('local');
-		this.xrGlBinding = new XRWebGLBinding(this.xrSession, this.glContext);
+
+		// Check if depth was initialized
+		if (this.config.depthSensing)
+		{
+			// @ts-ignore
+			if(this.xrSession.depthUsage !== "cpu-optimized") {
+				throw new Error("Unsupported depth API usage!");
+			}
+
+			// @ts-ignore
+			if(this.xrSession.depthDataFormat !== "luminance-alpha") {
+				throw new Error("Unsupported depth data format!");
+			}
+		}
 
 		// Hit test source
 		if (this.config.hitTest)
@@ -358,7 +372,6 @@ export class ARRenderer
 		div.style.left = "0px";
 		div.style.width = "100%";
 		div.style.height = "100%";
-		div.style.backgroundColor = "#FF0000";
 
 		return div;
 	}
@@ -548,7 +561,7 @@ export class ARRenderer
 			if (this.config.depthSensing) 
 			{
 				this.xrDepth = [];
-				
+
 				for (const view of this.xrViews)
 				{
 					// @ts-ignore

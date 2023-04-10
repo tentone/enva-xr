@@ -23,8 +23,8 @@ renderer.scene.add(probe);
 // const planes = new Planes();
 // renderer.scene.add(planes);
 
-// const floor = new FloorPlane();
-// renderer.scene.add(floor);
+const floor = new FloorPlane();
+renderer.scene.add(floor);
 
 const ruler = new Measurement([new Vector3(0, 0, 0), new Vector3(1, 0, -2)]);
 renderer.scene.add(ruler);
