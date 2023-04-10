@@ -1,5 +1,5 @@
 import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D, ShadowMapType, Raycaster, Intersection} from "three";
-import {DepthDataTexture} from "texture/DepthDataTexture";
+import {DepthDataTexture} from "./texture/DepthDataTexture";
 import {ARObject} from "./object/ARObject";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
 import {EventManager} from "./utils/EventManager";
@@ -182,7 +182,7 @@ export class ARRenderer
 	 * 
 	 * Available when the config.depthtexture flag is set true.
 	 */
-	public depthtexture: DepthDataTexture = null;
+	public depthTexture: DepthDataTexture = null;
 
 	/**
 	 * Canvas depth texture created from depth data.
@@ -228,6 +228,10 @@ export class ARRenderer
 		}
 
 		this.domContainer = this.createDOMContainer();
+
+		if (this.config.depthTexture) {
+			this.depthTexture = new DepthDataTexture();
+		}
 	}
 
 	/**
@@ -627,10 +631,23 @@ export class ARRenderer
 								
 								this.depthCanvasTexture.updateDepth(depthInfo, 0, 2);
 							}
+							// @ts-ignore
+							else if (depthInfo instanceof XRGPUDepthInformation)
+							{
+								throw new Error('DepthCanvasTexture not supported for XRGPUDepthInformation');
+							}
 						}
 
+						if (this.config.depthCanvasTexture) 
+						{
+							// @ts-ignore
+							if (depthInfo instanceof XRCPUDepthInformation) 
+							{							
+								this.depthTexture.updateDepth(depthInfo);
+							}
+						}
 
-						// Update normal matrix
+						// Update uniforms of XR materials
 						AugmentedMaterial.updateUniforms(this.scene, depthInfo);
 					}
 					

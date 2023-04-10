@@ -1,5 +1,6 @@
 import {AmbientLight, BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, Vector2, Vector3} from "three";
-import {ARRenderer, Cursor, LightProbe, Measurement, Planes, FloorPlane} from "../src/Main";
+import {ARRenderer, Cursor, LightProbe, Measurement, Planes, FloorPlane, AugmentedMaterial} from "../src/Main";
+import { Material } from "cannon-es";
 
 const renderer = new ARRenderer();
 
@@ -50,7 +51,10 @@ renderer.domContainer.onclick = function(event: MouseEvent) {
 
 renderer.domContainer.ondblclick = function(event: MouseEvent) {
     if (cursor.visible) {
-        let sphere = new Mesh(new SphereGeometry(), new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)}));
+        let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
+        material = AugmentedMaterial.transform(material, renderer.depthTexture);
+        
+        let sphere = new Mesh(new SphereGeometry(), material);
         sphere.receiveShadow = true;
         sphere.castShadow = true;
         sphere.scale.setScalar(0.1);
