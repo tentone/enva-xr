@@ -1,4 +1,4 @@
-import {DataTexture, RGFormat, UnsignedByteType, LinearFilter} from "three";
+import {DataTexture, LuminanceAlphaFormat, UnsignedByteType, LinearFilter} from "three";
 
 /**
  * Stores the raw depth values in a 16 bit value packed texture.
@@ -11,7 +11,7 @@ export class DepthDataTexture extends DataTexture
 {
 	public constructor(width = 160, height = 90)
 	{
-		super(new Uint8Array(width * height), width, height, RGFormat, UnsignedByteType);
+		super(new Uint8Array(width * height), width, height, LuminanceAlphaFormat, UnsignedByteType);
 
 		this.magFilter = LinearFilter;
 		this.minFilter = LinearFilter;
@@ -26,10 +26,8 @@ export class DepthDataTexture extends DataTexture
 	 */
 	public updateDepth(depthInfo: XRCPUDepthInformation): void
 	{
-		const buffer = depthInfo.data;
-
 		// @ts-ignore
-		this.image.data = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+		this.image.data = new Uint8Array(depthInfo.data);
 		this.needsUpdate = true;
 	}
 }

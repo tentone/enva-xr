@@ -38,6 +38,10 @@ export class FloorPlane extends Group implements ARObject
 
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void 
 	{
+		if (!renderer.config.hitTest) {
+			// console.warn('XR hit test source must be available for FloorPlane object. Check renderer configuration.');
+		}
+
 		if (renderer.xrHitTestSource)
 		{
 			let hitResults = frame.getHitTestResults(renderer.xrHitTestSource);

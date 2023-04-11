@@ -47,6 +47,8 @@ export class AugmentedMaterial
 			uniform bool uOcclusionEnabled;
 			uniform float uRawValueToMeters;
 
+			const highp float kMaxDepthInMeters = 8.0;
+
 			varying float vDepth;
 			` + shader.fragmentShader;
 
@@ -62,7 +64,7 @@ export class AugmentedMaterial
 			shader.fragmentShader = shader.fragmentShader.replace("void main",
 				`float getDepthInMeters(in sampler2D depthText, in vec2 uv)
             {
-                vec2 packedDepth = texture2D(depthText, uv).rg;
+                vec2 packedDepth = texture2D(depthText, uv).ra;
                 return dot(packedDepth, vec2(255.0, 256.0 * 255.0)) * uRawValueToMeters;
             }
             void main`);
@@ -77,9 +79,16 @@ export class AugmentedMaterial
 
    				vec2 depthUV = (uUvTransform * vec4(vec2(x, y), 0, 1)).xy;
                 float depth = getDepthInMeters(uDepthTexture, depthUV);
+
+				// Calculate normalized depth
+				// highp float normalizedDepth = clamp(depth / kMaxDepthInMeters, 0.0, 1.0);
+
                 if (depth < vDepth)
                 {
-                    discard;
+					// TODO <REMOVE>
+					gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+                    return;
+					// discard;
                 }
             }
 			`);

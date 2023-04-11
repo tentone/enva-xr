@@ -35,24 +35,29 @@ export class Cursor extends Mesh implements ARObject
 	
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void 
 	{
-		const hitResults: XRHitTestResult[] = frame.getHitTestResults(renderer.xrHitTestSource);
-		// console.log('enva-xr: Hit test result', hitResults);
-		
-		if (hitResults.length > 0)
-		{
-			const hit = hitResults[0];
-			const pose = hit.getPose(renderer.xrReferenceSpace);
-
-			const matrix = new Matrix4();
-			matrix.fromArray(pose.transform.matrix);
-
-			this.position.setFromMatrixPosition(matrix);
-
-			this.visible = true;
+		if (!renderer.config.hitTest) {
+			// console.warn('XR hit test source must be available for Cursor object. Check renderer configuration.');
 		}
-		else
+
+		if (renderer.xrHitTestSource)
 		{
-			this.visible = false;
+			const hitResults: XRHitTestResult[] = frame.getHitTestResults(renderer.xrHitTestSource);
+			if (hitResults.length > 0)
+			{
+				const hit = hitResults[0];
+				const pose = hit.getPose(renderer.xrReferenceSpace);
+
+				const matrix = new Matrix4();
+				matrix.fromArray(pose.transform.matrix);
+
+				this.position.setFromMatrixPosition(matrix);
+
+				this.visible = true;
+			}
+			else
+			{
+				this.visible = false;
+			}
 		}
 	}	
 }

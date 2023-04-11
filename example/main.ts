@@ -4,14 +4,17 @@ import { Material } from "cannon-es";
 
 const renderer = new ARRenderer();
 
-let box: Mesh = new Mesh(new BoxGeometry(), new MeshPhysicalMaterial());
+let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
+material = AugmentedMaterial.transform(material, renderer.depthTexture);
+
+let box: Mesh = new Mesh(new BoxGeometry(), material);
 box.receiveShadow = true;
 box.castShadow = true;
 box.scale.setScalar(0.1);
 box.position.set(0, 0, 1);
 renderer.scene.add(box);
 
-box = new Mesh(new BoxGeometry(), new MeshPhysicalMaterial());
+box = new Mesh(new BoxGeometry(), material);
 box.receiveShadow = true;
 box.castShadow = true;
 box.scale.setScalar(0.1);

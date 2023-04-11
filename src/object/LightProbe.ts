@@ -49,16 +49,16 @@ export class LightProbe extends Group implements ARObject
 		if (renderer.xrLightProbe)
 		{
 			// @ts-ignore
-			let lightEstimate = frame.getLightEstimate(renderer.xrLightProbe);
+			const lightEstimate = frame.getLightEstimate(renderer.xrLightProbe);
 
 			// console.log('enva-xr: Light estimated', lightEstimate);
 			
 			if (lightEstimate)
 			{
-				let primaryLightPos = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
+				const primaryLightPos = new Vector3(lightEstimate.primaryLightDirection.x, lightEstimate.primaryLightDirection.y, lightEstimate.primaryLightDirection.z);
 				primaryLightPos.multiplyScalar(this.lightHeight);
 
-				let intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
+				const intensity = Math.max(1.0, Math.max(lightEstimate.primaryLightIntensity.x, Math.max(lightEstimate.primaryLightIntensity.y, lightEstimate.primaryLightIntensity.z)));
 				this.directional.position.copy(primaryLightPos);
 				this.directional.color.setRGB(lightEstimate.primaryLightIntensity.x / intensity, lightEstimate.primaryLightIntensity.y / intensity, lightEstimate.primaryLightIntensity.z / intensity);
 				this.directional.intensity = intensity;

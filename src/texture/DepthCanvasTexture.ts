@@ -46,12 +46,11 @@ export class DepthCanvasTexture extends CanvasTexture
 		// Get image data
 		if (!this.imageData) 
 		{
-			this.imageData = this.context.createImageData(canvas.width, canvas.height);
+			this.imageData = this.context.createImageData(depthInfo.width, depthInfo.height, {colorSpace: "srgb"});
 		}
 		
-		// Raw depth data.
-		const normFromView: Matrix4 = new Matrix4().fromArray(depthInfo.normDepthBufferFromNormView.matrix);
-		const viewFromNorm: Matrix4 = normFromView.invert();
+		// Matrix to transform normalized coord into view coordinates
+		const viewFromNorm: Matrix4 = new Matrix4().fromArray(depthInfo.normDepthBufferFromNormView.inverse.matrix);
 		const inverseDepth = new Vector3(1.0 / depthInfo.width, 1.0 / depthInfo.height, 0.0);
 
 		for (let x = 0; x < depthInfo.width; x++)
@@ -75,7 +74,7 @@ export class DepthCanvasTexture extends CanvasTexture
 				else if (distance < 0.0) {distance = 0.0;}
 
 				// Display depth information as RGB
-				const idx = (x * canvas.width + (canvas.width - y)) * 4;
+				const idx = (x * depthInfo.width + (depthInfo.width - y)) * 4;
 				this.imageData.data[idx] = Math.ceil(distance * 256);
 				this.imageData.data[idx + 1] = Math.ceil(distance * 256);
 				this.imageData.data[idx + 2] = Math.ceil(distance * 256);

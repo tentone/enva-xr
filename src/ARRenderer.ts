@@ -37,14 +37,14 @@ export class ARRendererConfig
 	 * 
 	 * Useful for interaction, object placement, etc. 
 	 */
-	public hitTest = true;
+	public hitTest = false;
 
 	/**
 	 * Lighting probe allow the system to check environment ligthing.
 	 * 
 	 * Tracks the intensity direction and color of the main light source.
 	 */
-	public lightProbe = true;
+	public lightProbe = false;
 
 	/**
 	 * Reflection cube map allow the obtain visual information of the user surrondings.
@@ -54,14 +54,14 @@ export class ARRendererConfig
 	/**
 	 * Depth information captured from the environment.
 	 */
-	public depthSensing = false;
+	public depthSensing = true;
 
 	/**
 	 * Provide a texture with the depth data captured by the system.
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthTexture = false;
+	public depthTexture = true;
 
 	/**
 	 * Provide a canvas texture with depth information.
@@ -70,7 +70,7 @@ export class ARRendererConfig
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthCanvasTexture = false;
+	public depthCanvasTexture = true;
 }
 
 /**
@@ -261,7 +261,7 @@ export class ARRenderer
 		if (this.config.domOverlay) 
 		{
 			document.body.appendChild(this.domContainer);
-			config.domOverlay = {root: this.domContainer};
+			config.domOverlay = {root: this.domContainer, type: "screen"};
 			config.requiredFeatures.push("dom-overlay");
 		}
 
@@ -615,6 +615,7 @@ export class ARRenderer
 					if (depthInfo)
 					{
 						// console.log('enva-xr: XR depth information', depthInfo);
+						
 						this.xrDepth.push(depthInfo);
 						
 						if (this.config.depthCanvasTexture) 
@@ -624,12 +625,20 @@ export class ARRenderer
 							{
 								if (!this.depthCanvasTexture) 
 								{
-	
-									const canvas = new OffscreenCanvas(depthInfo.width, depthInfo.height);
+									const canvas = document.createElement('canvas');
+									canvas.style.position = "absolute";
+									canvas.style.display = "block";
+									canvas.style.bottom = "10px";
+									canvas.style.left = "10px";
+									canvas.width = 90;
+									canvas.height = 160;
+									this.domContainer.appendChild(canvas);
+									
+									//const canvas = new OffscreenCanvas(depthInfo.width, depthInfo.height);
 									this.depthCanvasTexture = new DepthCanvasTexture(canvas);
 								}
 								
-								this.depthCanvasTexture.updateDepth(depthInfo, 0, 2);
+								this.depthCanvasTexture.updateDepth(depthInfo, 0, 3);
 							}
 							// @ts-ignore
 							else if (depthInfo instanceof XRGPUDepthInformation)
@@ -644,6 +653,11 @@ export class ARRenderer
 							if (depthInfo instanceof XRCPUDepthInformation) 
 							{							
 								this.depthTexture.updateDepth(depthInfo);
+							}
+							// @ts-ignore
+							else if (depthInfo instanceof XRGPUDepthInformation)
+							{
+								throw new Error('DepthDataTexture not supported for XRGPUDepthInformation');
 							}
 						}
 
