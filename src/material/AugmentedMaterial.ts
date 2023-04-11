@@ -40,12 +40,12 @@ export class AugmentedMaterial
 			// Fragment variables
 			shader.fragmentShader = `
 			uniform sampler2D uDepthTexture;
+			uniform mat4 uUvTransform;
+			uniform float uRawValueToMeters;
+
 			uniform float uWidth;
 			uniform float uHeight;
-			uniform mat4 uUvTransform;
-
 			uniform bool uOcclusionEnabled;
-			uniform float uRawValueToMeters;
 
 			const highp float kMaxDepthInMeters = 8.0;
 
@@ -119,17 +119,14 @@ export class AugmentedMaterial
 	 */
 	public static updateUniforms(scene: Object3D, depthInfo: XRDepthInformation): void
 	{
-		const normTextureFromNormViewMatrix = depthInfo.normDepthBufferFromNormView.matrix;
-		const rawValueToMeters = depthInfo.rawValueToMeters;
-		
 		scene.traverse(function(child: any)
 		{
 			if (child.material && child.material.isAgumentedMaterial)
 			{
 				child.material.userData.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
 				child.material.userData.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
-				child.material.userData.uUvTransform.value.fromArray(normTextureFromNormViewMatrix);
-				child.material.userData.uRawValueToMeters.value = rawValueToMeters;
+				child.material.userData.uUvTransform.value.fromArray(depthInfo.normDepthBufferFromNormView.matrix);
+				child.material.userData.uRawValueToMeters.value = depthInfo.rawValueToMeters;
 				child.material.uniformsNeedUpdate = true;
 			}
 		});
