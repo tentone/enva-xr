@@ -1,3 +1,4 @@
+import { ARRenderer } from "ARRenderer";
 import {Material, Texture, Matrix4, ShadowMaterial, Object3D} from "three";
 
 /**
@@ -117,14 +118,14 @@ export class AugmentedMaterial
 	 * @param scene - Scene to be updated, tarverses all objects and updates materials found.
 	 * @param depthInfo - Matrix obtained from AR depth from frame.getDepthInformation(view).
 	 */
-	public static updateUniforms(scene: Object3D, depthInfo: XRDepthInformation): void
+	public static updateUniforms(renderer: ARRenderer, depthInfo: XRDepthInformation): void
 	{
-		scene.traverse(function(child: any)
+		renderer.scene.traverse(function(child: any)
 		{
 			if (child.material && child.material.isAgumentedMaterial)
 			{
-				child.material.userData.uWidth.value = Math.floor(window.devicePixelRatio * window.innerWidth);
-				child.material.userData.uHeight.value = Math.floor(window.devicePixelRatio * window.innerHeight);
+				child.material.userData.uWidth.value = Math.floor(renderer.resolution.x);
+				child.material.userData.uHeight.value = Math.floor(renderer.resolution.y);
 				child.material.userData.uUvTransform.value.fromArray(depthInfo.normDepthBufferFromNormView.matrix);
 				child.material.userData.uRawValueToMeters.value = depthInfo.rawValueToMeters;
 				child.material.uniformsNeedUpdate = true;

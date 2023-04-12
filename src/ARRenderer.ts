@@ -90,7 +90,7 @@ export class ARRenderer
 	/**
 	 * Camera used to view the this.scene.
 	 */
-	public camera: PerspectiveCamera = new PerspectiveCamera(60, 1, 1e-1, 1e3);
+	public camera: PerspectiveCamera = new PerspectiveCamera(60, 1, 0.1, 8);
 
 	/**
 	 * Scene to draw into the screen.
@@ -243,10 +243,7 @@ export class ARRenderer
 		{
 			throw new Error("XR Session already running.");
 		}
-		
-		// Set resolution 
-		this.resolution.set(window.innerWidth, window.innerHeight);
-
+	
 		// Renderer
 		if (!this.renderer) 
 		{
@@ -356,6 +353,9 @@ export class ARRenderer
 
 			// console.log('enva-xr: XR light probe', this.xrLightProbe);
 		}
+
+		// Set resolution 
+		this.resize();
 
 		// Render loop
 		this.renderer.setAnimationLoop((time: number, frame: any) =>
@@ -553,6 +553,7 @@ export class ARRenderer
 
 		if (this.renderer) 
 		{
+			
 			this.renderer.setSize(this.resolution.x, this.resolution.y);
 			this.renderer.setPixelRatio(window.devicePixelRatio);
 		}
@@ -651,7 +652,7 @@ export class ARRenderer
 						{
 							// @ts-ignore
 							if (depthInfo instanceof XRCPUDepthInformation) 
-							{							
+							{
 								this.depthTexture.updateDepth(depthInfo);
 							}
 							// @ts-ignore
