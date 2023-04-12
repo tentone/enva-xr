@@ -1,5 +1,3 @@
-export {AugmentedBasicMaterial} from "./material/AugmentedBasicMaterial";
-export {AugmentedCanvasMaterial} from "./material/AugmentedCanvasMaterial";
 export {AugmentedMaterial} from "./material/AugmentedMaterial";
 
 export {Angle} from "./object/Angle";

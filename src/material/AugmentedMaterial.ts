@@ -49,8 +49,6 @@ export class AugmentedMaterial
 			uniform float uHeight;
 			uniform bool uOcclusionEnabled;
 
-			const highp float kMaxDepthInMeters = 8.0;
-
 			varying float vDepth;
 			` + shader.fragmentShader;
 
@@ -83,7 +81,6 @@ export class AugmentedMaterial
 
                 if (depth < vDepth)
                 {
-					// TODO <REMOVE>
 					gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
                     return;
 					// discard;
