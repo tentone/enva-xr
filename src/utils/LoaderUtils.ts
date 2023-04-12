@@ -36,7 +36,7 @@ export class LoaderUtils
 				{
 					child.castShadow = true;
 					child.receiveShadow = true;
-					child.material = AugmentedMaterial.transform(child.material, depthDataTexture);
+					child.material = AugmentedMaterial.transform(child.material);
 				}
 			});
 

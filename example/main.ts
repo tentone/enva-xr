@@ -1,11 +1,10 @@
 import {AmbientLight, BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, Vector2, Vector3} from "three";
 import {ARRenderer, Cursor, LightProbe, Measurement, Planes, FloorPlane, AugmentedMaterial} from "../src/Main";
-import { Material } from "cannon-es";
 
 const renderer = new ARRenderer();
 
 let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-material = AugmentedMaterial.transform(material, renderer.depthTexture);
+material = AugmentedMaterial.transform(material);
 
 let box: Mesh = new Mesh(new BoxGeometry(), material);
 box.receiveShadow = true;

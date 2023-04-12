@@ -1,4 +1,4 @@
-import {DataTexture, LuminanceAlphaFormat, UnsignedByteType, LinearFilter, ClampToEdgeWrapping, Texture} from "three";
+import {DataTexture, LuminanceAlphaFormat, UnsignedByteType, LinearFilter, ClampToEdgeWrapping, Texture, NearestFilter} from "three";
 
 /**
  * Stores the raw depth values in a 16 bit value packed texture.
@@ -9,9 +9,15 @@ import {DataTexture, LuminanceAlphaFormat, UnsignedByteType, LinearFilter, Clamp
  */
 export class DepthDataTexture extends DataTexture
 {
-	public constructor(width = 160, height = 90)
+	public constructor(depthInfo: XRCPUDepthInformation)
 	{
-		super(null, width, height, LuminanceAlphaFormat, UnsignedByteType, Texture.DEFAULT_MAPPING, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter);
+		super(new Uint8Array(depthInfo.data), depthInfo.width, depthInfo.height, LuminanceAlphaFormat, UnsignedByteType);
+		
+		this.generateMipmaps = false;
+		this.minFilter = LinearFilter;
+		this.magFilter = NearestFilter;
+		this.wrapS = ClampToEdgeWrapping;
+		this.wrapT = ClampToEdgeWrapping;
 	}
 
 	/**

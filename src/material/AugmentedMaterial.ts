@@ -1,5 +1,5 @@
 import { ARRenderer } from "ARRenderer";
-import {Material, Texture, Matrix4, ShadowMaterial, Object3D} from "three";
+import {Material, Matrix4, ShadowMaterial, Vector2} from "three";
 
 /**
  * Augmented Material has static tools to transform regular three.js materials into AR materials.
@@ -16,10 +16,10 @@ export class AugmentedMaterial
 	 * @param material - Material to be transformed into an augmented material.
 	 * @param depthMap - Depth map bound to the material. A single depth map should be used for all AR materials.
 	 */
-	public static transform(material: Material, depthMap: Texture): Material
+	public static transform(material: Material): Material
 	{
 		material.userData = {
-			uDepthTexture: {value: depthMap},
+			uDepthTexture: {value: null},
 			uWidth: {value: 1.0},
 			uHeight: {value: 1.0},
 			uUvTransform: {value: new Matrix4()},
@@ -41,6 +41,7 @@ export class AugmentedMaterial
 			// Fragment variables
 			shader.fragmentShader = `
 			uniform sampler2D uDepthTexture;
+
 			uniform mat4 uUvTransform;
 			uniform float uRawValueToMeters;
 
@@ -75,14 +76,10 @@ export class AugmentedMaterial
             if(uOcclusionEnabled)
             {
                 // Normalize x, y to range [0, 1]
-                float x = gl_FragCoord.x / uWidth;
-                float y = gl_FragCoord.y / uHeight;
+                vec4 depthUv = vec4(gl_FragCoord.x / uWidth, gl_FragCoord.y / uHeight, 0.0, 1.0);
 
-   				vec2 depthUV = (uUvTransform * vec4(vec2(x, y), 0, 1)).xy;
+   				vec2 depthUV = (uUvTransform * depthUv).xy;
                 float depth = getDepthInMeters(uDepthTexture, depthUV);
-
-				// Calculate normalized depth
-				// highp float normalizedDepth = clamp(depth / kMaxDepthInMeters, 0.0, 1.0);
 
                 if (depth < vDepth)
                 {
@@ -120,12 +117,15 @@ export class AugmentedMaterial
 	 */
 	public static updateUniforms(renderer: ARRenderer, depthInfo: XRDepthInformation): void
 	{
+		const size = renderer.renderer.getSize(new Vector2());
+
 		renderer.scene.traverse(function(child: any)
 		{
 			if (child.material && child.material.isAgumentedMaterial)
 			{
-				child.material.userData.uWidth.value = Math.floor(renderer.resolution.x);
-				child.material.userData.uHeight.value = Math.floor(renderer.resolution.y);
+				child.material.userData.uDepthTexture.value = renderer.depthTexture;
+				child.material.userData.uWidth.value = Math.floor(size.x);
+				child.material.userData.uHeight.value = Math.floor(size.y);
 				child.material.userData.uUvTransform.value.fromArray(depthInfo.normDepthBufferFromNormView.matrix);
 				child.material.userData.uRawValueToMeters.value = depthInfo.rawValueToMeters;
 				child.material.uniformsNeedUpdate = true;

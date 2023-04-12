@@ -70,7 +70,7 @@ export class ARRendererConfig
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthCanvasTexture = true;
+	public depthCanvasTexture = false;
 }
 
 /**
@@ -228,10 +228,6 @@ export class ARRenderer
 		}
 
 		this.domContainer = this.createDOMContainer();
-
-		if (this.config.depthTexture) {
-			this.depthTexture = new DepthDataTexture();
-		}
 	}
 
 	/**
@@ -553,10 +549,11 @@ export class ARRenderer
 
 		if (this.renderer) 
 		{
-			
 			this.renderer.setSize(this.resolution.x, this.resolution.y);
 			this.renderer.setPixelRatio(window.devicePixelRatio);
 		}
+
+
 	}
 
 	/**
@@ -653,7 +650,11 @@ export class ARRenderer
 							// @ts-ignore
 							if (depthInfo instanceof XRCPUDepthInformation) 
 							{
-								this.depthTexture.updateDepth(depthInfo);
+								if (!this.depthTexture) {
+									this.depthTexture = new DepthDataTexture(depthInfo);
+								} else {
+									this.depthTexture.updateDepth(depthInfo);
+								}
 							}
 							// @ts-ignore
 							else if (depthInfo instanceof XRGPUDepthInformation)
@@ -663,7 +664,7 @@ export class ARRenderer
 						}
 
 						// Update uniforms of XR materials
-						AugmentedMaterial.updateUniforms(this.scene, depthInfo);
+						AugmentedMaterial.updateUniforms(this, depthInfo);
 					}
 					
 				}
