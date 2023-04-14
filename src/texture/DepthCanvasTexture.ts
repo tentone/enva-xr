@@ -1,4 +1,4 @@
-import {CanvasTexture, Matrix4, Vector3} from "three";
+import {CanvasTexture, Matrix4, Vector2, Vector3, Vector4} from "three";
 
 /**
  * Canvas texture to stored depth data obtained from the WebXR API.
@@ -22,6 +22,34 @@ export class DepthCanvasTexture extends CanvasTexture
 		super(canvas);
 
 		this.context = this.image.getContext("2d", {willReadFrequently: true});
+	}
+
+	/**
+	 * Calculate a colorized pixel for depth visualization using turbo color map.
+	 * 
+	 * More information at https://ai.googleblog.com/2019/08/turbo-improved-rainbow-colormap-for.html
+	 * 
+	 * @param depth Normalized depth value.
+	 * @returns Colorized depth using the turbo color map.
+	 */
+	public turboColorMap(x: number): Vector3 {
+		const kRedVec4 = new Vector4(0.55305649, 3.00913185, -5.46192616, -11.11819092);
+		const kGreenVec4 = new Vector4(0.16207513, 0.17712472, 15.24091500, -36.50657960);
+		const kBlueVec4 = new Vector4(-0.05195877, 5.18000081, -30.94853351, 81.96403246);
+		const kRedVec2 = new Vector2(27.81927491, -14.87899417);
+		const kGreenVec2 = new Vector2(25.95549545, -5.02738237);
+		const kBlueVec2 = new Vector2(-86.53476570, 30.23299484);
+
+		// Adjusts color space via 6 degree poly interpolation to avoid pure red.
+		x = Math.min(Math.max(x * 0.9 + 0.03, 0.0), 1.0);
+		const v4 = new Vector4( 1.0, x, x * x, x * x * x);
+		const v2 = new Vector2(v4.z * v4.z, v4.w * v4.z);
+
+		return new Vector3(
+			v4.dot(kRedVec4) + v2.dot(kRedVec2),
+			v4.dot(kGreenVec4) + v2.dot(kGreenVec2),
+			v4.dot(kBlueVec4) + v2.dot(kBlueVec2)
+		);
 	}
 
 	/**
