@@ -9,8 +9,8 @@ material = AugmentedMaterial.transform(material);
 let box: Mesh = new Mesh(new BoxGeometry(), material);
 box.receiveShadow = true;
 box.castShadow = true;
-box.scale.setScalar(0.1);
-box.position.set(0, 0, 1);
+box.scale.setScalar(2);
+box.position.set(0, 0, 5);
 renderer.scene.add(box);
 
 box = new Mesh(new BoxGeometry(), material);

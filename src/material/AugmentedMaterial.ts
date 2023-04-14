@@ -63,29 +63,51 @@ export class AugmentedMaterial
 
 			shader.fragmentShader = shader.fragmentShader.replace("void main",
 				`float getDepthInMeters(in sampler2D depthText, in vec2 uv)
-            {
-                vec2 packedDepth = texture2D(depthText, uv).ra;
-                return dot(packedDepth, vec2(255.0, 256.0 * 255.0)) * uRawValueToMeters;
-            }
-            void main`);
+			{
+				vec2 packedDepth = texture2D(depthText, uv).ra;
+				return dot(packedDepth, vec2(255.0, 256.0 * 255.0)) * uRawValueToMeters;
+			}
+
+			vec3 turboColormap(in float x) {
+				const vec4 kRedVec4 = vec4(0.55305649, 3.00913185, -5.46192616, -11.11819092);
+				const vec4 kGreenVec4 = vec4(0.16207513, 0.17712472, 15.24091500, -36.50657960);
+				const vec4 kBlueVec4 = vec4(-0.05195877, 5.18000081, -30.94853351, 81.96403246);
+				const vec2 kRedVec2 = vec2(27.81927491, -14.87899417);
+				const vec2 kGreenVec2 = vec2(25.95549545, -5.02738237);
+				const vec2 kBlueVec2 = vec2(-86.53476570, 30.23299484);
+
+				// Adjusts color space via 6 degree poly interpolation to avoid pure red.
+				x = clamp(x * 0.9 + 0.03, 0.0, 1.0);
+				vec4 v4 = vec4( 1.0, x, x * x, x * x * x);
+				vec2 v2 = v4.zw * v4.z;
+
+				return vec3(
+					dot(v4, kRedVec4)   + dot(v2, kRedVec2),
+					dot(v4, kGreenVec4) + dot(v2, kGreenVec2),
+					dot(v4, kBlueVec4)  + dot(v2, kBlueVec2)
+				);
+			}
+
+			void main`);
 
 			shader.fragmentShader = shader.fragmentShader.replace(fragmentEntryPoint, `
-            ${fragmentEntryPoint}
-            if(uOcclusionEnabled)
-            {
-                // Normalize x, y to range [0, 1]
-                vec4 depthUv = vec4(gl_FragCoord.x / uWidth, gl_FragCoord.y / uHeight, 0.0, 1.0);
+			${fragmentEntryPoint}
+			if(uOcclusionEnabled)
+			{
+				// Normalize x, y to range [0, 1]
+				vec4 depthUv = vec4(gl_FragCoord.x / uWidth, gl_FragCoord.y / uHeight, 0.0, 1.0);
 
-   				vec2 depthUV = (uUvTransform * depthUv).xy;
-                float depth = getDepthInMeters(uDepthTexture, depthUV);
+				vec2 depthUV = (uUvTransform * depthUv).xy;
+				float depth = getDepthInMeters(uDepthTexture, depthUV);
 
-                if (depth < vDepth)
-                {
-					gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-                    return;
+				gl_FragColor = vec4(turboColormap(depth), 1.0);
+				return;
+
+				if (depth < vDepth)
+				{
 					// discard;
-                }
-            }
+				}
+			}
 			`);
 
 			// Vertex variables
