@@ -13,6 +13,7 @@ export class DepthDataTexture extends DataTexture
 	{
 		super(new Uint8Array(depthData.data), depthData.width, depthData.height, LuminanceAlphaFormat, UnsignedByteType);
 		
+		this.format = LuminanceAlphaFormat;
 		this.generateMipmaps = false;
 		this.minFilter = LinearFilter;
 		this.magFilter = NearestFilter;

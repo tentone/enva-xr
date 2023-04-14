@@ -62,12 +62,21 @@ export class AugmentedMaterial
 			// Fragment depth logic
 
 			shader.fragmentShader = shader.fragmentShader.replace("void main",
-				`float getDepthInMeters(in sampler2D depthText, in vec2 uv)
+			`
+			const highp float kMaxDepthInMeters = 8.0;
+			const float kInvalidDepthThreshold = 0.01;
+			
+			float getDepthInMeters(in sampler2D depthText, in vec2 depthUv)
 			{
-				vec2 packedDepth = texture2D(depthText, uv).ra;
+				vec2 packedDepth = texture2D(depthText, depthUv).ra;
 				return dot(packedDepth, vec2(255.0, 256.0 * 255.0)) * uRawValueToMeters;
 			}
 
+			// Turbo color map visualization of depth information.
+			//
+			// Inpu value range from 0.0 to 1.0.
+			//
+			// More information at https://ai.googleblog.com/2019/08/turbo-improved-rainbow-colormap-for.html
 			vec3 turboColormap(in float x) {
 				const vec4 kRedVec4 = vec4(0.55305649, 3.00913185, -5.46192616, -11.11819092);
 				const vec4 kGreenVec4 = vec4(0.16207513, 0.17712472, 15.24091500, -36.50657960);
@@ -88,21 +97,31 @@ export class AugmentedMaterial
 				);
 			}
 
+			// Nomalize depth and trunk value to min invalid depth
+			//
+			// Use turbo color map to get depth color.
+			vec3 depthGetColorVisualization(in float depth) {
+				float normalized = clamp(depth / kMaxDepthInMeters, 0.0, 1.0);
+				return step(kInvalidDepthThreshold, normalized) * turboColormap(normalized);
+			}
+
 			void main`);
 
 			shader.fragmentShader = shader.fragmentShader.replace(fragmentEntryPoint, `
 			${fragmentEntryPoint}
 			if(uOcclusionEnabled)
 			{
-				// Normalize x, y to range [0, 1]
-				vec4 depthUv = vec4(gl_FragCoord.x / uWidth, gl_FragCoord.y / uHeight, 0.0, 1.0);
-
-				vec2 depthUV = (uUvTransform * depthUv).xy;
+				// Normalize screen coordinates
+				vec4 screenUV = vec4(gl_FragCoord.x / uWidth, gl_FragCoord.y / uHeight, 0.0, 1.0);
+				vec2 depthUV = (uUvTransform * screenUV).xy;
+				
 				float depth = getDepthInMeters(uDepthTexture, depthUV);
 
-				gl_FragColor = vec4(turboColormap(depth), 1.0);
+				// Calculate color for visualization
+				gl_FragColor = vec4(depthGetColorVisualization(depth), 1.0);
 				return;
 
+				// Depth test
 				if (depth < vDepth)
 				{
 					// discard;
