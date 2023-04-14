@@ -70,7 +70,7 @@ export class ARRendererConfig
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthCanvasTexture = false;
+	public depthCanvasTexture = true;
 }
 
 /**
@@ -628,8 +628,8 @@ export class ARRenderer
 									canvas.style.display = "block";
 									canvas.style.bottom = "10px";
 									canvas.style.left = "10px";
-									canvas.width = 90;
-									canvas.height = 160;
+									canvas.width = depthData.width;
+									canvas.height = depthData.height;
 									this.domContainer.appendChild(canvas);
 									
 									//const canvas = new OffscreenCanvas(depthData.width, depthData.height);
