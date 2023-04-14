@@ -132,9 +132,9 @@ export class AugmentedMaterial
 	 * https://immersive-web.github.io/depth-sensing/
 	 * 
 	 * @param scene - Scene to be updated, tarverses all objects and updates materials found.
-	 * @param depthInfo - Matrix obtained from AR depth from frame.getDepthInformation(view).
+	 * @param depthData - Matrix obtained from AR depth from frame.getDepthInformation(view).
 	 */
-	public static updateUniforms(renderer: ARRenderer, depthInfo: XRDepthInformation): void
+	public static updateUniforms(renderer: ARRenderer, depthData: XRDepthInformation): void
 	{
 		const size = renderer.renderer.getSize(new Vector2());
 
@@ -145,8 +145,8 @@ export class AugmentedMaterial
 				child.material.userData.uDepthTexture.value = renderer.depthTexture;
 				child.material.userData.uWidth.value = Math.floor(size.x);
 				child.material.userData.uHeight.value = Math.floor(size.y);
-				child.material.userData.uUvTransform.value.fromArray(depthInfo.normDepthBufferFromNormView.matrix);
-				child.material.userData.uRawValueToMeters.value = depthInfo.rawValueToMeters;
+				child.material.userData.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
+				child.material.userData.uRawValueToMeters.value = depthData.rawValueToMeters;
 				child.material.uniformsNeedUpdate = true;
 			}
 		});

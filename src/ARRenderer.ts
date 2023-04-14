@@ -608,18 +608,18 @@ export class ARRenderer
 				for (const view of this.xrViews)
 				{
 					// @ts-ignore
-					const depthInfo: XRDepthInformation = frame.getDepthInformation(view);
+					const depthData: XRDepthInformation = frame.getDepthInformation(view);
 
-					if (depthInfo)
+					if (depthData)
 					{
-						// console.log('enva-xr: XR depth information', depthInfo);
+						// console.log('enva-xr: XR depth information', depthData);
 						
-						this.xrDepth.push(depthInfo);
+						this.xrDepth.push(depthData);
 						
 						if (this.config.depthCanvasTexture) 
 						{
 							// @ts-ignore
-							if (depthInfo instanceof XRCPUDepthInformation) 
+							if (depthData instanceof XRCPUDepthInformation) 
 							{
 								if (!this.depthCanvasTexture) 
 								{
@@ -632,14 +632,14 @@ export class ARRenderer
 									canvas.height = 160;
 									this.domContainer.appendChild(canvas);
 									
-									//const canvas = new OffscreenCanvas(depthInfo.width, depthInfo.height);
+									//const canvas = new OffscreenCanvas(depthData.width, depthData.height);
 									this.depthCanvasTexture = new DepthCanvasTexture(canvas);
 								}
 								
-								this.depthCanvasTexture.updateDepth(depthInfo, 0, 3);
+								this.depthCanvasTexture.updateDepth(depthData, 0, 3);
 							}
 							// @ts-ignore
-							else if (depthInfo instanceof XRGPUDepthInformation)
+							else if (depthData instanceof XRGPUDepthInformation)
 							{
 								throw new Error('DepthCanvasTexture not supported for XRGPUDepthInformation');
 							}
@@ -648,23 +648,23 @@ export class ARRenderer
 						if (this.config.depthCanvasTexture) 
 						{
 							// @ts-ignore
-							if (depthInfo instanceof XRCPUDepthInformation) 
+							if (depthData instanceof XRCPUDepthInformation) 
 							{
 								if (!this.depthTexture) {
-									this.depthTexture = new DepthDataTexture(depthInfo);
+									this.depthTexture = new DepthDataTexture(depthData);
 								} else {
-									this.depthTexture.updateDepth(depthInfo);
+									this.depthTexture.updateDepth(depthData);
 								}
 							}
 							// @ts-ignore
-							else if (depthInfo instanceof XRGPUDepthInformation)
+							else if (depthData instanceof XRGPUDepthInformation)
 							{
 								throw new Error('DepthDataTexture not supported for XRGPUDepthInformation');
 							}
 						}
 
 						// Update uniforms of XR materials
-						AugmentedMaterial.updateUniforms(this, depthInfo);
+						AugmentedMaterial.updateUniforms(this, depthData);
 					}
 					
 				}

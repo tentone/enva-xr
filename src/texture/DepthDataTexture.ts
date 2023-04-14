@@ -9,9 +9,9 @@ import {DataTexture, LuminanceAlphaFormat, UnsignedByteType, LinearFilter, Clamp
  */
 export class DepthDataTexture extends DataTexture
 {
-	public constructor(depthInfo: XRCPUDepthInformation)
+	public constructor(depthData: XRCPUDepthInformation)
 	{
-		super(new Uint8Array(depthInfo.data), depthInfo.width, depthInfo.height, LuminanceAlphaFormat, UnsignedByteType);
+		super(new Uint8Array(depthData.data), depthData.width, depthData.height, LuminanceAlphaFormat, UnsignedByteType);
 		
 		this.generateMipmaps = false;
 		this.minFilter = LinearFilter;
@@ -25,12 +25,12 @@ export class DepthDataTexture extends DataTexture
 	 *
 	 * Depth data is retrieved from the WebXR API.
 	 *
-	 * @param depthInfo
+	 * @param depthData
 	 */
-	public updateDepth(depthInfo: XRCPUDepthInformation): void
+	public updateDepth(depthData: XRCPUDepthInformation): void
 	{
 		// @ts-ignore
-		this.image.data = new Uint8Array(depthInfo.data);
+		this.image.data = new Uint8Array(depthData.data);
 		this.needsUpdate = true;
 	}
 }

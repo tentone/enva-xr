@@ -29,33 +29,33 @@ export class DepthCanvasTexture extends CanvasTexture
 	 *
 	 * Uses the camera planes to correctly adjust the values.
 	 * 
-	 * @param depthInfo - Depth info obtained from XR.
+	 * @param depthData - Depth info obtained from XR.
 	 * @param near - Near plane of camera.
 	 * @param far - Far plane of camera.
 	 */
-	public updateDepth(depthInfo: XRCPUDepthInformation, near: number, far: number): void
+	public updateDepth(depthData: XRCPUDepthInformation, near: number, far: number): void
 	{
 		// Adjust size of the canvas to match depth information
 		const canvas = this.image;
-		if (canvas.width !== depthInfo.width || canvas.height !== depthInfo.height)
+		if (canvas.width !== depthData.width || canvas.height !== depthData.height)
 		{
-			canvas.width = depthInfo.width;
-			canvas.height = depthInfo.height;
+			canvas.width = depthData.width;
+			canvas.height = depthData.height;
 		}
 
 		// Get image data
 		if (!this.imageData) 
 		{
-			this.imageData = this.context.createImageData(depthInfo.width, depthInfo.height, {colorSpace: "srgb"});
+			this.imageData = this.context.createImageData(depthData.width, depthData.height, {colorSpace: "srgb"});
 		}
 		
 		// Matrix to transform normalized coord into view coordinates
-		const viewFromNorm: Matrix4 = new Matrix4().fromArray(depthInfo.normDepthBufferFromNormView.inverse.matrix);
-		const inverseDepth = new Vector3(1.0 / depthInfo.width, 1.0 / depthInfo.height, 0.0);
+		const viewFromNorm: Matrix4 = new Matrix4().fromArray(depthData.normDepthBufferFromNormView.inverse.matrix);
+		const inverseDepth = new Vector3(1.0 / depthData.width, 1.0 / depthData.height, 0.0);
 
-		for (let x = 0; x < depthInfo.width; x++)
+		for (let x = 0; x < depthData.width; x++)
 		{
-			for (let y = 0; y < depthInfo.height; y++)
+			for (let y = 0; y < depthData.height; y++)
 			{	
 				const coords = new Vector3(x, y, 0);
 				coords.multiply(inverseDepth);
@@ -66,7 +66,7 @@ export class DepthCanvasTexture extends CanvasTexture
 					continue;
 				}
 				
-				const depth = depthInfo.getDepthInMeters(coords.x, coords.y);
+				const depth = depthData.getDepthInMeters(coords.x, coords.y);
 
 				// Transform distance into values inside of the [near, far] range.
 				let distance = (depth - near) / (far - near);
@@ -74,7 +74,7 @@ export class DepthCanvasTexture extends CanvasTexture
 				else if (distance < 0.0) {distance = 0.0;}
 
 				// Display depth information as RGB
-				const idx = (x * depthInfo.width + (depthInfo.width - y)) * 4;
+				const idx = (x * depthData.width + (depthData.width - y)) * 4;
 				this.imageData.data[idx] = Math.ceil(distance * 256);
 				this.imageData.data[idx + 1] = Math.ceil(distance * 256);
 				this.imageData.data[idx + 2] = Math.ceil(distance * 256);
