@@ -97,15 +97,15 @@ export class DepthCanvasTexture extends CanvasTexture
 				const depth = depthData.getDepthInMeters(coords.x, coords.y);
 
 				// Transform distance into values inside of the [near, far] range.
-				let distance = (depth - near) / (far - near);
-				if (distance > 1.0) {distance = 1.0;}
-				else if (distance < 0.0) {distance = 0.0;}
+				let depthNorm = (depth - near) / (far - near);
+				if (depthNorm > 1.0) {depthNorm = 1.0;}
+				else if (depthNorm < 0.0) {depthNorm = 0.0;}
 
 				// Display depth information as RGB
 				const idx = (x * depthData.width + (depthData.width - y)) * 4;
-				this.imageData.data[idx] = Math.ceil(distance * 256);
-				this.imageData.data[idx + 1] = Math.ceil(distance * 256);
-				this.imageData.data[idx + 2] = Math.ceil(distance * 256);
+				this.imageData.data[idx] = Math.ceil(depthNorm * 256);
+				this.imageData.data[idx + 1] = Math.ceil(depthNorm * 256);
+				this.imageData.data[idx + 2] = Math.ceil(depthNorm * 256);
 				this.imageData.data[idx + 3] = 255;
 			}
 		}
