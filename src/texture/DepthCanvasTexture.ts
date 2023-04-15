@@ -120,7 +120,7 @@ export class DepthCanvasTexture extends CanvasTexture
 			}
 		}
 		
-		console.log('enva-xr: Depth box is ', box, depthData);
+		// console.log('enva-xr: Depth box is ', box, depthData);
 
 		// Update canvas content
 		this.context.putImageData(this.imageData, 0, 0);

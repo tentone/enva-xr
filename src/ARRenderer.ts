@@ -61,7 +61,7 @@ export class ARRendererConfig
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthTexture = false;
+	public depthTexture = true;
 
 	/**
 	 * Provide a canvas texture with depth information.
@@ -70,7 +70,7 @@ export class ARRendererConfig
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthCanvasTexture = true;
+	public depthCanvasTexture = false;
 }
 
 /**

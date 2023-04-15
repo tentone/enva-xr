@@ -9,16 +9,22 @@ import {DataTexture, LuminanceAlphaFormat, UnsignedByteType, LinearFilter, Clamp
  */
 export class DepthDataTexture extends DataTexture
 {
+	/**
+	 * Depth data stored in the texture.
+	 */
+	public data: Uint8Array;
+
 	public constructor(depthData: XRCPUDepthInformation)
 	{
-		super(new Uint8Array(depthData.data), depthData.width, depthData.height, LuminanceAlphaFormat, UnsignedByteType);
+		const data = new Uint8Array(depthData.data)
+
+		super(data, depthData.width, depthData.height, LuminanceAlphaFormat, UnsignedByteType);
 		
-		this.format = LuminanceAlphaFormat;
-		this.generateMipmaps = false;
+		this.data = data;
 		this.minFilter = LinearFilter;
-		this.magFilter = NearestFilter;
 		this.wrapS = ClampToEdgeWrapping;
 		this.wrapT = ClampToEdgeWrapping;
+		this.unpackAlignment = 1;
 	}
 
 	/**
@@ -29,9 +35,8 @@ export class DepthDataTexture extends DataTexture
 	 * @param depthData
 	 */
 	public updateDepth(depthData: XRCPUDepthInformation): void
-	{
-		// @ts-ignore
-		this.image.data = new Uint8Array(depthData.data);
+	{	
+		this.data.set(new Uint8Array(depthData.data));
 		this.needsUpdate = true;
 	}
 }

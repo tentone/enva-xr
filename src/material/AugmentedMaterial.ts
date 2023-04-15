@@ -1,4 +1,5 @@
 import { ARRenderer } from "ARRenderer";
+import { chdir } from "process";
 import {Material, Matrix4, ShadowMaterial, Vector2} from "three";
 
 /**
@@ -113,6 +114,8 @@ export class AugmentedMaterial
 			{
 				// Normalize screen coordinates
 				vec4 screenUV = vec4(gl_FragCoord.x / uWidth, gl_FragCoord.y / uHeight, 0.0, 1.0);
+				// vec4 screenUV = vec4(0.5, 0.5, 0.0, 1.0);
+
 				vec2 depthUV = (uUvTransform * screenUV).xy;
 				
 				float depth = getDepthInMeters(uDepthTexture, depthUV);
@@ -156,6 +159,8 @@ export class AugmentedMaterial
 	public static updateUniforms(renderer: ARRenderer, depthData: XRDepthInformation): void
 	{
 		const size = renderer.renderer.getSize(new Vector2());
+
+		// console.log('enva-xr: Renderer size.', size);
 
 		renderer.scene.traverse(function(child: any)
 		{
