@@ -44,7 +44,7 @@ export class AugmentedBasicMaterial extends ShaderMaterial
 		if (renderer.xrDepth.length > 0) {
 			const depthData = renderer.xrDepth[0];
 			const size = renderer.renderer.getSize(new Vector2());
-
+			
 			this.uniforms.uDepthTexture.value = new DepthDataTexture(depthData);
 			this.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
 			this.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);

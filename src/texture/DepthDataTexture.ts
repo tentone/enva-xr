@@ -1,4 +1,4 @@
-import {DataTexture, LuminanceAlphaFormat, LinearFilter, ClampToEdgeWrapping, UnsignedByteType} from "three";
+import {DataTexture, LuminanceAlphaFormat, LinearFilter, ClampToEdgeWrapping, UnsignedByteType, NearestFilter} from "three";
 
 /**
  * Stores the raw depth values in a 16 bit value packed texture.
@@ -13,7 +13,9 @@ export class DepthDataTexture extends DataTexture
 	{
 		super(new Uint8Array(depthData.data), depthData.width, depthData.height, LuminanceAlphaFormat, UnsignedByteType);
 
+		this.generateMipmaps = false;
 		this.minFilter = LinearFilter;
+		this.magFilter = NearestFilter;
 		this.wrapS = ClampToEdgeWrapping;
 		this.wrapT = ClampToEdgeWrapping;
 

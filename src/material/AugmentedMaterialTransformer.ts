@@ -45,9 +45,10 @@ export class AugmentedMaterialTransformer
 			shader.fragmentShader = `
 			uniform sampler2D uDepthTexture;
 
-			uniform mat4 uUvTransform;
 			uniform float uRawValueToMeters;
+			uniform mat4 uUvTransform;
 			uniform vec2 uResolution;
+			
 			uniform bool uOcclusionEnabled;
 
 			varying float vDepth;
@@ -113,13 +114,13 @@ export class AugmentedMaterialTransformer
 			if(uOcclusionEnabled)
 			{
 				// Normalize screen coordinates
-				vec4 screenUv = vec4(uResolution.x / gl_FragCoord.x, uResolution.x / gl_FragCoord.y, 0.0, 1.0);
+				vec4 screenUv = vec4((gl_FragCoord.x / uResolution.x), (gl_FragCoord.y / uResolution.x), 0.0, 1.0);
 				vec2 depthUv = (uUvTransform * screenUv).xy;
 				
-				// Get depth
+				// Calculate depth in meters
 				float depth = getDepthInMeters(uDepthTexture, depthUv);
-
-				// Calculate color for visualization
+			
+				// Debug visualization
 				gl_FragColor = vec4(depthGetColorVisualization(depth), 1.0);
 				return;
 

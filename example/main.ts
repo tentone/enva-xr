@@ -12,14 +12,7 @@ import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicM
 
 	let material = new AugmentedBasicMaterial(texture);
 
-	let box: Mesh = new Mesh(new BoxGeometry(), material);
-	box.receiveShadow = true;
-	box.castShadow = true;
-	box.scale.setScalar(2);
-	box.position.set(0, 0, 5);
-	renderer.scene.add(box);
-
-	box = new Mesh(new BoxGeometry(), material);
+	let box = new Mesh(new BoxGeometry(), material);
 	box.receiveShadow = true;
 	box.castShadow = true;
 	box.scale.setScalar(0.1);
