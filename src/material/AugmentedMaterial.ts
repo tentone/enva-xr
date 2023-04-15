@@ -1,6 +1,5 @@
 import { ARRenderer } from "ARRenderer";
-import { chdir } from "process";
-import {Material, Matrix4, ShadowMaterial, Texture, Vector2} from "three";
+import {DataTexture, Material, Matrix4, Shader, ShadowMaterial, Vector2, WebGLRenderer} from "three";
 
 /**
  * Augmented Material has static tools to transform regular three.js materials into AR materials.
@@ -20,7 +19,7 @@ export class AugmentedMaterial
 	public static transform(material: Material): Material
 	{
 		material.userData = {
-			uDepthTexture: {value: new Texture()},
+			uDepthTexture: {value: new DataTexture()},
 			uWidth: {value: 1.0},
 			uHeight: {value: 1.0},
 			uUvTransform: {value: new Matrix4()},
@@ -31,8 +30,11 @@ export class AugmentedMaterial
 		// @ts-ignore
 		material.isAgumentedMaterial = true;
 
-		material.onBeforeCompile = (shader) =>
+		material.onBeforeCompile = (shader: Shader, renderer: WebGLRenderer) =>
 		{
+			// @ts-ignore
+			material.shader = shader;
+
 			// Pass uniforms from userData to the
 			for (let i in material.userData)
 			{
@@ -164,15 +166,16 @@ export class AugmentedMaterial
 
 		renderer.scene.traverse(function(child: any)
 		{
-			if (child.material && child.material.isAgumentedMaterial)
+			if (child.material && child.material.isAgumentedMaterial && child.material.shader)
 			{
-				child.material.uniforms.uDepthTexture.value = renderer.depthTexture;
-				child.material.uniforms.uWidth.value = Math.floor(size.x);
-				child.material.uniforms.uHeight.value = Math.floor(size.y);
-				child.material.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
-				child.material.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
-				child.material.uniformsNeedUpdate = true;
-				child.material.needsUpdate = true
+				console.log('enva-xr: Material to be updated', child.material);
+
+				child.material.shader.uniforms.uDepthTexture.value = renderer.depthTexture;
+				child.material.shader.uniforms.uWidth.value = Math.floor(size.x);
+				child.material.shader.uniforms.uHeight.value = Math.floor(size.y);
+				child.material.shader.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
+				child.material.shader.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
+				child.material.needsUpdate = true;
 			}
 		});
 	}
