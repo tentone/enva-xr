@@ -1,6 +1,6 @@
 import { ARRenderer } from "ARRenderer";
 import { chdir } from "process";
-import {Material, Matrix4, ShadowMaterial, Vector2} from "three";
+import {Material, Matrix4, ShadowMaterial, Texture, Vector2} from "three";
 
 /**
  * Augmented Material has static tools to transform regular three.js materials into AR materials.
@@ -20,7 +20,7 @@ export class AugmentedMaterial
 	public static transform(material: Material): Material
 	{
 		material.userData = {
-			uDepthTexture: {value: null},
+			uDepthTexture: {value: new Texture()},
 			uWidth: {value: 1.0},
 			uHeight: {value: 1.0},
 			uUvTransform: {value: new Matrix4()},
@@ -166,12 +166,13 @@ export class AugmentedMaterial
 		{
 			if (child.material && child.material.isAgumentedMaterial)
 			{
-				child.material.userData.uDepthTexture.value = renderer.depthTexture;
-				child.material.userData.uWidth.value = Math.floor(size.x);
-				child.material.userData.uHeight.value = Math.floor(size.y);
-				child.material.userData.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
-				child.material.userData.uRawValueToMeters.value = depthData.rawValueToMeters;
+				child.material.uniforms.uDepthTexture.value = renderer.depthTexture;
+				child.material.uniforms.uWidth.value = Math.floor(size.x);
+				child.material.uniforms.uHeight.value = Math.floor(size.y);
+				child.material.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
+				child.material.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
 				child.material.uniformsNeedUpdate = true;
+				child.material.needsUpdate = true
 			}
 		});
 	}
