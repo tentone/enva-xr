@@ -74,7 +74,7 @@ export class AugmentedMaterial
 
 			// Turbo color map visualization of depth information.
 			//
-			// Inpu value range from 0.0 to 1.0.
+			// Input value range from 0.0 to 1.0.
 			//
 			// More information at https://ai.googleblog.com/2019/08/turbo-improved-rainbow-colormap-for.html
 			vec3 turboColormap(in float x) {

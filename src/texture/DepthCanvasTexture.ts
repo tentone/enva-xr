@@ -1,4 +1,4 @@
-import {CanvasTexture, Matrix4, Vector2, Vector3, Vector4} from "three";
+import {Box2, Box3, CanvasTexture, Matrix4, Vector2, Vector3, Vector4} from "three";
 
 /**
  * Canvas texture to stored depth data obtained from the WebXR API.
@@ -32,7 +32,7 @@ export class DepthCanvasTexture extends CanvasTexture
 	 * @param depth Normalized depth value.
 	 * @returns Colorized depth using the turbo color map.
 	 */
-	public turboColorMap(x: number): Vector3 {
+	public static turboColorMap(x: number): Vector3 {
 		const kRedVec4 = new Vector4(0.55305649, 3.00913185, -5.46192616, -11.11819092);
 		const kGreenVec4 = new Vector4(0.16207513, 0.17712472, 15.24091500, -36.50657960);
 		const kBlueVec4 = new Vector4(-0.05195877, 5.18000081, -30.94853351, 81.96403246);
@@ -81,6 +81,9 @@ export class DepthCanvasTexture extends CanvasTexture
 		const viewFromNorm: Matrix4 = new Matrix4().fromArray(depthData.normDepthBufferFromNormView.inverse.matrix);
 		const inverseDepth = new Vector3(1.0 / depthData.width, 1.0 / depthData.height, 0.0);
 
+		// Box to check wich depth data is inside screen coordinates.
+		const box = new Box2(new Vector2(depthData.width, depthData.height), new Vector2(0, 0));
+
 		for (let x = 0; x < depthData.width; x++)
 		{
 			for (let y = 0; y < depthData.height; y++)
@@ -93,7 +96,12 @@ export class DepthCanvasTexture extends CanvasTexture
 				{
 					continue;
 				}
-				
+
+				if (x < box.min.x) {box.min.x = x;}
+				if (y < box.min.y) {box.min.y = y;}
+				if (x > box.max.x) {box.max.x = x;}
+				if (y > box.max.y) {box.max.y = y;}
+
 				const depth = depthData.getDepthInMeters(coords.x, coords.y);
 
 				// Transform distance into values inside of the [near, far] range.
@@ -102,13 +110,17 @@ export class DepthCanvasTexture extends CanvasTexture
 				else if (depthNorm < 0.0) {depthNorm = 0.0;}
 
 				// Display depth information as RGB
-				const idx = (x * depthData.width + (depthData.width - y)) * 4;
-				this.imageData.data[idx] = Math.ceil(depthNorm * 256);
-				this.imageData.data[idx + 1] = Math.ceil(depthNorm * 256);
-				this.imageData.data[idx + 2] = Math.ceil(depthNorm * 256);
+				const idx = (y * depthData.width + x) * 4;
+
+				const color = DepthCanvasTexture.turboColorMap(depthNorm);
+				this.imageData.data[idx] = Math.ceil(color.x * 256);
+				this.imageData.data[idx + 1] = Math.ceil(color.y * 256);
+				this.imageData.data[idx + 2] = Math.ceil(color.z * 256);
 				this.imageData.data[idx + 3] = 255;
 			}
 		}
+		
+		console.log('enva-xr: Depth box is ', box, depthData);
 
 		// Update canvas content
 		this.context.putImageData(this.imageData, 0, 0);

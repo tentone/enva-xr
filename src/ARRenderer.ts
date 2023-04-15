@@ -61,7 +61,7 @@ export class ARRendererConfig
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthTexture = true;
+	public depthTexture = false;
 
 	/**
 	 * Provide a canvas texture with depth information.
@@ -70,7 +70,7 @@ export class ARRendererConfig
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthCanvasTexture = false;
+	public depthCanvasTexture = true;
 }
 
 /**
@@ -470,7 +470,7 @@ export class ARRenderer
 		else if (!this.canvas)
 		{
 			this.canvas = document.createElement("canvas");
-			document.body.appendChild(this.canvas);
+			// document.body.appendChild(this.canvas);
 		}
 
 		this.glContext = this.canvas.getContext("webgl2", {xrCompatible: true});
@@ -530,7 +530,9 @@ export class ARRenderer
 		{
 			try 
 			{
-				this.canvas.parentElement.removeChild(this.canvas);
+				if (this.canvas.parentElement) {
+					this.canvas.parentElement.removeChild(this.canvas);
+				}
 			}
 			catch (e) {}
 		}
@@ -552,8 +554,6 @@ export class ARRenderer
 			this.renderer.setSize(this.resolution.x, this.resolution.y);
 			this.renderer.setPixelRatio(window.devicePixelRatio);
 		}
-
-
 	}
 
 	/**
@@ -623,14 +623,7 @@ export class ARRenderer
 							{
 								if (!this.depthCanvasTexture) 
 								{
-									const canvas = document.createElement('canvas');
-									canvas.style.position = "absolute";
-									canvas.style.display = "block";
-									canvas.style.bottom = "10px";
-									canvas.style.left = "10px";
-									canvas.width = depthData.width;
-									canvas.height = depthData.height;
-									this.domContainer.appendChild(canvas);
+									const canvas = this.createDebugCanvas(depthData);
 									
 									//const canvas = new OffscreenCanvas(depthData.width, depthData.height);
 									this.depthCanvasTexture = new DepthCanvasTexture(canvas);
@@ -689,5 +682,36 @@ export class ARRenderer
 		}
 		
 		this.renderer.render(this.scene, this.camera);
+	}
+
+	
+	/**
+	 * Create a visual debug canvas used to view depth data associated 
+	 * 
+	 * @param depthData Depth data to calculate the size of the canvas element.
+	 */
+	public createDebugCanvas(depthData: XRDepthInformation, scale: number = 1.5): HTMLCanvasElement {
+		const canvas = document.createElement('canvas');
+		canvas.style.position = "absolute";
+		canvas.style.display = "block";
+		canvas.style.bottom = "5px";
+		canvas.style.left = "5px";
+		canvas.style.width = (depthData.width * scale) + "px";
+		canvas.style.height = (depthData.height * scale) + "px";
+		canvas.width = depthData.width;
+		canvas.height = depthData.height;
+
+		// Check device rotation and depth rotation
+		const devicePortrait = window.innerHeight / window.innerWidth > 1.0;
+		const depthPortrait = depthData.height / depthData.width > 1.0;
+		if (devicePortrait !== depthPortrait) {
+			canvas.style.rotate = "90deg";
+		}
+
+		if (this.config.domOverlay) {
+			this.domContainer.appendChild(canvas);
+		}
+
+		return canvas;
 	}
 }
