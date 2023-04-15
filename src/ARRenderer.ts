@@ -3,7 +3,7 @@ import {DepthDataTexture} from "./texture/DepthDataTexture";
 import {ARObject} from "./object/ARObject";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
 import {EventManager} from "./utils/EventManager";
-import {AugmentedMaterial} from "./material/AugmentedMaterial";
+import {AugmentedMaterialTransformer} from "./material/AugmentedMaterialTransformer";
 
 /**
  * Configuration of the AR renderer.
@@ -643,11 +643,15 @@ export class ARRenderer
 							// @ts-ignore
 							if (depthData instanceof XRCPUDepthInformation) 
 							{
-								if (!this.depthTexture) {
+								if (!this.depthTexture)
+								{
 									this.depthTexture = new DepthDataTexture(depthData);
-								} else {
+								}
+								else
+								{
 									this.depthTexture.updateDepth(depthData);
 								}
+								
 							}
 							// @ts-ignore
 							else if (depthData instanceof XRGPUDepthInformation)
@@ -657,9 +661,8 @@ export class ARRenderer
 						}
 
 						// Update uniforms of XR materials
-						AugmentedMaterial.updateUniforms(this, depthData);
+						AugmentedMaterialTransformer.updateUniforms(this, depthData);
 					}
-					
 				}
 			}
 

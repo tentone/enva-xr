@@ -6,7 +6,7 @@ import {DataTexture, Material, Matrix4, Shader, ShadowMaterial, Vector2, WebGLRe
  * 
  * The required code is injected into existing shader code.
  */
-export class AugmentedMaterial
+export class AugmentedMaterialTransformer
 {
 	/**
 	 * Create a augmented reality occlusion enabled material from a standard three.js material.
@@ -47,9 +47,7 @@ export class AugmentedMaterial
 
 			uniform mat4 uUvTransform;
 			uniform float uRawValueToMeters;
-
-			uniform float uWidth;
-			uniform float uHeight;
+			uniform vec2 uResolution;
 			uniform bool uOcclusionEnabled;
 
 			varying float vDepth;
@@ -69,9 +67,9 @@ export class AugmentedMaterial
 			const highp float kMaxDepthInMeters = 8.0;
 			const float kInvalidDepthThreshold = 0.01;
 			
-			float getDepthInMeters(in sampler2D depthText, in vec2 depthUv)
+			float getDepthInMeters(in sampler2D depthTexture, in vec2 depthUv)
 			{
-				vec2 packedDepth = texture2D(depthText, depthUv).ra;
+				vec2 packedDepth = texture2D(depthTexture, depthUv).ra;
 				return dot(packedDepth, vec2(255.0, 256.0 * 255.0)) * uRawValueToMeters;
 			}
 
@@ -115,12 +113,11 @@ export class AugmentedMaterial
 			if(uOcclusionEnabled)
 			{
 				// Normalize screen coordinates
-				vec4 screenUV = vec4(gl_FragCoord.x / uWidth, gl_FragCoord.y / uHeight, 0.0, 1.0);
-				// vec4 screenUV = vec4(0.5, 0.5, 0.0, 1.0);
-
-				vec2 depthUV = (uUvTransform * screenUV).xy;
+				vec4 screenUv = vec4(uResolution.x / gl_FragCoord.x, uResolution.x / gl_FragCoord.y, 0.0, 1.0);
+				vec2 depthUv = (uUvTransform * screenUv).xy;
 				
-				float depth = getDepthInMeters(uDepthTexture, depthUV);
+				// Get depth
+				float depth = getDepthInMeters(uDepthTexture, depthUv);
 
 				// Calculate color for visualization
 				gl_FragColor = vec4(depthGetColorVisualization(depth), 1.0);
@@ -129,7 +126,7 @@ export class AugmentedMaterial
 				// Depth test
 				if (depth < vDepth)
 				{
-					// discard;
+					discard;
 				}
 			}
 			`);
@@ -171,8 +168,7 @@ export class AugmentedMaterial
 				console.log('enva-xr: Material to be updated', child.material);
 
 				child.material.shader.uniforms.uDepthTexture.value = renderer.depthTexture;
-				child.material.shader.uniforms.uWidth.value = Math.floor(size.x);
-				child.material.shader.uniforms.uHeight.value = Math.floor(size.y);
+				child.material.shader.uniforms.uResolution.value.set(size.x, size.y);
 				child.material.shader.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
 				child.material.shader.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
 				child.material.needsUpdate = true;

@@ -1,4 +1,5 @@
-export {AugmentedMaterial} from "./material/AugmentedMaterial";
+export {AugmentedMaterialTransformer} from "./material/AugmentedMaterialTransformer";
+export {AugmentedBasicMaterial} from "./material/AugmentedBasicMaterial";
 
 export {Angle} from "./object/Angle";
 export {BillboardGroup} from "./object/BillboardGroup";
