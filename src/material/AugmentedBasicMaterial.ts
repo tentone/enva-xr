@@ -16,14 +16,14 @@ export class AugmentedBasicMaterial extends ShaderMaterial
 	 */
 	public texture: Texture = null;
 
-	public constructor(texture: Texture)
+	public constructor(texture: Texture, depthData: XRDepthInformation)
 	{
 		super({
 			uniforms: {
 				uRawValueToMeters: {value: 0.001},
 				uTexture: {value: texture},
-				uDepthTexture: {value: new DataTexture()},
-				uResolution: {value: new Vector2(1.0, 1.0)},
+				uDepthTexture: {value: new DepthDataTexture(depthData)},
+				uResolution: {value: new Vector2(100, 100)},
 				uUvTransform: {value: new Matrix4()}
 			},
 			vertexShader: AugmentedBasicMaterialVertex,
@@ -45,14 +45,13 @@ export class AugmentedBasicMaterial extends ShaderMaterial
 			const depthData = renderer.xrDepth[0];
 			const size = renderer.renderer.getSize(new Vector2());
 			
-			this.uniforms.uDepthTexture.value = new DepthDataTexture(depthData);
+			this.uniforms.uDepthTexture.value.updateDepth(depthData);
 			this.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
 			this.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
 			this.uniforms.uResolution.value.set(size.x, size.y);
 			this.uniformsNeedUpdate = true;
-			this.needsUpdate = true
 
-			// console.log('enva-xr: Update uniforms material.', size, material, depthData);
+			// console.log('enva-xr: Update uniforms material.', size, depthData);
 		}
 
 	}

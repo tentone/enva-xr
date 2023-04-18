@@ -1,4 +1,4 @@
-import {AmbientLight, BoxGeometry, DataTexture, LinearFilter, LuminanceAlphaFormat, Mesh, MeshPhysicalMaterial, SphereGeometry, TextureLoader, UnsignedByteType, Vector2, Vector3} from "three";
+import {AmbientLight, BoxGeometry, DataTexture, LinearFilter, LuminanceAlphaFormat, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, SphereGeometry, TextureLoader, UnsignedByteType, Vector2, Vector3} from "three";
 import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicMaterial, DepthDataTexture} from "../src/Main";
 
 (async function (): Promise<void> {
@@ -7,16 +7,16 @@ import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicM
 	// let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
 	// material = AugmentedMaterialTransformer.transform(material);
 
+	let material = null;
+	
 	let loader = new TextureLoader();
 	let texture = await loader.loadAsync('assets/texture/ball/color.jpg');
 
-	let material = new AugmentedBasicMaterial(texture);
-
-	let box = new Mesh(new BoxGeometry(), material);
+	let box = new Mesh(new BoxGeometry(), new MeshBasicMaterial());
 	box.receiveShadow = true;
 	box.castShadow = true;
-	box.scale.setScalar(0.1);
-	box.position.set(0, 0, -1);
+	box.scale.setScalar(2.0);
+	box.position.set(0, 0, -3);
 	renderer.scene.add(box);
 
 	const ambient = new AmbientLight(0x111111);
@@ -66,8 +66,15 @@ import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicM
 	};
 
 	renderer.onFrame = function(time: number, renderer: ARRenderer) {
-		material.updateMaterial(renderer);
-		box.rotation.x += 0.01;
+		if (renderer.xrDepth.length > 0) {
+			if (material === null) {
+				material = new AugmentedBasicMaterial(texture, renderer.xrDepth[0]);
+				box.material = material;
+			} else {
+				material.updateMaterial(renderer);
+			}
+		}
+		// box.rotation.x += 0.01;
 	};
 
 	var button = document.getElementById("start");

@@ -58,11 +58,11 @@ vec3 depthGetColorVisualization(in float depth) {
 void main(void)
 {
 	// Normalize x, y to range [0.0, 1.0]
-	vec4 screenUv = vec4((gl_FragCoord.x / uResolution.x), (gl_FragCoord.y / uResolution.x), 0.0, 1.0);
-	vec2 depthUv = (uUvTransform * screenUv).xy;
+	vec2 screenUv = gl_FragCoord.xy / uResolution;
+	vec4 depthUv = uUvTransform * vec4(screenUv, 0.0, 1.0);
 
 	// Calculate depth in meters
-	float depth = getDepthInMeters(uDepthTexture, depthUv);
+	float depth = getDepthInMeters(uDepthTexture, depthUv.xy);
 
 	// Debug visualization
 	gl_FragColor = vec4(depthGetColorVisualization(depth), 1.0);

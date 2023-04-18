@@ -13,6 +13,11 @@ import {AugmentedMaterialTransformer} from "./material/AugmentedMaterialTransfor
 export class ARRendererConfig 
 {
 	/**
+	 * If true webgl2 is used instead of webgl1.
+	 */
+	public useWebGL2 = false;
+
+	/**
 	 * The front-facing camera API enables AR experiences to express their preference to use a front-facing (or "selfie") camera when creating immersive sessions.
 	 * 
 	 * Some XR device form factors, most notably smartphones, have multiple cameras that can be used to power an immersive (generally AR) experience.
@@ -291,8 +296,7 @@ export class ARRenderer
 
 		this.renderer.xr.setReferenceSpaceType('local');
 		this.renderer.xr.setSession(this.xrSession);
-		
-		this.event.add(window, "resize", () => {this.resize();});
+
 		this.event.add(this.xrSession, "end", () => {this.stop();});
 		this.event.create();
 
@@ -349,9 +353,6 @@ export class ARRenderer
 
 			// console.log('enva-xr: XR light probe', this.xrLightProbe);
 		}
-
-		// Set resolution 
-		this.resize();
 
 		// Render loop
 		this.renderer.setAnimationLoop((time: number, frame: any) =>
@@ -454,7 +455,7 @@ export class ARRenderer
 	/**
 	 * Create and setup webglrenderer.
 	 * 
-	 * Creates a webgl2 renderer with XR compatibility enabled.
+	 * Creates a webgl renderer with XR compatibility enabled.
 	 * 
 	 * If the canvas
 	 *
@@ -473,7 +474,8 @@ export class ARRenderer
 			// document.body.appendChild(this.canvas);
 		}
 
-		this.glContext = this.canvas.getContext("webgl2", {xrCompatible: true});
+		// @ts-ignore
+		this.glContext = this.canvas.getContext(this.config.useWebGL2 ? "webgl2" : "webgl", {xrCompatible: true});
 
 		await this.glContext.makeXRCompatible();
 
@@ -496,9 +498,6 @@ export class ARRenderer
 		this.renderer.shadowMap.type = PCFSoftShadowMap;
 
 		this.renderer.sortObjects = true;
-
-		this.renderer.setPixelRatio(window.devicePixelRatio);
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.xr.enabled = true;
 	}
 
@@ -538,24 +537,6 @@ export class ARRenderer
 		}
 	}
 
-
-	/**
-	 * Update the canvas and renderer size based on window size.
-	 */
-	public resize(): void
-	{
-		this.resolution.set(window.innerWidth, window.innerHeight);
-
-		this.camera.aspect = this.resolution.x / this.resolution.y;
-		this.camera.updateProjectionMatrix();
-
-		if (this.renderer) 
-		{
-			this.renderer.setSize(this.resolution.x, this.resolution.y);
-			this.renderer.setPixelRatio(window.devicePixelRatio);
-		}
-	}
-
 	/**
 	 * Raycast into the AR scene.
 	 * 
@@ -590,6 +571,11 @@ export class ARRenderer
 		{
 			return;
 		}
+
+		this.renderer.getSize(this.resolution);
+
+		this.camera.aspect = this.resolution.x / this.resolution.y;
+		this.camera.updateProjectionMatrix();
 
 		// Update viewer pose
 		this.xrViewerPose = frame.getViewerPose(this.xrReferenceSpace);
