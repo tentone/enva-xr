@@ -20,7 +20,7 @@
 
 - Download the repository from git `gh repo clone tentone/enva-xr`
 - Install [Node](https://nodejs.org/en/) and [NPM](https://www.npmjs.com/).
-- Prepare a browser compatible with WebXR in a depth with support for `depth-estimation`, `hit-test` and `lighting`.
+- Ensure that your browser is compatible with WebXR and check features support (e.g. `depth-estimation`, `hit-test`, `lighting`).
 - Install dependencies from NPM by running `npm install` and start the code running `npm run start`
 
 
