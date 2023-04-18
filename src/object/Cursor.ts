@@ -35,7 +35,8 @@ export class Cursor extends Mesh implements ARObject
 	
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void 
 	{
-		if (!renderer.config.hitTest) {
+		if (!renderer.config.hitTest) 
+		{
 			// console.warn('XR hit test source must be available for Cursor object. Check renderer configuration.');
 		}
 

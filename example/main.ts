@@ -1,24 +1,28 @@
-import {AmbientLight, BoxGeometry, DataTexture, LinearFilter, LuminanceAlphaFormat, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, SphereGeometry, TextureLoader, UnsignedByteType, Vector2, Vector3} from "three";
-import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicMaterial, DepthDataTexture, AugmentedMaterialTransformer} from "../src/Main";
+import {AmbientLight, BoxGeometry, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, SphereGeometry, TextureLoader, Vector2} from "three";
+import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedBasicMaterial, AugmentedMaterial} from "../src/Main";
 
 (async function (): Promise<void> {
-	const renderer = new ARRenderer();
+	const renderer = new ARRenderer({
+		depthSensing: true,
+		depthTexture: true,
+		lightProbe: true
+	});
 
-	let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-	material = AugmentedMaterialTransformer.transform(material);
-	
 	let loader = new TextureLoader();
 	let texture = await loader.loadAsync('assets/texture/ball/color.jpg');
 
-	let box = new Mesh(new BoxGeometry(), new MeshBasicMaterial());
+	let material: any = new MeshPhysicalMaterial({map: texture, color: (Math.random() * 0xFFFFFF)});
+	material = AugmentedMaterial.transform(material);
+
+	let box = new Mesh(new BoxGeometry(), material);
 	box.receiveShadow = true;
 	box.castShadow = true;
 	box.scale.setScalar(0.4);
 	box.position.set(0, 0, -2);
 	renderer.scene.add(box);
 
-	const ambient = new AmbientLight(0x111111);
-	renderer.scene.add(ambient);
+	// const ambient = new AmbientLight(0x111111);
+	// renderer.scene.add(ambient);
 
 	const probe = new LightProbe();
 	renderer.scene.add(probe);
@@ -51,7 +55,7 @@ import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicM
 	renderer.domContainer.ondblclick = function(event: MouseEvent) {
 		if (cursor.visible) {
 			let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-			material = AugmentedMaterialTransformer.transform(material);
+			material = AugmentedMaterial.transform(material);
 			
 			let sphere = new Mesh(new SphereGeometry(), material);
 			sphere.receiveShadow = true;
@@ -64,14 +68,9 @@ import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicM
 	};
 
 	renderer.onFrame = function(time: number, renderer: ARRenderer) {
-		if (renderer.xrDepth.length > 0) {
-			if (material === null) {
-				material = new AugmentedBasicMaterial(texture, renderer.xrDepth[0]);
-				box.material = material;
-			} else {
-				material.updateMaterial(renderer);
-			}
-		}
+		// if (renderer.xrDepth.length > 0) {
+		// 	material.updateMaterial(renderer);
+		// }
 		// box.rotation.x += 0.01;
 	};
 

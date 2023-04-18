@@ -1,4 +1,4 @@
-import { ARRenderer } from "ARRenderer";
+import {ARRenderer} from "ARRenderer";
 import {DataTexture, Material, Matrix4, Shader, ShadowMaterial, Vector2, WebGLRenderer} from "three";
 
 /**
@@ -6,7 +6,7 @@ import {DataTexture, Material, Matrix4, Shader, ShadowMaterial, Vector2, WebGLRe
  * 
  * The required code is injected into existing shader code.
  */
-export class AugmentedMaterialTransformer
+export class AugmentedMaterial
 {
 	/**
 	 * Create a augmented reality occlusion enabled material from a standard three.js material.
@@ -20,8 +20,7 @@ export class AugmentedMaterialTransformer
 	{
 		material.userData = {
 			uDepthTexture: {value: new DataTexture()},
-			uWidth: {value: 1.0},
-			uHeight: {value: 1.0},
+			uResolution: {value: new Vector2(1, 1)},
 			uUvTransform: {value: new Matrix4()},
 			uOcclusionEnabled: {value: true},
 			uRawValueToMeters: {value: 0.0}
@@ -64,7 +63,7 @@ export class AugmentedMaterialTransformer
 			// Fragment depth logic
 
 			shader.fragmentShader = shader.fragmentShader.replace("void main",
-			`
+				`
 			const highp float kMaxDepthInMeters = 8.0;
 			const float kInvalidDepthThreshold = 0.01;
 			
@@ -158,7 +157,8 @@ export class AugmentedMaterialTransformer
 	 */
 	public static updateUniforms(renderer: ARRenderer): void
 	{
-		if (renderer.xrViews.length > 0 && renderer.xrDepth.length > 0) {
+		if (renderer.xrViews.length > 0 && renderer.xrDepth.length > 0) 
+		{
 			const depthData = renderer.xrDepth[0];
 			const view = renderer.xrViews[0];
 
@@ -173,10 +173,16 @@ export class AugmentedMaterialTransformer
 				{
 					console.log('enva-xr: Material to be updated', child.material);
 
-					child.material.shader.uniforms.uDepthTexture.value = renderer.depthTexture;
-					child.material.shader.uniforms.uResolution.value.set(viewport.width, viewport.height);
-					child.material.shader.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
-					child.material.shader.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
+					const uniforms = child.material.shader.uniforms;
+
+					if (renderer.depthTexture && renderer.depthTexture !== uniforms.uDepthTexture.value) 
+					{
+						uniforms.uDepthTexture.value = renderer.depthTexture;
+					}
+
+					uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
+					uniforms.uResolution.value.set(viewport.width, viewport.height);
+					uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
 					child.material.needsUpdate = true;
 				}
 			});

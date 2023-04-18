@@ -1,4 +1,4 @@
-export {AugmentedMaterialTransformer} from "./material/AugmentedMaterialTransformer";
+export {AugmentedMaterial} from "./material/AugmentedMaterial";
 export {AugmentedBasicMaterial} from "./material/AugmentedBasicMaterial";
 
 export {Angle} from "./object/Angle";

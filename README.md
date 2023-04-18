@@ -1,20 +1,22 @@
-# Environment-Aware WebXR Augmented Reality
+# Enva-XR - Environment Aware Augmented Reality
 
 - Web-based framework for environment-aware rendering and interaction in augmented reality based on [WebXR](https://www.w3.org/TR/webxr/) using [three.js](https://threejs.org/)
-- The framework implements realistic rendering of 3D objects, handles with geometry occlusions, matches the lighting of the environment, casts shadows, and provides physics interaction with real-world objects.
-- Target the web environment and have designed our solution to work on a vast range of devices as, monocular camera setups or devices with dedicated higher quality depth sensors.
-- Single application while being capable of obtaining over 20 frames per second even on middle-range devices.
-- [Demonstration video](https://www.youtube.com/watch?v=uFTV4o01338) of the features in the framework.
-- Based on the experimental [WebXR AR](https://immersive-web.github.io/webxr-ar-module/) draft  API available in Chrome 88+
+- The framework handles  geometry occlusions, matches the lighting of the environment, casts shadows, and provides physics interaction with real-world objects.
+- Material from three.js can be reused the shader code required for AR occlusion is injected into the existing shaders using the `onBeforeCompile` callback.
+- Capable of obtaining over 20 frames per second even on middle-range devices.
+- [WebXR AR](https://immersive-web.github.io/webxr-ar-module/) features supported by the framework
   - [Lighting Estimation](https://immersive-web.github.io/lighting-estimation/)
   - [Depth Sensing Module](https://immersive-web.github.io/depth-sensing/)
-  - [Hit Test Module](https://immersive-web.github.io/hit-test/)
+  - [Hit Test](https://immersive-web.github.io/hit-test/)
+  - [DOM Overlay](https://immersive-web.github.io/dom-overlays/)
+  - [Anchors](https://immersive-web.github.io/anchors/)
+  - [Plane Detection](https://immersive-web.github.io/real-world-geometry/plane-detection.html)
 
 <img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/screenshot/a.jpg" width="133"><img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/screenshot/b.jpg" width="133"><img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/screenshot/f.jpg" width="133"><img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/screenshot/e.jpg" width="133"><img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/screenshot/c.jpg" width="133"><img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/screenshot/d.jpg" width="133">
 
 
 
-### Getting Started
+## Getting Started
 
 - Download the repository from git `gh repo clone tentone/enva-xr`
 - Install [Node](https://nodejs.org/en/) and [NPM](https://www.npmjs.com/).
@@ -22,28 +24,64 @@
 - Install dependencies from NPM by running `npm install` and start the code running `npm run start`
 
 
+## Usage
+
+ - Bellow is a simple usage example of the library the `ARRenderer` is responsible for most of the work required to setup the AR scene.
+ - The `ARRenderer` receives a configuration object that indicates wich WebXR features should be enabled.
+ - To enable AR rendering on existing `three.js` materials the `AugmentedMaterial` class should be used to transform regular materials into AR materials.
+ 
+
+``` typescript
+const renderer = new ARRenderer({
+  depthSensing: true,
+  depthTexture: true,
+  lightProbe: true
+});
+
+let loader = new TextureLoader();
+let texture = await loader.loadAsync('assets/texture/ball/color.jpg');
+
+let material: any = new MeshPhysicalMaterial({map: texture, color: (Math.random() * 0xFFFFFF)});
+material = AugmentedMaterial.transform(material);
+
+let box = new Mesh(new BoxGeometry(), material);
+box.receiveShadow = true;
+box.castShadow = true;
+renderer.scene.add(box);
+
+const probe = new LightProbe();
+renderer.scene.add(probe);
+
+const floor = new FloorPlane();
+renderer.scene.add(floor);
+
+renderer.onFrame = function(time: number, renderer: ARRenderer) {
+  box.rotation.x += 0.01;
+};
+
+renderer.start();
+```
 
 
-### Algorithms
 
-- To ensure consistency in the rendering of the virtual scene we implement a physically-based rendering pipeline.
+## Rendering
 
-- Physically correct attributes are associated with each 3D object that, combined with lighting information captured by the device, enables the rendering of AR content that matches the real-world illumination.
+- Depth data provided by WebXR can be used for occlusion in the 3D scene.
+- Occlusion is calculated in the shader code injected using the `AugmentedMaterial.transform()` method.
+- To enable realistic rendering of the scene the `MeshPhysicalMaterial` material should be used alonside PBR assets. 
 
-- Depth data provided by WebXR to dynamically place 3D objects around the environment, calculate geometry occlusion and build a model of the environment to enable physics interaction.
+<img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/rendering.png" width="600">
 
-- Calculate geometry occlusion on a pixel basis directly from the projected vertices coordinates to prevent loss in data precision 
 
-<img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/rendering.png" width="800">
+## Physics
 
-- To reuse the PBR pipeline of three.js we inject our code into the existing shaders generated by the library using the `onBeforeCompile` method of the material.
-- We use the [cannon.js](https://schteppe.github.io/cannon.js/) physics simulation engine for all physics interactions.
+- [cannon.js](https://schteppe.github.io/cannon.js/) can be used for physics interaction between objects
 - The environment is mapped using a probabilistic voxel based model that is updated every frame.
+- To enable physics simulation `VoxelEnvironment` can be used.
+- Currently performance is limited might be improved using [WebXR Real World Geometry](https://github.com/immersive-web/real-world-geometry) API
 
-<img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/physics.png" width="750">
+<img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/physics.png" width="600">
 
-
-
-### License
+## License
 
 - The code from the project is MIT licensed. The license is available on the project repository,

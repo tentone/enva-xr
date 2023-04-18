@@ -1,4 +1,5 @@
 import {BufferGeometry, BufferAttribute, Vector3, Group, Mesh, ShadowMaterial, Material, MeshBasicMaterial} from "three";
+import {AugmentedMaterial} from "material/AugmentedMaterial";
 import {ARRenderer} from "../ARRenderer";
 import {ARObject} from "./ARObject";
 
@@ -70,8 +71,7 @@ export class Planes extends Group implements ARObject
 		super();
 
 		this.material = new ShadowMaterial({opacity: 0.5});
-		// this.material = new MeshBasicMaterial({opacity: 0.1, transparent: true, color: 0xFF0000});
-		// this.material = AugmentedMaterial.transform(this.material, this.depthDataTexture);
+		this.material = AugmentedMaterial.transform(this.material);
 	}
 
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) 
@@ -79,7 +79,6 @@ export class Planes extends Group implements ARObject
 		// @ts-ignore
 		if (frame.detectedPlanes) 
 		{
-
 			// Delete planes that are no longer visible
 			this.planes.forEach((planeData: PlaneData, plane: any) => 
 			{

@@ -1,8 +1,7 @@
 import {ShaderMaterial, Matrix4, Texture, DataTexture, Vector2} from "three";
+import {ARRenderer} from "../ARRenderer";
 import AugmentedBasicMaterialFragment from "./AugmentedBasicMaterialFragment.glsl";
 import AugmentedBasicMaterialVertex from "./AugmentedBasicMaterialVertex.glsl";
-import { ARRenderer } from "../ARRenderer";
-import { DepthDataTexture } from "../texture/DepthDataTexture";
 
 /**
  * Shader material used to combine virtual and real scene with depth blending.
@@ -16,22 +15,23 @@ export class AugmentedBasicMaterial extends ShaderMaterial
 	 */
 	public texture: Texture = null;
 
-	public constructor(texture: Texture, depthData: XRDepthInformation)
+	
+	public constructor(texture: Texture)
 	{
 		super({
 			uniforms: {
 				uRawValueToMeters: {value: 0.001},
 				uTexture: {value: texture},
-				uDepthTexture: {value: new DepthDataTexture(depthData)},
-				uResolution: {value: new Vector2(100, 100)},
+				uDepthTexture: {value: new DataTexture()},
+				uResolution: {value: new Vector2(1, 1)},
 				uUvTransform: {value: new Matrix4()}
 			},
 			vertexShader: AugmentedBasicMaterialVertex,
 			fragmentShader: AugmentedBasicMaterialFragment,
 			depthTest: true,
-	    	depthWrite: true
+			depthWrite: true
 		});
-
+		
 		this.texture = texture;
 	}
 
@@ -40,15 +40,21 @@ export class AugmentedBasicMaterial extends ShaderMaterial
 	 * 
 	 * Must be called every frame before rending the scene.
 	 */
-	public updateMaterial(renderer: ARRenderer): void {
-		if (renderer.xrViews.length > 0 && renderer.xrDepth.length > 0) {
+	public updateMaterial(renderer: ARRenderer): void 
+	{
+		if (renderer.xrViews.length > 0 && renderer.xrDepth.length > 0) 
+		{
 			const depthData = renderer.xrDepth[0];
 			const view = renderer.xrViews[0];
 
 			const baseLayer = renderer.xrSession.renderState.baseLayer;
 			const viewport = baseLayer.getViewport(view);
 
-			this.uniforms.uDepthTexture.value.updateDepth(depthData);
+			if (renderer.depthTexture && renderer.depthTexture !== this.uniforms.uDepthTexture.value) 
+			{
+				this.uniforms.uDepthTexture.value = renderer.depthTexture;
+			}
+			
 			this.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
 			this.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
 			this.uniforms.uResolution.value.set(viewport.width, viewport.height);
@@ -58,5 +64,4 @@ export class AugmentedBasicMaterial extends ShaderMaterial
 		}
 
 	}
-
 }

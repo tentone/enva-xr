@@ -3,7 +3,7 @@ import {DepthDataTexture} from "./texture/DepthDataTexture";
 import {ARObject} from "./object/ARObject";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
 import {EventManager} from "./utils/EventManager";
-import {AugmentedMaterialTransformer} from "./material/AugmentedMaterialTransformer";
+import {AugmentedMaterial} from "./material/AugmentedMaterial";
 
 /**
  * Configuration of the AR renderer.
@@ -13,9 +13,9 @@ import {AugmentedMaterialTransformer} from "./material/AugmentedMaterialTransfor
 export class ARRendererConfig 
 {
 	/**
-	 * If true webgl2 is used instead of webgl1.
+	 * If true webgl 2 is used instead of webgl 1.
 	 */
-	public useWebGL2 = false;
+	public useWebGL2? = false;
 
 	/**
 	 * The front-facing camera API enables AR experiences to express their preference to use a front-facing (or "selfie") camera when creating immersive sessions.
@@ -26,7 +26,7 @@ export class ARRendererConfig
 	 * 
 	 * More information about the feature https://github.com/immersive-web/front-facing-camera/blob/main/explainer.md
 	 */
-	public frontFacing = false;
+	public frontFacing? = false;
 
 	/**
 	 * DOM overlay will create a DOM container to place custom HTML elements in the screen.
@@ -35,38 +35,38 @@ export class ARRendererConfig
 	 * 
 	 * Can be used alongside CSS 3D to have HTML element following the environment.
 	 */
-	public domOverlay = true;
+	public domOverlay? = false;
 
 	/**
 	 * Hit test allow the user to ray cast into real-wolrd depth data.
 	 * 
 	 * Useful for interaction, object placement, etc. 
 	 */
-	public hitTest = false;
+	public hitTest? = false;
 
 	/**
 	 * Lighting probe allow the system to check environment ligthing.
 	 * 
 	 * Tracks the intensity direction and color of the main light source.
 	 */
-	public lightProbe = false;
+	public lightProbe? = false;
 
 	/**
 	 * Reflection cube map allow the obtain visual information of the user surrondings.
 	 */
-	public reflectionCubeMap = false;
+	public reflectionCubeMap? = false;
 
 	/**
 	 * Depth information captured from the environment.
 	 */
-	public depthSensing = true;
+	public depthSensing? = false;
 
 	/**
 	 * Provide a texture with the depth data captured by the system.
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthTexture = true;
+	public depthTexture? = false;
 
 	/**
 	 * Provide a canvas texture with depth information.
@@ -75,7 +75,7 @@ export class ARRendererConfig
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthCanvasTexture = false;
+	public depthCanvasTexture? = false;
 }
 
 /**
@@ -220,7 +220,7 @@ export class ARRenderer
 	 */
 	public event: EventManager = new EventManager();
 
-	public constructor()
+	public constructor(config: ARRendererConfig = {})
 	{
 		if (!navigator.xr) 
 		{
@@ -232,6 +232,7 @@ export class ARRenderer
 			throw new Error("WebXR is not available trough HTTP.");
 		}
 
+		Object.setPrototypeOf(this.config, config);
 		this.domContainer = this.createDOMContainer();
 	}
 
@@ -546,7 +547,8 @@ export class ARRenderer
 		{
 			try 
 			{
-				if (this.canvas.parentElement) {
+				if (this.canvas.parentElement) 
+				{
 					this.canvas.parentElement.removeChild(this.canvas);
 				}
 			}
@@ -595,7 +597,8 @@ export class ARRenderer
 
 		// Update camera aspect ratio
 		const aspectRatio = this.resolution.x / this.resolution.y;
-		if (this.camera.aspect !== aspectRatio) {
+		if (this.camera.aspect !== aspectRatio) 
+		{
 			this.camera.aspect = aspectRatio;
 			this.camera.updateProjectionMatrix();
 		}
@@ -632,9 +635,8 @@ export class ARRenderer
 							{
 								if (!this.depthCanvasTexture) 
 								{
-									const canvas = this.createDebugCanvas(depthData);
-									
-									//const canvas = new OffscreenCanvas(depthData.width, depthData.height);
+									// const canvas = this.createDebugCanvas(depthData);
+									const canvas = new OffscreenCanvas(depthData.width, depthData.height);
 									this.depthCanvasTexture = new DepthCanvasTexture(canvas);
 								}
 								
@@ -647,7 +649,7 @@ export class ARRenderer
 							}
 						}
 
-						if (this.config.depthCanvasTexture) 
+						if (this.config.depthTexture) 
 						{
 							// @ts-ignore
 							if (depthData instanceof XRCPUDepthInformation) 
@@ -670,7 +672,7 @@ export class ARRenderer
 						}
 
 						// Update uniforms of XR materials
-						AugmentedMaterialTransformer.updateUniforms(this);
+						AugmentedMaterial.updateUniforms(this);
 					}
 				}
 			}
@@ -702,25 +704,28 @@ export class ARRenderer
 	 * 
 	 * @param depthData Depth data to calculate the size of the canvas element.
 	 */
-	public createDebugCanvas(depthData: XRDepthInformation, scale: number = 1.5): HTMLCanvasElement {
+	public createDebugCanvas(depthData: XRDepthInformation, scale = 1.5): HTMLCanvasElement 
+	{
 		const canvas = document.createElement('canvas');
 		canvas.style.position = "absolute";
 		canvas.style.display = "block";
 		canvas.style.bottom = "5px";
 		canvas.style.left = "5px";
-		canvas.style.width = (depthData.width * scale) + "px";
-		canvas.style.height = (depthData.height * scale) + "px";
+		canvas.style.width = depthData.width * scale + "px";
+		canvas.style.height = depthData.height * scale + "px";
 		canvas.width = depthData.width;
 		canvas.height = depthData.height;
 
 		// Check device rotation and depth rotation
 		const devicePortrait = window.innerHeight / window.innerWidth > 1.0;
 		const depthPortrait = depthData.height / depthData.width > 1.0;
-		if (devicePortrait !== depthPortrait) {
+		if (devicePortrait !== depthPortrait) 
+		{
 			canvas.style.rotate = "90deg";
 		}
 
-		if (this.config.domOverlay) {
+		if (this.config.domOverlay) 
+		{
 			this.domContainer.appendChild(canvas);
 		}
 

@@ -32,7 +32,8 @@ export class DepthCanvasTexture extends CanvasTexture
 	 * @param depth Normalized depth value.
 	 * @returns Colorized depth using the turbo color map.
 	 */
-	public static turboColorMap(x: number): Vector3 {
+	public static turboColorMap(x: number): Vector3 
+	{
 		const kRedVec4 = new Vector4(0.55305649, 3.00913185, -5.46192616, -11.11819092);
 		const kGreenVec4 = new Vector4(0.16207513, 0.17712472, 15.24091500, -36.50657960);
 		const kBlueVec4 = new Vector4(-0.05195877, 5.18000081, -30.94853351, 81.96403246);

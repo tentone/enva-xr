@@ -2,7 +2,7 @@ import {Vector3, Mesh, Scene, Matrix4, Euler} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import {Body, World} from "cannon-es";
 import {threeToCannon} from 'three-to-cannon';
-import {AugmentedMaterialTransformer} from "../material/AugmentedMaterialTransformer";
+import {AugmentedMaterial} from "../material/AugmentedMaterial";
 import {ObjectUtils} from "./ObjectUtils";
 
 /**
@@ -36,7 +36,7 @@ export class LoaderUtils
 				{
 					child.castShadow = true;
 					child.receiveShadow = true;
-					child.material = AugmentedMaterialTransformer.transform(child.material);
+					child.material = AugmentedMaterial.transform(child.material);
 				}
 			});
 
