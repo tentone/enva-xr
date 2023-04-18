@@ -1,13 +1,11 @@
 import {AmbientLight, BoxGeometry, DataTexture, LinearFilter, LuminanceAlphaFormat, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, SphereGeometry, TextureLoader, UnsignedByteType, Vector2, Vector3} from "three";
-import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicMaterial, DepthDataTexture} from "../src/Main";
+import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicMaterial, DepthDataTexture, AugmentedMaterialTransformer} from "../src/Main";
 
 (async function (): Promise<void> {
 	const renderer = new ARRenderer();
 
-	// let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-	// material = AugmentedMaterialTransformer.transform(material);
-
-	let material = null;
+	let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
+	material = AugmentedMaterialTransformer.transform(material);
 	
 	let loader = new TextureLoader();
 	let texture = await loader.loadAsync('assets/texture/ball/color.jpg');
@@ -15,8 +13,8 @@ import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicM
 	let box = new Mesh(new BoxGeometry(), new MeshBasicMaterial());
 	box.receiveShadow = true;
 	box.castShadow = true;
-	box.scale.setScalar(2.0);
-	box.position.set(0, 0, -3);
+	box.scale.setScalar(0.4);
+	box.position.set(0, 0, -2);
 	renderer.scene.add(box);
 
 	const ambient = new AmbientLight(0x111111);
@@ -31,8 +29,8 @@ import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicM
 	const floor = new FloorPlane();
 	renderer.scene.add(floor);
 
-	const ruler = new Measurement([new Vector3(0, 0, 0), new Vector3(1, 0, -2)]);
-	renderer.scene.add(ruler);
+	// const ruler = new Measurement([new Vector3(0, 0, 0), new Vector3(1, 0, -2)]);
+	// renderer.scene.add(ruler);
 
 	const cursor = new Cursor();
 	renderer.scene.add(cursor);
@@ -53,7 +51,7 @@ import {ARRenderer, Cursor, LightProbe, Measurement, FloorPlane, AugmentedBasicM
 	renderer.domContainer.ondblclick = function(event: MouseEvent) {
 		if (cursor.visible) {
 			let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-			// material = AugmentedMaterialTransformer.transform(material);
+			material = AugmentedMaterialTransformer.transform(material);
 			
 			let sphere = new Mesh(new SphereGeometry(), material);
 			sphere.receiveShadow = true;

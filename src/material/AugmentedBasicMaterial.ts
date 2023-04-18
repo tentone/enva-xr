@@ -41,17 +41,20 @@ export class AugmentedBasicMaterial extends ShaderMaterial
 	 * Must be called every frame before rending the scene.
 	 */
 	public updateMaterial(renderer: ARRenderer): void {
-		if (renderer.xrDepth.length > 0) {
+		if (renderer.xrViews.length > 0 && renderer.xrDepth.length > 0) {
 			const depthData = renderer.xrDepth[0];
-			const size = renderer.renderer.getSize(new Vector2());
-			
+			const view = renderer.xrViews[0];
+
+			const baseLayer = renderer.xrSession.renderState.baseLayer;
+			const viewport = baseLayer.getViewport(view);
+
 			this.uniforms.uDepthTexture.value.updateDepth(depthData);
 			this.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
 			this.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
-			this.uniforms.uResolution.value.set(size.x, size.y);
+			this.uniforms.uResolution.value.set(viewport.width, viewport.height);
 			this.uniformsNeedUpdate = true;
 
-			// console.log('enva-xr: Update uniforms material.', size, depthData);
+			// console.log('enva-xr: Update uniforms material.', renderer.resolution, viewport, depthData);
 		}
 
 	}

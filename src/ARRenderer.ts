@@ -394,7 +394,7 @@ export class ARRenderer
 		this.xrHitTestSource = null;
 		this.xrReferenceSpace = null;
 		this.xrGlBinding = null;
-		this.xrDepth = null;
+		this.xrDepth = [];
 		this.xrLightProbe = null;
 		this.xrReflectionCubeMap = null;
 		this.xrViewerPose = null;
@@ -452,6 +452,23 @@ export class ARRenderer
 		// console.log("enva-xr: Shadow type changed to " + this.renderer.shadowMap.type);
 	}
 
+	/**
+	 * Update the canvas and renderer size based on window size.
+	 */
+	public resize(): void
+	{
+		this.resolution.set(window.innerWidth, window.innerHeight);
+
+		this.camera.aspect = this.resolution.x / this.resolution.y;
+		this.camera.updateProjectionMatrix();
+
+		if (this.renderer && !this.renderer.xr.isPresenting) 
+		{
+			this.renderer.setSize(this.resolution.x, this.resolution.y);
+			this.renderer.setPixelRatio(window.devicePixelRatio);
+		}
+	}
+	
 	/**
 	 * Create and setup webglrenderer.
 	 * 
@@ -571,11 +588,17 @@ export class ARRenderer
 		{
 			return;
 		}
+		
 
-		this.renderer.getSize(this.resolution);
+		// Set resolution
+		// this.resolution.set(window.innerWidth, window.innerHeight);
 
-		this.camera.aspect = this.resolution.x / this.resolution.y;
-		this.camera.updateProjectionMatrix();
+		// Update camera aspect ratio
+		const aspectRatio = this.resolution.x / this.resolution.y;
+		if (this.camera.aspect !== aspectRatio) {
+			this.camera.aspect = aspectRatio;
+			this.camera.updateProjectionMatrix();
+		}
 
 		// Update viewer pose
 		this.xrViewerPose = frame.getViewerPose(this.xrReferenceSpace);
@@ -647,7 +670,7 @@ export class ARRenderer
 						}
 
 						// Update uniforms of XR materials
-						AugmentedMaterialTransformer.updateUniforms(this, depthData);
+						AugmentedMaterialTransformer.updateUniforms(this);
 					}
 				}
 			}

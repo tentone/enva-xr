@@ -114,15 +114,15 @@ export class AugmentedMaterialTransformer
 			if(uOcclusionEnabled)
 			{
 				// Normalize screen coordinates
-				vec4 screenUv = vec4((gl_FragCoord.x / uResolution.x), (gl_FragCoord.y / uResolution.x), 0.0, 1.0);
-				vec2 depthUv = (uUvTransform * screenUv).xy;
+				vec2 screenUv = vec2(1.0 - (-gl_FragCoord.x / uResolution.x + 1.0), -gl_FragCoord.y / uResolution.y + 1.0);
+				vec4 depthUv = uUvTransform * vec4(screenUv, 0.0, 1.0);
 				
 				// Calculate depth in meters
-				float depth = getDepthInMeters(uDepthTexture, depthUv);
+				float depth = getDepthInMeters(uDepthTexture, depthUv.xy);
 			
 				// Debug visualization
-				gl_FragColor = vec4(depthGetColorVisualization(depth), 1.0);
-				return;
+				// gl_FragColor = vec4(depthGetColorVisualization(depth), 1.0);
+				// return;
 
 				// Depth test
 				if (depth < vDepth)
@@ -156,25 +156,31 @@ export class AugmentedMaterialTransformer
 	 * @param scene - Scene to be updated, tarverses all objects and updates materials found.
 	 * @param depthData - Matrix obtained from AR depth from frame.getDepthInformation(view).
 	 */
-	public static updateUniforms(renderer: ARRenderer, depthData: XRDepthInformation): void
+	public static updateUniforms(renderer: ARRenderer): void
 	{
-		const size = renderer.renderer.getSize(new Vector2());
+		if (renderer.xrViews.length > 0 && renderer.xrDepth.length > 0) {
+			const depthData = renderer.xrDepth[0];
+			const view = renderer.xrViews[0];
 
-		// console.log('enva-xr: Renderer size.', size);
+			const baseLayer = renderer.xrSession.renderState.baseLayer;
+			const viewport = baseLayer.getViewport(view);
 
-		renderer.scene.traverse(function(child: any)
-		{
-			if (child.material && child.material.isAgumentedMaterial && child.material.shader)
+			// console.log('enva-xr: Renderer size.', size);
+
+			renderer.scene.traverse(function(child: any)
 			{
-				console.log('enva-xr: Material to be updated', child.material);
+				if (child.material && child.material.isAgumentedMaterial && child.material.shader)
+				{
+					console.log('enva-xr: Material to be updated', child.material);
 
-				child.material.shader.uniforms.uDepthTexture.value = renderer.depthTexture;
-				child.material.shader.uniforms.uResolution.value.set(size.x, size.y);
-				child.material.shader.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
-				child.material.shader.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
-				child.material.needsUpdate = true;
-			}
-		});
+					child.material.shader.uniforms.uDepthTexture.value = renderer.depthTexture;
+					child.material.shader.uniforms.uResolution.value.set(viewport.width, viewport.height);
+					child.material.shader.uniforms.uUvTransform.value.fromArray(depthData.normDepthBufferFromNormView.matrix);
+					child.material.shader.uniforms.uRawValueToMeters.value = depthData.rawValueToMeters;
+					child.material.needsUpdate = true;
+				}
+			});
+		}
 	}
 	
 }
