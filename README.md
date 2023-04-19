@@ -24,12 +24,13 @@
 - Install dependencies from NPM by running `npm install` and start the code running `npm run start`
 
 
-## Usage
+## Usage Example
 
  - Bellow is a simple usage example of the library the `ARRenderer` is responsible for most of the work required to setup the AR scene.
  - The `ARRenderer` receives a configuration object that indicates wich WebXR features should be enabled.
- - To enable AR rendering on existing `three.js` materials the `AugmentedMaterial` class should be used to transform regular materials into AR materials.
- 
+ - To enable AR rendering on existing `three.js` materials the `AugmentedMaterial.transform()` method should be used to transform regular materials into AR materials.
+ - The example bellow demonstrates how to create a simple AR scene with occlusion and lighting enabled.
+ - `LightProbe` object replicates the envornment lighting and position main light source position and direction. Internaly contains a three.js LightProbe and DirectionalLight with shadow casting enabled by default. 
 
 ``` typescript
 const renderer = new ARRenderer({
@@ -38,10 +39,7 @@ const renderer = new ARRenderer({
   lightProbe: true
 });
 
-let loader = new TextureLoader();
-let texture = await loader.loadAsync('assets/texture/ball/color.jpg');
-
-let material: any = new MeshPhysicalMaterial({map: texture, color: (Math.random() * 0xFFFFFF)});
+let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
 material = AugmentedMaterial.transform(material);
 
 let box = new Mesh(new BoxGeometry(), material);
@@ -75,9 +73,9 @@ renderer.start();
 
 ## Physics
 
-- [cannon.js](https://schteppe.github.io/cannon.js/) can be used for physics interaction between objects
-- The environment is mapped using a probabilistic voxel based model that is updated every frame.
-- To enable physics simulation `VoxelEnvironment` can be used.
+- [cannon.js](https://schteppe.github.io/cannon.js/) can be used for physics interaction between objects.
+- The  `VoxelEnvironment` provides a probabilistic voxel based model that maps the environment from depth data that is updated every frame.
+- Alternativelly physics can rely on plane detection using the `FloorPlane` or `Planes` objects.
 - Currently performance is limited might be improved using [WebXR Real World Geometry](https://github.com/immersive-web/real-world-geometry) API
 
 <img src="https://raw.githubusercontent.com/tentone/ar-occlusion/main/readme/physics.png" width="600">
