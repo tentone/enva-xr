@@ -3,16 +3,16 @@ import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial} from "../
 
 (async function (): Promise<void> {
 	const renderer = new ARRenderer({
-		depthSensing: true,
-		depthTexture: true,
-		lightProbe: true
+		depthSensing: false,
+		depthTexture: false,
+		lightProbe: false
 	});
 
 	let loader = new TextureLoader();
 	let texture = await loader.loadAsync('assets/texture/ball/color.jpg');
 
 	let material: any = new MeshPhysicalMaterial({map: texture, color: (Math.random() * 0xFFFFFF)});
-	material = AugmentedMaterial.transform(material);
+	// material = AugmentedMaterial.transform(material);
 
 	let box = new Mesh(new BoxGeometry(), material);
 	box.receiveShadow = true;
@@ -55,7 +55,7 @@ import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial} from "../
 	renderer.domContainer.ondblclick = function(event: MouseEvent) {
 		if (cursor.visible) {
 			let material: any = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-			material = AugmentedMaterial.transform(material);
+			// material = AugmentedMaterial.transform(material);
 			
 			let sphere = new Mesh(new SphereGeometry(), material);
 			sphere.receiveShadow = true;
