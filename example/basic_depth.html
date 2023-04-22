@@ -29,7 +29,7 @@
                     lightProbe: true
                 });
 
-                 let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
+                let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
                 material = AugmentedMaterial.transform(material);
 
                 let box = new Mesh(new BoxGeometry(), material);
