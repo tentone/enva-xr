@@ -1,5 +1,5 @@
-import {AmbientLight, BoxGeometry, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, SphereGeometry, TextureLoader, Vector2} from "three";
-import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedBasicMaterial, AugmentedMaterial} from "../src/Main";
+import {BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, TextureLoader, Vector2} from "three";
+import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial} from "../src/Main";
 
 (async function (): Promise<void> {
 	const renderer = new ARRenderer({
