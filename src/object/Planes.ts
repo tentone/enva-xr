@@ -1,5 +1,5 @@
 import {BufferGeometry, BufferAttribute, Vector3, Group, Mesh, ShadowMaterial, Material, MeshBasicMaterial} from "three";
-import {AugmentedMaterial} from "material/AugmentedMaterial";
+import {AugmentedMaterial} from "../material/AugmentedMaterial";
 import {ARRenderer} from "../ARRenderer";
 import {ARObject} from "./ARObject";
 

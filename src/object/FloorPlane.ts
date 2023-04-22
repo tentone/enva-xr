@@ -1,6 +1,6 @@
-import {Group, Matrix4, Mesh, PlaneGeometry, ShadowMaterial, MeshBasicMaterial, Material, Vector3} from "three";
+import {Group, Matrix4, Mesh, PlaneGeometry, ShadowMaterial, Material, Vector3} from "three";
 import {ARRenderer} from "ARRenderer";
-import {AugmentedMaterial} from "material/AugmentedMaterial";
+import {AugmentedMaterial} from "../material/AugmentedMaterial";
 import {ARObject} from "./ARObject";
 
 /**
