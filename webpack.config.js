@@ -4,8 +4,7 @@ export default {
 	mode: 'production',
 	entry: './src/Main.ts',
 	output: {
-		filename: 'build.js',
-		
+		filename: '[name].bundle.js',
 		path: path.resolve('./build'),
 	},
 	resolve: {

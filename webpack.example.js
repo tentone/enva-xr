@@ -1,43 +1,24 @@
 import path from 'path';
 import Webpack from 'webpack';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
-import CopyPlugin from 'copy-webpack-plugin';
 
 export default {
 	mode: 'development',
-	entry: ['./example/main.ts'],
+	entry: './src/Main.ts',
 	output: {
 		filename: '[name].bundle.js',
 		path: path.resolve("./build")
 	},
 	devServer: {
 		static: {
-			directory: path.join(__dirname, 'public'),
+			directory: path.join('.'),
 		},
 		compress: true,
 		hot: true,
 		port: 9000,
 	},
 	plugins: [
-		new CopyPlugin({
-			patterns: [
-				{
-					from: path.resolve("./assets"),
-					to: path.resolve("./build/assets"),
-					force: true
-				}
-			],
-			options: {concurrency: 100}
-		}),
-		new HtmlWebpackPlugin({
-			filename: 'index.html',
-			template: './example/index.html'
-		}),
 		new Webpack.HotModuleReplacementPlugin()
 	],
-	resolve: {
-		extensions: ['.ts', '.js', '.glsl'],
-	},
 	module: {
 		rules: [
 			{

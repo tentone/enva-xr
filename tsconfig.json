@@ -1,7 +1,4 @@
 {
-	"exclude": [
-		"node_modules"
-	],
 	"compilerOptions": {
 		"lib": [
 			"es2020",
@@ -33,5 +30,15 @@
 		"allowJs": true,
 		"esModuleInterop": true,
 		"importHelpers": false
-	}
+	},
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"example/**/*",
+		"node_modules/**/*",
+		"docs/**/*",
+		"build/**/*",
+		"assets/**/*",
+	]
 }
