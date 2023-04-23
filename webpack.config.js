@@ -2,10 +2,18 @@ import path from 'path';
 
 export default {
 	mode: 'production',
-	entry: './src/Main.ts',
+	entry: './src/enva.ts',
 	output: {
-		filename: '[name].bundle.js',
+		clean: true,
+		filename: 'enva.module.js',
 		path: path.resolve('./build'),
+		library: {
+			name: 'enva',
+			type: 'commonjs',
+		},
+	},
+	externals: {
+		three: 'three'
 	},
 	resolve: {
 		extensions: ['.ts', '.js', '.glsl'],

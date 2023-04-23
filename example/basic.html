@@ -14,13 +14,13 @@
 			{
 				"imports": {
 					"three": "./lib/three.module.js",
-					"enva-xr": "../build/build.js"
+					"enva": "../build/enva.module.js"
 				}
 			}
 		</script>
         <script type="module">
             import {BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, TextureLoader, Vector2} from "three";
-            import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial} from "enva-xr";
+            import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial} from "enva";
 
             (async function () {
                 const renderer = new ARRenderer({

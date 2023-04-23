@@ -10,8 +10,8 @@
     "lint-fix": "eslint --ext .ts --fix src"
   },
   "type": "module",
-	"main": "build/build.d.ts",
-	"module": "build/build.module.js",
+	"main": "build/enva.d.ts",
+	"module": "build/enva.module.js",
   "author": "Tentone",
   "license": "MIT",
   "keywords": [

@@ -7,7 +7,6 @@
 		"baseUrl": "./src",
 		"outDir": "build",
 		"target": "esnext",
-		"types": ["node"],
 		"module": "commonjs",
 		"newLine": "lf",
 		"sourceMap": true,
