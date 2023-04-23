@@ -22,4 +22,5 @@ export {ObjectUtils} from "./utils/ObjectUtils";
 export {XRManager} from "./utils/XRManager";
 export {LoaderUtils} from "./utils/LoaderUtils";
 
+export {ARRendererConfig} from './ARRendererConfig';
 export {ARRenderer} from './ARRenderer';
