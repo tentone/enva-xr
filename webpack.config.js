@@ -1,11 +1,12 @@
-const path = require('path');
+import path from 'path';
 
-module.exports = {
+export default {
 	mode: 'production',
-	entry: './src/main.ts',
+	entry: './src/Main.ts',
 	output: {
 		filename: 'build.js',
-		path: path.resolve(__dirname, 'build'),
+		
+		path: path.resolve('./build'),
 	},
 	resolve: {
 		extensions: ['.ts', '.js', '.glsl'],

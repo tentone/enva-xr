@@ -1,5 +1,5 @@
 import {Body, Shape, World} from "cannon-es";
-import {Vector3, Mesh, Quaternion, Matrix4, Material, BufferGeometry} from "three";
+import {Vector3, Mesh, Quaternion, Matrix4, Material, Scene, BufferGeometry, WebGLRenderer, Camera, Group} from "three";
 
 /**
  * Wrapper for cannon.js physics objects.

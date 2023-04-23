@@ -2,14 +2,16 @@
   "name": "enva-xr",
   "version": "0.0.2",
   "description": "Environment aware augmented reality rendering using WebXR",
-  "main": "src/Main.js",
   "scripts": {
-    "serve": "http-server . -S -p 8080",
+    "serve": "http-server . -S -p 9000",
     "build": "webpack --config ./webpack.config.js ",
     "build-example": "webpack --config ./webpack.example.js ",
     "start": "webpack-dev-server --config ./webpack.example.js --host 0.0.0.0 --https",
     "lint-fix": "eslint --ext .ts --fix src"
   },
+  "type": "module",
+	"main": "build/build.d.ts",
+	"module": "build/build.module.js",
   "author": "Tentone",
   "license": "MIT",
   "keywords": [
