@@ -24,23 +24,25 @@
 
             (async function () {
                 const renderer = new ARRenderer({
-                    depthSensing: true,
-                    depthTexture: true,
-                    lightProbe: true
+                    domOverlay: true,
+                    hitTest: true
                 });
 
-                let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-                material = AugmentedMaterial.transform(material);
+                let cursor = new Cursor();
+                renderer.scene.add(cursor);
 
-                let box = new Mesh(new BoxGeometry(), material);
-                box.receiveShadow = true;
-                box.castShadow = true;
-                box.scale.setScalar(0.4);
-                box.position.set(0, 0, -2);
-                renderer.scene.add(box);
-
-                renderer.onFrame = function(time, renderer) {
-                    box.rotation.x += 0.01;
+                renderer.domContainer.ondblclick = function(event) {
+                    if (cursor.visible) {
+                        let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
+                        
+                        let sphere = new Mesh(new SphereGeometry(), material);
+                        sphere.receiveShadow = true;
+                        sphere.castShadow = true;
+                        sphere.scale.setScalar(0.1);
+                        sphere.position.copy(cursor.position);
+                        sphere.position.y += sphere.scale.y / 2.0;
+                        renderer.scene.add(sphere);
+                    }
                 };
 
                 var button = document.getElementById("start");

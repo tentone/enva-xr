@@ -24,17 +24,12 @@
 
             (async function () {
                 const renderer = new ARRenderer({
-                    depthSensing: true,
-                    depthTexture: true,
-                    lightProbe: true
+                    domOverlay: true
                 });
 
                 let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-                material = AugmentedMaterial.transform(material);
 
                 let box = new Mesh(new BoxGeometry(), material);
-                box.receiveShadow = true;
-                box.castShadow = true;
                 box.scale.setScalar(0.4);
                 box.position.set(0, 0, -2);
                 renderer.scene.add(box);
