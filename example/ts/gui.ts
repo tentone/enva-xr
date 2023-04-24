@@ -1,11 +1,10 @@
 import {Vector3} from "three";
-import {Measurement} from "../src/object/Measurement";
+import {Measurement} from "../../src/enva";
 
 let x = 20;
 let y = 20;
 const w = 50;
 const h = 50;
-
 
 /**
  * Application user interface.

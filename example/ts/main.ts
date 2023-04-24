@@ -1,5 +1,5 @@
 import {BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, TextureLoader, Vector2} from "three";
-import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial} from "../src/Main";
+import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial} from "../../src/enva";
 
 (async function (): Promise<void> {
 	const renderer = new ARRenderer({

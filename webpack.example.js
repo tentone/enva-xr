@@ -4,6 +4,7 @@ import Config  from './webpack.config';
 
 export default Object.assign(Config, {
 	mode: 'development',
+	entry: path.resolve('./example/ts/main.ts'),
 	devServer: {
 		static: {
 			directory: path.join('.'),

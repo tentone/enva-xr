@@ -2,7 +2,7 @@ import path from 'path';
 
 export default {
 	mode: 'production',
-	entry: './src/enva.ts',
+	entry: path.resolve('./src/enva.ts'),
 	output: {
 		clean: true,
 		filename: 'enva.module.js',
