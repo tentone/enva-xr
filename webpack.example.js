@@ -1,6 +1,6 @@
 import path from 'path';
 import Webpack from 'webpack';
-import Config  from './webpack.config';
+import Config  from './webpack.config.js';
 
 export default Object.assign(Config, {
 	mode: 'development',
