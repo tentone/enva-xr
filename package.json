@@ -3,15 +3,19 @@
   "version": "0.0.2",
   "description": "Environment aware augmented reality rendering using WebXR",
   "scripts": {
-    "serve": "http-server . -S -p 9000",
-    "build": "webpack --config ./webpack.config.js ",
-    "build-example": "webpack --config ./webpack.example.js ",
-    "start": "webpack-dev-server --config ./webpack.example.js --host 0.0.0.0 --https",
+    "watch": "parcel watch",
+    "build": "parcel build",
+    "serve-webpack": "http-server . -S -p 9000 -o example/basic.html",
+    "build-webpack": "webpack --config ./webpack.config.js ",
+    "build-webpack-example": "webpack --config ./webpack.example.js ",
+    "start-webpack": "webpack-dev-server --config ./webpack.example.js --host 0.0.0.0 --https",
     "lint-fix": "eslint --ext .ts --fix src"
   },
   "type": "module",
-	"main": "build/enva.d.ts",
-	"module": "build/enva.module.js",
+  "source": "src/enva.ts",
+  "types": "dist/types.d.ts",
+  "module": "dist/module.js",
+  "main": "dist/main.js",
   "author": "Tentone",
   "license": "MIT",
   "keywords": [
@@ -20,8 +24,8 @@
     "webxr"
   ],
   "peerDependencies": {
-		"three": ">0.150.0"
-	},
+    "three": ">0.150.0"
+  },
   "dependencies": {
     "cannon-es": "0.20.0",
     "cannon-es-debugger": "1.0.0",
@@ -29,18 +33,21 @@
     "troika-three-text": "0.47.1"
   },
   "devDependencies": {
-    "three": "0.150.1",
+    "@parcel/transformer-glsl": "2.8.3",
+    "@parcel/transformer-typescript-types": "2.8.3",
     "@typescript-eslint/eslint-plugin": "5.57.0",
     "eslint": "8.11.0",
     "eslint-plugin-import": "2.25.4",
     "html-webpack-plugin": "5.5.0",
+    "http-server": "14.1.1",
+    "parcel": "2.8.3",
     "raw-loader": "4.0.2",
-    "ts-node": "10.9.1",
+    "three": "0.150.1",
     "ts-loader": "9.4.2",
+    "ts-node": "10.9.1",
     "typescript": "5.0.2",
     "webpack": "5.76.3",
     "webpack-cli": "5.0.1",
-    "webpack-dev-server": "4.13.1",
-    "http-server": "14.1.1"
+    "webpack-dev-server": "4.13.1"
   }
 }

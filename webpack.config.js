@@ -1,17 +1,9 @@
 import path from 'path';
 
-export default {
+export const Config = {
 	mode: 'production',
 	entry: path.resolve('./src/enva.ts'),
-	output: {
-		clean: true,
-		filename: 'enva.module.js',
-		path: path.resolve('./build'),
-		library: {
-			name: 'enva',
-			type: 'commonjs',
-		},
-	},
+	target: 'web',
 	externals: {
 		three: 'three'
 	},
@@ -32,3 +24,12 @@ export default {
 		]
 	}
 };
+
+export default Object.assign(structuredClone(Config), {
+	output: {
+		clean: true,
+		filename: 'enva.js',
+		path: path.resolve('./build'),
+		library: 'enva',
+	}
+});

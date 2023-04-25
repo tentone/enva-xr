@@ -3,7 +3,7 @@ import Webpack from 'webpack';
 import Config  from './webpack.config.js';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
-export default Object.assign(Config, {
+export default Object.assign(structuredClone(Config), {
 	mode: 'development',
 	entry: path.resolve('./example/ts/main.ts'),
 	devServer: {
