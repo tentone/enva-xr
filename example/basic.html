@@ -18,7 +18,7 @@
 			}
 		</script>
         <script type="module">
-            import {BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, TextureLoader, Vector2} from "three";
+            import {BoxGeometry, Mesh, MeshBasicMaterial, SphereGeometry, TextureLoader, Vector2} from "three";
             import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial} from "../src/enva.ts";
 
             (async function () {
@@ -26,7 +26,7 @@
                     domOverlay: true
                 });
 
-                let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
+                let material = new MeshBasicMaterial({color: (Math.random() * 0xFFFFFF)});
 
                 let box = new Mesh(new BoxGeometry(), material);
                 box.scale.setScalar(0.4);
@@ -34,7 +34,7 @@
                 renderer.scene.add(box);
 
                 renderer.onFrame = function(time, renderer) {
-                    box.rotation.x += 0.01;
+                    box.rotation.y += 0.01;
                 };
 
                 var button = document.getElementById("start");

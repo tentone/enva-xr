@@ -71,11 +71,15 @@ export class Planes extends Group implements ARObject
 		super();
 
 		this.material = new ShadowMaterial({opacity: 0.5});
-		this.material = AugmentedMaterial.transform(this.material);
 	}
 
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame) 
 	{
+		// @ts-ignore
+		if (renderer.config.depthDataTexture && !this.material.isAugmentedMaterial) {
+			this.material = AugmentedMaterial.transform(this.material);
+		}
+
 		// @ts-ignore
 		if (frame.detectedPlanes) 
 		{

@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "Environment aware augmented reality rendering using WebXR",
   "scripts": {
-    "start": "parcel example/basic.html --port 9000 --https",
+    "start": "parcel example/cursor.html --port 9000 --https",
     "watch": "parcel watch",
     "build": "parcel build",
     "serve": "http-server . -S -p 9000 -o example/basic.html",
@@ -12,7 +12,7 @@
   "type": "module",
   "targets": {
     "main": {
-      "includeNodeModules": ["troika-three-text", "three-to-cannon", "cannon-es", "cannon-es-debugger"]
+      "includeNodeModules": true
     }
   },
   "source": "src/enva.ts",

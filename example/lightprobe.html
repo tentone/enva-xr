@@ -18,21 +18,30 @@
 			}
 		</script>
         <script type="module">
-            import {BoxGeometry, Mesh, MeshBasicMaterial, SphereGeometry, TextureLoader, Vector2} from "three";
-            import {ARRenderer, Cursor} from "../src/enva.ts";
+            import {BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, TextureLoader, AmbientLight, Vector2} from "three";
+            import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial, FloorPlane} from "../src/enva.ts";
 
             (async function () {
                 const renderer = new ARRenderer({
                     domOverlay: true,
-                    hitTest: true
+                    hitTest: true,
+                    lightProbe: true
                 });
 
-                 let cursor = new Cursor();
+                renderer.scene.add(new AmbientLight(0x333333));
+
+                let lightProbe = new LightProbe();
+                renderer.scene.add(lightProbe);
+
+                let cursor = new Cursor();
                 renderer.scene.add(cursor);
+                
+                let floor = new FloorPlane();
+                renderer.scene.add(floor);
 
                 renderer.domContainer.ondblclick = function(event) {
                     if (cursor.visible) {
-                        let material = new MeshBasicMaterial({color: (Math.random() * 0xFFFFFF)});
+                        let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
                         
                         let sphere = new Mesh(new SphereGeometry(), material);
                         sphere.receiveShadow = true;

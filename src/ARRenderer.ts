@@ -161,7 +161,7 @@ export class ARRenderer
 			throw new Error("WebXR is not available trough HTTP.");
 		}
 
-		Object.setPrototypeOf(this.config, config);
+		Object.assign(this.config, config);
 		this.domContainer = this.createDOMContainer();
 	}
 

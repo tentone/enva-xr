@@ -27,7 +27,6 @@ export class FloorPlane extends Group implements ARObject
 		super();
 
 		this.material = new ShadowMaterial({opacity: 0.5});
-		this.material = AugmentedMaterial.transform(this.material);
 
 		this.mesh = new Mesh(new PlaneGeometry(100, 100, 1, 1), this.material);
 		this.mesh.rotation.set(-Math.PI / 2, 0, 0);
@@ -38,9 +37,14 @@ export class FloorPlane extends Group implements ARObject
 
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void 
 	{
+		// @ts-ignore
+		if (renderer.config.depthDataTexture && !this.material.isAugmentedMaterial) {
+			this.material = AugmentedMaterial.transform(this.material);
+		}
+
 		if (!renderer.config.hitTest) 
 		{
-			// console.warn('XR hit test source must be available for FloorPlane object. Check renderer configuration.');
+			throw new Error('XR hit test source must be available for FloorPlane object. Check renderer configuration.');
 		}
 
 		if (renderer.xrHitTestSource)
