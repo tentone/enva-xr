@@ -13,12 +13,12 @@ declare module "*.fs" {
 	export default value;
 }
 
-type XRLightProbe = any;
+export type XRLightProbe = any;
 
 
-type XRDepthInformation = any;
+export type XRDepthInformation = any;
 
-type XRCPUDepthInformation = {
+export type XRCPUDepthInformation = {
 	data: ArrayBuffer,
 	width: number,
 	height: number,
@@ -27,5 +27,5 @@ type XRCPUDepthInformation = {
 	getDepthInMeters: (x: number, y: number) => number,
 };
 
-type XRGPUDepthInformation = any;
-type XRWebGLDepthInformation = any;
+export type XRGPUDepthInformation = any;
+export type XRWebGLDepthInformation = any;

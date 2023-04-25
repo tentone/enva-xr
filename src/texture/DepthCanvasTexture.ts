@@ -1,4 +1,5 @@
 import {Box2, Box3, CanvasTexture, Matrix4, Vector2, Vector3, Vector4} from "three";
+import { XRCPUDepthInformation } from "types.js";
 
 /**
  * Canvas texture to stored depth data obtained from the WebXR API.

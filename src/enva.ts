@@ -1,5 +1,4 @@
 export {AugmentedMaterial} from "./material/AugmentedMaterial";
-export {AugmentedBasicMaterial} from "./material/AugmentedBasicMaterial";
 
 export {Angle} from "./object/Angle";
 export {BillboardGroup} from "./object/BillboardGroup";
@@ -22,5 +21,5 @@ export {ObjectUtils} from "./utils/ObjectUtils";
 export {XRManager} from "./utils/XRManager";
 export {LoaderUtils} from "./utils/LoaderUtils";
 
-export {ARRendererConfig} from './ARRendererConfig';
-export {ARRenderer} from './ARRenderer';
+export {ARRendererConfig} from './ARRendererConfig.ts';
+export {ARRenderer} from './ARRenderer.ts';

@@ -5,6 +5,7 @@ import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
 import {EventManager} from "./utils/EventManager";
 import {AugmentedMaterial} from "./material/AugmentedMaterial";
 import { ARRendererConfig } from "./ARRendererConfig";
+import { XRDepthInformation, XRLightProbe } from "types.js";
 
 /**
  * AR renderer is responsible for rendering the scene in AR environment.

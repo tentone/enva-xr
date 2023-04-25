@@ -1,4 +1,5 @@
-import {DataTexture, LuminanceAlphaFormat, LinearFilter, ClampToEdgeWrapping, UnsignedByteType, NearestFilter, RGFormat} from "three";
+import {DataTexture, LuminanceAlphaFormat, LinearFilter, ClampToEdgeWrapping, UnsignedByteType} from "three";
+import { XRCPUDepthInformation } from "types.js";
 
 /**
  * Stores the raw depth values in a 16 bit value packed texture.

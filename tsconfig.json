@@ -7,8 +7,9 @@
 		"baseUrl": "./src",
 		"outDir": "build",
 		"target": "esnext",
-		"module": "commonjs",
+		"module": "node16",
 		"newLine": "lf",
+		"allowImportingTsExtensions": true,
 		"sourceMap": true,
 		"inlineSourceMap": false,
 		"inlineSources": false,
@@ -39,5 +40,6 @@
 		"docs/**/*",
 		"build/**/*",
 		"assets/**/*",
+		"dist/**/*",
 	]
 }
