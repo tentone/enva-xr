@@ -1,11 +1,11 @@
 import {Vector2, WebGLRenderer, Scene, PerspectiveCamera, PCFSoftShadowMap, Object3D, ShadowMapType, Raycaster, Intersection} from "three";
+import {XRDepthInformation, XRLightProbe} from "types.js";
 import {DepthDataTexture} from "./texture/DepthDataTexture";
 import {ARObject} from "./object/ARObject";
 import {DepthCanvasTexture} from "./texture/DepthCanvasTexture";
 import {EventManager} from "./utils/EventManager";
 import {AugmentedMaterial} from "./material/AugmentedMaterial";
-import { ARRendererConfig } from "./ARRendererConfig";
-import { XRDepthInformation, XRLightProbe } from "types.js";
+import {ARRendererConfig} from "./ARRendererConfig";
 
 /**
  * AR renderer is responsible for rendering the scene in AR environment.
