@@ -3,13 +3,18 @@
   "version": "0.0.2",
   "description": "Environment aware augmented reality rendering using WebXR",
   "scripts": {
-    "start": "parcel example/basic.html --https",
+    "start": "parcel example/basic.html --port 9000 --https",
     "watch": "parcel watch",
     "build": "parcel build",
     "serve": "http-server . -S -p 9000 -o example/basic.html",
     "lint-fix": "eslint --ext .ts --fix src"
   },
   "type": "module",
+  "targets": {
+    "main": {
+      "includeNodeModules": ["troika-three-text", "three-to-cannon", "cannon-es", "cannon-es-debugger"]
+    }
+  },
   "source": "src/enva.ts",
   "types": "dist/types.d.ts",
   "module": "dist/module.js",
@@ -25,13 +30,14 @@
     "three": ">0.150.0"
   },
   "dependencies": {
+    "three": "0.150.1",
     "cannon-es": "0.20.0",
     "cannon-es-debugger": "1.0.0",
     "three-to-cannon": "4.3.0",
     "troika-three-text": "0.47.1"
   },
   "devDependencies": {
-    "@parcel/packager-ts": "^2.8.3",
+    "@parcel/packager-ts": "2.8.3",
     "@parcel/transformer-glsl": "2.8.3",
     "@parcel/transformer-typescript-tsc": "2.8.3",
     "@parcel/transformer-typescript-types": "2.8.3",
@@ -40,10 +46,7 @@
     "eslint-plugin-import": "2.25.4",
     "http-server": "14.1.1",
     "parcel": "2.8.3",
-    "process": "^0.11.10",
-    "three": "0.150.1",
-    "ts-loader": "9.4.2",
-    "ts-node": "10.9.1",
+    "process": "0.11.10",
     "typescript": "5.0.2"
   }
 }

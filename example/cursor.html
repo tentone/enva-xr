@@ -10,16 +10,9 @@
 			Start AR
 		</button>
         <script async src="./lib/es-module-shims.js"></script>
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "./lib/three.module.js"
-				}
-			}
-		</script>
         <script type="module">
             import {BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, TextureLoader, Vector2} from "three";
-            import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial} from "enva";
+            import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial} from "../src/enva.ts";
 
             (async function () {
                 const renderer = new ARRenderer({

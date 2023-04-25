@@ -19,7 +19,6 @@ export {DepthDataTexture} from "./texture/DepthDataTexture";
 export {MathUtils} from "./utils/MathUtils";
 export {ObjectUtils} from "./utils/ObjectUtils";
 export {XRManager} from "./utils/XRManager";
-export {LoaderUtils} from "./utils/LoaderUtils";
 
-export {ARRendererConfig} from './ARRendererConfig.ts';
-export {ARRenderer} from './ARRenderer.ts';
+export {ARRendererConfig} from './ARRendererConfig';
+export {ARRenderer} from './ARRenderer';
