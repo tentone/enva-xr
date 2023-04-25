@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "description": "Environment aware augmented reality rendering using WebXR",
   "scripts": {
+    "start": "parcel example/basic.html --https",
     "watch": "parcel watch",
     "build": "parcel build",
     "serve": "http-server . -S -p 9000 -o example/basic.html",
@@ -39,6 +40,7 @@
     "eslint-plugin-import": "2.25.4",
     "http-server": "14.1.1",
     "parcel": "2.8.3",
+    "process": "^0.11.10",
     "three": "0.150.1",
     "ts-loader": "9.4.2",
     "ts-node": "10.9.1",
