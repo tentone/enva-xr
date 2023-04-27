@@ -1,4 +1,4 @@
-import {ARRenderer} from "ARRenderer";
+import {ARRenderer} from "../ARRenderer.ts";
 
 /**
  * Interface to indicate that the object is an AR object.

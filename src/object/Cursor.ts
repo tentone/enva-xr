@@ -1,7 +1,7 @@
 import {Mesh, MeshBasicMaterial, RingGeometry, CircleGeometry, BufferGeometry, Material, Matrix4} from "three";
-import {mergeBufferGeometries} from "three/examples/jsm/utils/BufferGeometryUtils";
-import {ARRenderer} from "ARRenderer";
-import {ARObject} from "./ARObject";
+import {mergeBufferGeometries} from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import {ARRenderer} from "../ARRenderer.ts";
+import {ARObject} from "./ARObject.ts";
 
 /**
  * Cursor is used to interfact with the environment.

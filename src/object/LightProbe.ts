@@ -1,6 +1,6 @@
 import {AmbientLightProbe, DirectionalLight, Group, Vector3} from "three";
-import {ARRenderer} from "ARRenderer";
-import {ARObject} from "./ARObject";
+import {ARRenderer} from "../ARRenderer.ts";
+import {ARObject} from "./ARObject.ts";
 
 /**
  * Light probe can be used to cast light the mirror the lighting conditions in real world.

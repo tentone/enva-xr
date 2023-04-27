@@ -1,7 +1,7 @@
 import {Group, Matrix4, Mesh, PlaneGeometry, ShadowMaterial, Material, Vector3} from "three";
-import {ARRenderer} from "ARRenderer";
-import {AugmentedMaterial} from "../material/AugmentedMaterial";
-import {ARObject} from "./ARObject";
+import {ARRenderer} from "../ARRenderer.ts";
+import {AugmentedMaterial} from "../material/AugmentedMaterial.ts";
+import {ARObject} from "./ARObject.ts";
 
 /**
  * Floor plane can be used for AR objects to cast shadows on.

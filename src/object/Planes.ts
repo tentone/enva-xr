@@ -1,7 +1,7 @@
-import {BufferGeometry, BufferAttribute, Vector3, Group, Mesh, ShadowMaterial, Material, MeshBasicMaterial} from "three";
-import {AugmentedMaterial} from "../material/AugmentedMaterial";
-import {ARRenderer} from "../ARRenderer";
-import {ARObject} from "./ARObject";
+import {BufferGeometry, BufferAttribute, Vector3, Group, Mesh, ShadowMaterial, Material} from "three";
+import {AugmentedMaterial} from "../material/AugmentedMaterial.ts";
+import {ARRenderer} from "../ARRenderer.ts";
+import {ARObject} from "./ARObject.ts";
 
 /**
  * Data of a specific plane being managed in the Planes object.
