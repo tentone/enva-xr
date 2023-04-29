@@ -34,7 +34,7 @@
 	},
 	"include": [
 		"src/**/*"
-	],
+, "example/LoaderUtils.ts"	],
 	"exclude": [
 		"example/**/*",
 		"node_modules/**/*",

@@ -2,8 +2,8 @@ import {Vector3, Mesh, Scene, Matrix4, Euler} from "three";
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader.js";
 import {Body, World} from "cannon-es";
 import {threeToCannon} from 'three-to-cannon';
-import {AugmentedMaterial} from "../material/AugmentedMaterial.ts";
-import {ObjectUtils} from "./ObjectUtils.ts";
+import {AugmentedMaterial} from "../src/material/AugmentedMaterial.js";
+import {ObjectUtils} from "../src/utils/ObjectUtils.js";
 
 /**
  * Loader utils contain auxiliary methods to load objects from file.
@@ -63,6 +63,7 @@ export class LoaderUtils
 			body.type = Body.STATIC;
 			body.position.set(object.position.x, object.position.y + size.y / 2, object.position.z);
 			body.velocity.set(0, 0, 0);
+			
 			// @ts-ignore
 			body.addShape(shape);
 			world.addBody(body);
