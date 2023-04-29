@@ -3,10 +3,10 @@
   "version": "0.0.2",
   "description": "Environment aware augmented reality rendering using WebXR",
   "scripts": {
-    "start": "parcel example/cursor.html --port 9000 --https",
+    "start": "parcel example/depth.html --port 9000 --https",
     "watch": "parcel watch",
     "build": "parcel build",
-    "serve": "http-server . -S -p 9000 -o example/basic.html",
+    "serve": "http-server . -S -p 9000 -o example/lightprobe.html",
     "lint-fix": "eslint --ext .ts --fix src"
   },
   "type": "module",

@@ -23,9 +23,11 @@
 
             (async function () {
                 const renderer = new ARRenderer({
-                    depthSensing: false,
-                    depthTexture: false,
-                    lightProbe: false
+                    depthSensing: true,
+                    depthTexture: true,
+                    lightProbe: false,
+                    domOverlay: false,
+                    hitTest: false
                 });
 
                 let loader = new TextureLoader();
@@ -44,20 +46,20 @@
                 const ambient = new AmbientLight(0x111111);
                 renderer.scene.add(ambient);
 
-                const probe = new LightProbe();
-                renderer.scene.add(probe);
+                // const probe = new LightProbe();
+                // renderer.scene.add(probe);
 
-                const planes = new Planes();
-                renderer.scene.add(planes);
+                // const planes = new Planes();
+                // renderer.scene.add(planes);
 
-                const floor = new FloorPlane();
-                renderer.scene.add(floor);
+                // const floor = new FloorPlane();
+                // renderer.scene.add(floor);
 
-                const ruler = new Measurement([new Vector3(0, 0, 0), new Vector3(1, 0, -2)]);
-                renderer.scene.add(ruler);
+                // const ruler = new Measurement([new Vector3(0, 0, 0), new Vector3(1, 0, -2)]);
+                // renderer.scene.add(ruler);
 
-                const cursor = new Cursor();
-                renderer.scene.add(cursor);
+                // const cursor = new Cursor();
+                // renderer.scene.add(cursor);
 
                 renderer.domContainer.onclick = function(event) {
                     const size = new Vector2(window.innerWidth, window.innerHeight);
@@ -72,20 +74,20 @@
                     }
                 };
 
-                renderer.domContainer.ondblclick = function(event) {
-                    if (cursor.visible) {
-                        let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
-                        material = AugmentedMaterial.transform(material);
+                // renderer.domContainer.ondblclick = function(event) {
+                //     if (cursor.visible) {
+                //         let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
+                //         material = AugmentedMaterial.transform(material);
                         
-                        let sphere = new Mesh(new SphereGeometry(), material);
-                        sphere.receiveShadow = true;
-                        sphere.castShadow = true;
-                        sphere.scale.setScalar(0.1);
-                        sphere.position.copy(cursor.position);
-                        sphere.position.y += sphere.scale.y / 2.0;
-                        renderer.scene.add(sphere);
-                    }
-                };
+                //         let sphere = new Mesh(new SphereGeometry(), material);
+                //         sphere.receiveShadow = true;
+                //         sphere.castShadow = true;
+                //         sphere.scale.setScalar(0.1);
+                //         sphere.position.copy(cursor.position);
+                //         sphere.position.y += sphere.scale.y / 2.0;
+                //         renderer.scene.add(sphere);
+                //     }
+                // };
 
                 renderer.onFrame = function(time, renderer) {
                     box.rotation.x += 0.01;
