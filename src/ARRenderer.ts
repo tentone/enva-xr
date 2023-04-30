@@ -208,6 +208,16 @@ export class ARRenderer
 			config.requiredFeatures.push("light-estimation");
 		}
 
+		if (this.config.imageTracking) 
+		{
+			if (!(this.config.imageTracking instanceof Array)) {
+				throw new Error("imageTracking must provide a list of images to be tracked.")
+			}
+
+			config.requiredFeatures.push('image-tracking');
+			config.trackedImages = this.config.imageTracking;
+		}
+
 		if (this.config.depthSensing) 
 		{
 			config.requiredFeatures.push("depth-sensing");

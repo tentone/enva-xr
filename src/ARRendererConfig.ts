@@ -70,4 +70,13 @@ export class ARRendererConfig
 	 * Automatically updated by the renderer every frame.
 	 */
 	public depthCanvasTexture? = false;
+
+	/**
+	 * Image tracking allows to use an image as reference to align the AR scene with the environemnt.
+	 * 
+	 * Must also provide an image as reference and the real-world size of the content of the image.
+	 *
+	 * More information about the feature https://github.com/immersive-web/marker-tracking/blob/main/explainer.md
+	 */
+	public imageTracking?: boolean | {trackableImages: {image: ImageBitmap, widthInMeters: number}[]} = false;
 }
