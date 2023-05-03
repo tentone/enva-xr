@@ -31,7 +31,7 @@
                 });
 
                 let loader = new TextureLoader();
-                let texture = await loader.loadAsync('assets/texture/ball/color.jpg');
+                let texture = await loader.loadAsync('./assets/texture/ball/color.jpg');
 
                 let material = new MeshPhysicalMaterial({map: texture, color: (Math.random() * 0xFFFFFF)});
                 material = AugmentedMaterial.transform(material);
