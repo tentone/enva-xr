@@ -30,10 +30,10 @@
                     hitTest: false
                 });
 
-                let loader = new TextureLoader();
-                let texture = await loader.loadAsync('./assets/texture/ball/color.jpg');
+                // let loader = new TextureLoader();
+                // let texture = await loader.loadAsync('./assets/texture/ball/color.jpg');
 
-                let material = new MeshPhysicalMaterial({map: texture, color: (Math.random() * 0xFFFFFF)});
+                let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
                 material = AugmentedMaterial.transform(material);
 
                 let box = new Mesh(new BoxGeometry(), material);
@@ -61,18 +61,18 @@
                 // const cursor = new Cursor();
                 // renderer.scene.add(cursor);
 
-                renderer.domContainer.onclick = function(event) {
-                    const size = new Vector2(window.innerWidth, window.innerHeight);
-                    const pos = new Vector2(event.clientX, event.clientY);
-                    const normalized = new Vector2((pos.x / size.x) * 2 - 1, (-pos.y / size.y) * 2 + 1);
+                // renderer.domContainer.onclick = function(event) {
+                //     const size = new Vector2(window.innerWidth, window.innerHeight);
+                //     const pos = new Vector2(event.clientX, event.clientY);
+                //     const normalized = new Vector2((pos.x / size.x) * 2 - 1, (-pos.y / size.y) * 2 + 1);
 
-                    console.log('enva-xr: Normalized coordinates', normalized, pos, size);
+                //     console.log('enva-xr: Normalized coordinates', normalized, pos, size);
 
-                    const intersections = renderer.raycast(normalized);
-                    if (intersections.length > 0) {
-                        console.log('enva-xr: Raycast results', intersections);
-                    }
-                };
+                //     const intersections = renderer.raycast(normalized);
+                //     if (intersections.length > 0) {
+                //         console.log('enva-xr: Raycast results', intersections);
+                //     }
+                // };
 
                 // renderer.domContainer.ondblclick = function(event) {
                 //     if (cursor.visible) {
