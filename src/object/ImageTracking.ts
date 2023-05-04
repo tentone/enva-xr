@@ -1,4 +1,4 @@
-import { Group } from "three";
+import { Group, Matrix4 } from "three";
 import { ARObject } from "./ARObject.ts";
 import { ARRenderer } from "ARRenderer.ts";
 
@@ -30,7 +30,6 @@ export class ImageTracking extends Group implements ARObject {
             throw new Error("Renderer configuration must have 'imageTracking' enabled.");
         }
         
-
         if (this.index > renderer.config.imageTracking.length) {
             throw new Error("Image tracking target not available check the index of tracker group.");
         }
@@ -48,6 +47,10 @@ export class ImageTracking extends Group implements ARObject {
                 const pose = frame.getPose(result.imageSpace, renderer.xrReferenceSpace);
                 
                 // TODO <ADD CODE TO SET THE TRANFORMS>
+                const matrix = new Matrix4();
+				matrix.fromArray(pose.transform.matrix);
+
+				this.position.setFromMatrixPosition(matrix);
             }
         }
     }
