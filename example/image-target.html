@@ -19,7 +19,7 @@
 		</script>
         <script type="module">
             import {BoxGeometry, Mesh, MeshBasicMaterial, SphereGeometry, TextureLoader, Vector2} from "three";
-            import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial, ImageUtils} from "../src/enva.ts";
+            import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial, ImageUtils, ImageTracking} from "../src/enva.ts";
 
             (async function () {
                 
@@ -32,18 +32,15 @@
                     ]
                 });
 
+                let tracker = new ImageTracking(0);
+                renderer.scene.add(tracker);
+                
                 let material = new MeshBasicMaterial({color: (Math.random() * 0xFFFFFF)});
 
                 let box = new Mesh(new BoxGeometry(), material);
                 box.scale.setScalar(0.4);
-                box.position.set(0, 0, -2);
-                renderer.scene.add(box);
-
-                
-
-                renderer.onFrame = function(time, renderer) {
-                    box.rotation.y += 0.01;
-                };
+                box.position.set(0, 0, 0);
+                tracker.add(box);
 
                 var button = document.getElementById("start");
                 button.onclick = () =>
