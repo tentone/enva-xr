@@ -210,8 +210,9 @@ export class ARRenderer
 
 		if (this.config.imageTracking) 
 		{
-			if (!(this.config.imageTracking instanceof Array)) {
-				throw new Error("imageTracking must provide a list of images to be tracked.")
+			if (!(this.config.imageTracking instanceof Array)) 
+			{
+				throw new Error("imageTracking must provide a list of images to be tracked.");
 			}
 
 			config.requiredFeatures.push('image-tracking');

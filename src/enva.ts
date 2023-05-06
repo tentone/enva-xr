@@ -8,7 +8,7 @@ export {PhysicsObject} from "./object/PhysicsObject";
 export {LightProbe} from "./object/LightProbe";
 export {FloorPlane} from "./object/FloorPlane";
 export {Planes, PlaneData} from "./object/Planes";
-export {ImageTracking} from "./object/ImageTracking"
+export {ImageTracking} from "./object/ImageTracking";
 
 export {VoxelBody} from "./physics/VoxelBody";
 export {VoxelEnvironment} from "./physics/VoxelEnvironment";

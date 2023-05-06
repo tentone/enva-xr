@@ -5,8 +5,7 @@
   "scripts": {
     "start": "parcel example/depth.html --port 9000 --https",
     "watch": "parcel watch",
-    "build": "parcel build",
-    "serve": "http-server . -S -p 9000 -o example/lightprobe.html",
+    "build": "parcel build example/basic.html",
     "lint-fix": "eslint --ext .ts --fix src"
   },
   "type": "module",

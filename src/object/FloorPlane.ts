@@ -38,7 +38,8 @@ export class FloorPlane extends Group implements ARObject
 	public beforeARUpdate(renderer: ARRenderer, time: number, frame: XRFrame): void 
 	{
 		// @ts-ignore
-		if (renderer.config.depthDataTexture && !this.material.isAugmentedMaterial) {
+		if (renderer.config.depthDataTexture && !this.material.isAugmentedMaterial) 
+		{
 			this.material = AugmentedMaterial.transform(this.material);
 		}
 
