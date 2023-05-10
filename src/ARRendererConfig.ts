@@ -9,7 +9,7 @@ export class ARRendererConfig
 	/**
 	 * If true webgl 2 is used instead of webgl 1.
 	 */
-	public useWebGL2? = false;
+	public useWebGL2?: boolean = false;
 
 	/**
 	 * The front-facing camera API enables AR experiences to express their preference to use a front-facing (or "selfie") camera when creating immersive sessions.
@@ -20,7 +20,7 @@ export class ARRendererConfig
 	 * 
 	 * More information about the feature https://github.com/immersive-web/front-facing-camera/blob/main/explainer.md
 	 */
-	public frontFacing? = false;
+	public frontFacing?: boolean = false;
 
 	/**
 	 * DOM overlay will create a DOM container to place custom HTML elements in the screen.
@@ -29,47 +29,49 @@ export class ARRendererConfig
 	 * 
 	 * Can be used alongside CSS 3D to have HTML element following the environment.
 	 */
-	public domOverlay? = false;
+	public domOverlay?: boolean = false;
 
 	/**
 	 * Hit test allow the user to ray cast into real-wolrd depth data.
 	 * 
 	 * Useful for interaction, object placement, etc. 
 	 */
-	public hitTest? = false;
+	public hitTest?: boolean = false;
 
 	/**
 	 * Lighting probe allow the system to check environment ligthing.
 	 * 
 	 * Tracks the intensity direction and color of the main light source.
 	 */
-	public lightProbe? = false;
+	public lightProbe?: boolean = false;
 
 	/**
 	 * Reflection cube map allow the obtain visual information of the user surrondings.
 	 */
-	public reflectionCubeMap? = false;
+	public reflectionCubeMap?: boolean = false;
 
 	/**
 	 * Depth information captured from the environment.
 	 */
-	public depthSensing? = false;
+	public depthSensing?: boolean = false;
 
 	/**
 	 * Provide a texture with the depth data captured by the system.
 	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthTexture? = false;
+	public depthTexture?: boolean = false;
 
 	/**
 	 * Provide a canvas texture with depth information.
 	 * 
 	 * Canvas texture is acessible on CPU, it is slower to update.
 	 * 
+	 * If set to debug a visible canvas is created in the DOM container of the renderer.
+	 * 
 	 * Automatically updated by the renderer every frame.
 	 */
-	public depthCanvasTexture? = false;
+	public depthCanvasTexture?: boolean | 'debug' = false;
 
 	/**
 	 * Image tracking allows to use an image as reference to align the AR scene with the environemnt.

@@ -575,8 +575,13 @@ export class ARRenderer
 							{
 								if (!this.depthCanvasTexture) 
 								{
-									// const canvas = this.createDebugCanvas(depthData);
-									const canvas = new OffscreenCanvas(depthData.width, depthData.height);
+									let canvas = null;
+									if (this.config.depthCanvasTexture === 'debug') {
+										canvas = this.createDebugCanvas(depthData);
+									} else {
+										canvas = new OffscreenCanvas(depthData.width, depthData.height);
+									}
+									
 									this.depthCanvasTexture = new DepthCanvasTexture(canvas);
 								}
 								

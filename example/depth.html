@@ -18,7 +18,7 @@
 			}
 		</script>
         <script type="module">
-            import {BoxGeometry, Mesh, MeshPhysicalMaterial, SphereGeometry, AmbientLight, TextureLoader, Vector2} from "three";
+            import {BoxGeometry, Mesh, MeshBasicMaterial, SphereGeometry, AmbientLight, TextureLoader, Vector2} from "three";
             import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial, Planes, Measurement} from "../src/enva.ts";
 
             (async function () {
@@ -27,13 +27,10 @@
                     depthTexture: true,
                     lightProbe: false,
                     domOverlay: false,
-                    hitTest: false
+                    hitTest: true
                 });
 
-                // let loader = new TextureLoader();
-                // let texture = await loader.loadAsync('./assets/texture/ball/color.jpg');
-
-                let material = new MeshPhysicalMaterial({color: (Math.random() * 0xFFFFFF)});
+                let material = new MeshBasicMaterial({color: (Math.random() * 0xFFFFFF)});
                 material = AugmentedMaterial.transform(material);
 
                 let box = new Mesh(new BoxGeometry(), material);
@@ -43,8 +40,8 @@
                 box.position.set(0, 0, -2);
                 renderer.scene.add(box);
 
-                const ambient = new AmbientLight(0x111111);
-                renderer.scene.add(ambient);
+                // const ambient = new AmbientLight(0x111111);
+                // renderer.scene.add(ambient);
 
                 // const probe = new LightProbe();
                 // renderer.scene.add(probe);
@@ -89,9 +86,9 @@
                 //     }
                 // };
 
-                renderer.onFrame = function(time, renderer) {
-                    box.rotation.x += 0.01;
-                };
+                // renderer.onFrame = function(time, renderer) {
+                //     box.rotation.x += 0.01;
+                // };
 
                 var button = document.getElementById("start");
                 button.onclick = () =>

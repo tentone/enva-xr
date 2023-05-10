@@ -171,7 +171,7 @@ export class AugmentedMaterial
 			{
 				if (child.material && child.material.isAgumentedMaterial && child.material.shader)
 				{
-					console.log('enva-xr: Material to be updated', child.material);
+					// console.log('enva-xr: Material to be updated', child.material);
 
 					const uniforms = child.material.shader.uniforms;
 
