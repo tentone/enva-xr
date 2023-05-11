@@ -29,16 +29,30 @@
                     domOverlay: false,
                     hitTest: true
                 });
+                
+                const geometry = new BoxGeometry();
 
-                let material = new MeshBasicMaterial({color: (Math.random() * 0xFFFFFF)});
-                material = AugmentedMaterial.transform(material);
+     
 
-                let box = new Mesh(new BoxGeometry(), material);
-                box.receiveShadow = true;
-                box.castShadow = true;
-                box.scale.setScalar(0.4);
-                box.position.set(0, 0, -2);
-                renderer.scene.add(box);
+                const spacing = 0.5;
+                const scale = 0.2;
+                for(let x = -5; x < 5; x++) {
+                    for(let y = -5; y < 5; y++) {
+                        let material = new MeshBasicMaterial({color: (Math.random() * 0xFFFFFF)});
+                        material = AugmentedMaterial.transform(material);
+
+                        let box = new Mesh(geometry, material);
+                        box.receiveShadow = true;
+                        box.castShadow = true;
+                        box.scale.setScalar(scale);
+                        box.position.set(x * spacing, 0, y * spacing);
+                        renderer.scene.add(box);
+                    }
+                }
+
+                
+
+    
 
                 // const ambient = new AmbientLight(0x111111);
                 // renderer.scene.add(ambient);

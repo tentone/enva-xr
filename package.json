@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "Environment aware augmented reality rendering using WebXR",
   "scripts": {
-    "start": "parcel example/depth-canvas.html --port 9000 --https",
+    "start": "parcel example/depth.html --port 9000 --https",
     "watch": "parcel watch",
     "build": "parcel build example/basic.html",
     "lint-fix": "eslint --ext .ts --fix src"
