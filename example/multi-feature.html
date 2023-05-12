@@ -18,7 +18,7 @@
 			}
 		</script>
         <script type="module">
-            import {BoxGeometry, Mesh, MeshBasicMaterial, SphereGeometry, AmbientLight, TextureLoader, Vector2} from "three";
+            import {BoxGeometry, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, SphereGeometry, AmbientLight, TextureLoader, Vector2} from "three";
             import {ARRenderer, Cursor, LightProbe, FloorPlane, AugmentedMaterial, Planes, Measurement} from "../src/enva.ts";
 
             (async function () {
@@ -40,8 +40,8 @@
                 box.position.set(0, 0, -2);
                 renderer.scene.add(box);
 
-                const ambient = new AmbientLight(0x111111);
-                renderer.scene.add(ambient);
+                // const ambient = new AmbientLight(0x111111);
+                // renderer.scene.add(ambient);
 
                 const probe = new LightProbe();
                 renderer.scene.add(probe);
