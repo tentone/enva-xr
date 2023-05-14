@@ -5,17 +5,37 @@
   "scripts": {
     "start": "parcel example/*.html --port 9000 --https",
     "watch": "parcel watch",
-    "build": "parcel build example/basic.html",
+    "build": "parcel build",
     "lint-fix": "eslint --ext .ts --fix src"
   },
   "type": "module",
   "targets": {
-    "main": {
+    "default": {
       "source": "src/enva.ts",
-      "includeNodeModules": true
+      "includeNodeModules": true,
+      "optimize": true,
+      "isLibrary": true
     },
-    "examples": {
-      "source": "example/*.html"
+    "example-basic": {
+      "source": "example/basic.html"
+    },
+    "example-cursor": {
+      "source": "example/cursor.html"
+    },
+    "example-depth-canvas": {
+      "source": "example/depth-canvas.html"
+    },
+    "example-depth": {
+      "source": "example/depth.html"
+    },
+    "example-image-target": {
+      "source": "example/image-target.html"
+    },
+    "example-light-probe": {
+      "source": "example/light-probe.html"
+    },
+    "example-multi-feature": {
+      "source": "example/multi-feature.html"
     }
   },
   "source": "src/enva.ts",
