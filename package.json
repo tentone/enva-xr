@@ -19,31 +19,31 @@
     },
     "example-basic": {
       "source": "example/basic.html",
-      "distDir": "./dist/examples"
+      "distDir": "./dist/examples/basic"
     },
     "example-cursor": {
       "source": "example/cursor.html",
-      "distDir": "./dist/examples"
+      "distDir": "./dist/examples/cursor"
     },
     "example-depth-canvas": {
       "source": "example/depth-canvas.html",
-      "distDir": "./dist/examples"
+      "distDir": "./dist/examples/depth-canvas"
     },
     "example-depth": {
       "source": "example/depth.html",
-      "distDir": "./dist/examples"
+      "distDir": "./dist/examples/depth"
     },
     "example-image-target": {
       "source": "example/image-target.html",
-      "distDir": "./dist/examples"
+      "distDir": "./dist/examples/image-target"
     },
     "example-light-probe": {
       "source": "example/light-probe.html",
-      "distDir": "./dist/examples"
+      "distDir": "./dist/examples/light-probe"
     },
     "example-multi-feature": {
       "source": "example/multi-feature.html",
-      "distDir": "./dist/examples"
+      "distDir": "./dist/examples/multi-feature"
     }
   },
   "source": "src/enva.ts",
