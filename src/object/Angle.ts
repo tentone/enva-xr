@@ -1,5 +1,4 @@
 import {BufferGeometry, Line, LineBasicMaterial, Matrix4, Vector3} from "three";
-import {Text} from "troika-three-text";
 
 /**
  * Represents a angle measurement between three points.
@@ -11,10 +10,6 @@ export class Angle extends Line
 	 */
 	public points: Vector3[];
 
-	/**
-	 * Text used to display the measurement value.
-	 */
-	public text: Text;
 
 	public constructor(points: Vector3[])
 	{
@@ -31,14 +26,6 @@ export class Angle extends Line
 
 
 		this.points = points;
-
-		this.text = new Text();
-		this.text.fontSize = 0.1;
-		this.text.color = 0xFFFFFF;
-		this.text.anchorX = "center";
-		this.text.anchorY = "middle";
-		this.text.rotation.set(Math.PI, Math.PI, Math.PI);
-		this.add(this.text);
 
 		this.updateText();
 	}
@@ -124,7 +111,6 @@ export class Angle extends Line
 	{
 		if (this.points.length < 3)
 		{
-			this.text.visible = false;
 			return;
 		}
 
@@ -135,10 +121,5 @@ export class Angle extends Line
 		}
 		center.divideScalar(this.points.length);
 
-		this.text.visible = true;
-		this.text.position.copy(center);
-		this.text.position.y += 0.1;
-		this.text.text = this.getAngle() + " deg";
-		this.text.sync();
 	}
 }

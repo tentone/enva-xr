@@ -1,5 +1,4 @@
 import {BufferGeometry, Event, Intersection, Line, Line3, LineBasicMaterial, Matrix4, Object3D, Raycaster, Vector3} from "three";
-import {Text} from "troika-three-text";
 
 /**
  * Represents a measurement from a point to another.
@@ -11,10 +10,10 @@ export class Measurement extends Line
 	 */
 	public points: Vector3[] = [];
 
-	/**
-	 * Text used to display the measurement value.
-	 */
-	public text: Text = new Text();
+	// /**
+	//  * Text used to display the measurement value.
+	//  */
+	// public text: Text = new Text();
 
 	/**
 	 * @param points - Points of the measurement, length must be 2.
@@ -34,13 +33,13 @@ export class Measurement extends Line
 
 		this.points = points;
 
-		this.text = new Text();
-		this.text.fontSize = 0.1;
-		this.text.color = 0xFFFFFF;
-		this.text.anchorX = "center";
-		this.text.anchorY = "middle";
-		this.text.rotation.set(Math.PI, Math.PI, Math.PI);
-		this.add(this.text);
+		// this.text = new Text();
+		// this.text.fontSize = 0.1;
+		// this.text.color = 0xFFFFFF;
+		// this.text.anchorX = "center";
+		// this.text.anchorY = "middle";
+		// this.text.rotation.set(Math.PI, Math.PI, Math.PI);
+		// this.add(this.text);
 
 		this.updateText();
 	}
@@ -92,10 +91,10 @@ export class Measurement extends Line
 		let distance = Math.round(this.points[0].distanceTo(this.points[1]) * 100);
 		let line = new Line3(this.points[0], this.points[1]);
 
-		line.getCenter(this.text.position);
-		this.text.position.y += 0.1;
+		// line.getCenter(this.text.position);
+		// this.text.position.y += 0.1;
 
-		this.text.text = distance + " cm";
-		this.text.sync();
+		// this.text.text = distance + " cm";
+		// this.text.sync();
 	}
 }

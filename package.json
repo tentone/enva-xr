@@ -1,6 +1,6 @@
 {
   "name": "enva-xr",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Environment aware augmented reality rendering using WebXR",
   "scripts": {
     "start": "parcel example/*.html --port 9000 --https",
@@ -14,28 +14,36 @@
       "source": "src/enva.ts",
       "includeNodeModules": true,
       "optimize": true,
-      "isLibrary": true
+      "isLibrary": true,
+      "distDir": "./dist"
     },
     "example-basic": {
-      "source": "example/basic.html"
+      "source": "example/basic.html",
+      "distDir": "./dist/examples"
     },
     "example-cursor": {
-      "source": "example/cursor.html"
+      "source": "example/cursor.html",
+      "distDir": "./dist/examples"
     },
     "example-depth-canvas": {
-      "source": "example/depth-canvas.html"
+      "source": "example/depth-canvas.html",
+      "distDir": "./dist/examples"
     },
     "example-depth": {
-      "source": "example/depth.html"
+      "source": "example/depth.html",
+      "distDir": "./dist/examples"
     },
     "example-image-target": {
-      "source": "example/image-target.html"
+      "source": "example/image-target.html",
+      "distDir": "./dist/examples"
     },
     "example-light-probe": {
-      "source": "example/light-probe.html"
+      "source": "example/light-probe.html",
+      "distDir": "./dist/examples"
     },
     "example-multi-feature": {
-      "source": "example/multi-feature.html"
+      "source": "example/multi-feature.html",
+      "distDir": "./dist/examples"
     }
   },
   "source": "src/enva.ts",
@@ -50,12 +58,12 @@
     "webxr"
   ],
   "peerDependencies": {
-    "three": ">0.150.0"
+    "three": ">0.150.0",
+    "cannon-es": ">0.20.0"
   },
   "dependencies": {
     "three": "0.152.2",
-    "cannon-es": "0.20.0",
-    "troika-three-text": "0.47.1"
+    "cannon-es": "0.20.0"
   },
   "devDependencies": {
     "@parcel/packager-ts": "2.8.3",
