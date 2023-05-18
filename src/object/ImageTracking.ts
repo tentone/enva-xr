@@ -52,7 +52,6 @@ export class ImageTracking extends Group implements ARObject
 				// Get the pose of the image relative to a reference space.
 				const pose = frame.getPose(result.imageSpace, renderer.xrReferenceSpace);
                 
-				// TODO <ADD CODE TO SET THE TRANFORMS>
 				const matrix = new Matrix4();
 				matrix.fromArray(pose.transform.matrix);
 

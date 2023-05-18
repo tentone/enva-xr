@@ -9,7 +9,7 @@ export class ImageUtils
      * 
      * @param src - Src of the image, can also be base64 data.
      */
-	public static loadImageBitmap(src: string): Promise<ImageBitmap> 
+	public static loadBitmap(src: string): Promise<ImageBitmap> 
 	{
 		return new Promise(function(resolve, reject) 
 		{

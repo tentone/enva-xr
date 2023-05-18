@@ -9,6 +9,9 @@
     "lint-fix": "eslint --ext .ts --fix src"
   },
   "type": "module",
+  "staticFiles": {
+    "staticPath": "assets"
+  },
   "targets": {
     "default": {
       "source": "src/enva.ts",
@@ -58,12 +61,12 @@
     "webxr"
   ],
   "peerDependencies": {
-    "three": ">0.150.0",
-    "cannon-es": ">0.20.0"
+    "cannon-es": ">0.20.0",
+    "three": ">0.150.0"
   },
   "dependencies": {
-    "three": "0.152.2",
-    "cannon-es": "0.20.0"
+    "cannon-es": ">0.20.0",
+    "three": ">0.150.0"
   },
   "devDependencies": {
     "@parcel/packager-ts": "2.8.3",
@@ -75,6 +78,7 @@
     "eslint-plugin-import": "2.25.4",
     "http-server": "14.1.1",
     "parcel": "2.8.3",
+    "parcel-reporter-static-files-copy": "^1.5.0",
     "process": "0.11.10",
     "typescript": "5.0.2"
   }
