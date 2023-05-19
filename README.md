@@ -22,7 +22,7 @@
 - Install [Node](https://nodejs.org/en/) and [NPM](https://www.npmjs.com/).
 - Ensure that your browser is compatible with WebXR and check features support (e.g. `depth-estimation`, `hit-test`, `lighting`).
 - Install dependencies from NPM by running `npm install` and start the code running `npm run start`
-
+- To allow easier debugging in mobile devices [eruda](https://github.com/liriliri/eruda) can be used as a development tools alternative.
 
 ## Usage Example
 

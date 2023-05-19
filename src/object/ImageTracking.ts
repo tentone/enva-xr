@@ -54,7 +54,8 @@ export class ImageTracking extends Group implements ARObject
                 
 				const matrix = new Matrix4();
 				matrix.fromArray(pose.transform.matrix);
-
+				
+				
 				this.position.setFromMatrixPosition(matrix);
 			}
 		}
