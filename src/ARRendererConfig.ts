@@ -80,5 +80,5 @@ export class ARRendererConfig
 	 *
 	 * More information about the feature https://github.com/immersive-web/marker-tracking/blob/main/explainer.md
 	 */
-	public imageTracking?: boolean | {trackableImages: {image: ImageBitmap, widthInMeters: number}[]} = false;
+	public imageTracking?: boolean | {image: ImageBitmap, widthInMeters: number}[] = false;
 }
