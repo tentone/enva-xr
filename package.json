@@ -1,12 +1,13 @@
 {
   "name": "enva-xr",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Environment aware augmented reality rendering using WebXR",
   "scripts": {
     "start": "parcel example/*.html --port 9000 --https",
     "watch": "parcel watch",
     "build": "parcel build",
-    "lint-fix": "eslint --ext .ts --fix src"
+    "lint-fix": "eslint --ext .ts --fix src",
+    "pub": "npm run build && npm publish --access public ."
   },
   "type": "module",
   "staticFiles": {
