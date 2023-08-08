@@ -4,3 +4,9 @@ package-lock.json
 build/
 
 .parcel-cache/
+
+dist/3d/
+
+dist/markers/
+
+dist/texture/
